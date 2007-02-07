@@ -186,7 +186,7 @@ include-dir:
 
 # Plugins:
 
-plugins: include-dir
+plugins:
 	for i in `ls $(PLUGINDIR)/src | grep -v '[^a-z0-9]'`; do\
 		$(MAKE) -C "$(PLUGINDIR)/src/$$i" all || exit 1 ;\
 	done
@@ -206,9 +206,12 @@ orig-plugins-make-by-vdr-dont-use-it: include-dir
 	if [ -n "$$noapiv" ] ; then echo; echo "*** plugins without APIVERSION:$$noapiv"; echo; fi;\
 	if [ -n "$$failed" ] ; then echo; echo "*** failed plugins:$$failed"; echo; fi
 
+plugins-clean: clean-plugins
+
 clean-plugins:
 	@for i in `ls $(PLUGINDIR)/src | grep -v '[^a-z0-9]'`; do $(MAKE) -C "$(PLUGINDIR)/src/$$i" clean; done
-	@-rm -f $(PLUGINDIR)/lib/lib*-*.so.$(APIVERSION)
+	@-rm -f $(PLUGINDIR)/lib/lib*
+	-rm -f .plugins-built
 
 # Install the files:
 
@@ -259,7 +262,6 @@ clean-vdr:
 	$(MAKE) -C $(LSIDIR) clean
 	$(MAKE) -C $(TXMLDIR) clean
 	-rm -f $(OBJS) $(DEPFILE) vdr genfontfile genfontfile.o core* *~
-	-rm -rf include
 	-rm -rf srcdoc
 	-rm -f .plugins-built
 
