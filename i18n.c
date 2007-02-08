@@ -6106,7 +6106,7 @@ const tI18nPhrase Phrases[] = {
     "Min. pauza mezi událostmi (min)",
   },
   { "Setup.Miscellaneous$Min. user inactivity (min)",
-    "VDR ausschalten bei Inaktivität (min)",
+    "Ausschalten bei Inaktivität (min)",
     "Najmanj¹i èas neaktivnosti (min)",
     "Periodo minimo di inattivita' (min)",
     "Minimum gebruikers inactiviteit (min)",
