@@ -210,8 +210,8 @@ plugins-clean: clean-plugins
 
 clean-plugins:
 	@for i in `ls $(PLUGINDIR)/src | grep -v '[^a-z0-9]'`; do $(MAKE) -C "$(PLUGINDIR)/src/$$i" clean; done
-	@-rm -f $(PLUGINDIR)/lib/lib*
-	-rm -f .plugins-built
+	@-rm -f $(PLUGINDIR)/lib/*
+	@-rm -f $(PLUGINDIR)/lib/.plugins-built
 
 # Install the files:
 
