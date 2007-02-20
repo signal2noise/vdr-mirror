@@ -6194,7 +6194,7 @@ const tI18nPhrase Phrases[] = {
     "Kanál po spu¹tìní",
   },
   { "Setup.Miscellaneous$Initial volume",
-    "Lautstärke beim Einschalten",
+    "Lautstärke beim Einschalten (0-255)",
     "Privzeta glasnost",
     "Volume iniziale",
     "",// TODO
