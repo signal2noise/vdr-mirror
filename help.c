@@ -7,9 +7,22 @@
 #include <stdio.h>
 
 #include "tinyxml/tinyxml.h"
-//#include "tinyxml.h"
 #include "submenu.h" // dynamicmenuEnt
 #include "help.h"
+
+
+#undef  DBG
+#undef  ERR
+#define DBG " DEGUB [help]: -- "
+#define ERR " ERROR [help]: -- "
+
+#ifdef DEBUG_HELP
+#  undef DLOG
+#  define DLOG(x...) dsyslog(x)
+#else
+# define DLOG(x...)
+#endif
+
 
 using std::string;
 
@@ -34,16 +47,16 @@ cHelpPage *cHelpSection::GetHelpByTitle(const char *Title) const
 
 void cHelpPages::DumpHelp()
 {
-  printf (" Dump HelpMenus \n");
+  DLOG (" Dump HelpMenus \n");
   for (cHelpSection *hs = HelpMenus.First();hs; hs=HelpMenus.Next(hs))
  {
-    printf ("\t +++ Section %s +++\n", hs->Section());
+    DLOG ("\t +++ Section %s +++\n", hs->Section());
     for (cHelpPage *hp = hs->First();hp; hp=hs->cList<cHelpPage>::Next(hp))
     {
-       printf ("\t\t -- Title %s\n", hp->Title());
+       DLOG ("\t\t -- Title %s\n", hp->Title());
     } 
   }
-  printf (" Dump HelpMenus End \n\n\n\n");
+  DLOG (" Dump HelpMenus End \n\n\n\n");
 }
 
 
@@ -59,13 +72,13 @@ bool cHelpPages::Load()
   HelpMenus.Add(s);
   
   std::string fileName =  setup::FileNameFactory("help");
-  printf (" Parse file %s \n", fileName.c_str());
+  DLOG (" Parse file %s \n", fileName.c_str());
   TiXmlDocument doc(fileName.c_str());
   ok = doc.LoadFile(); // args encoding
   
   if (ok)
   {
-    printf (" Load OK \n");
+    DLOG (" Load OK \n");
 
     TiXmlHandle docHandle( &doc);
     TiXmlHandle handleSection = docHandle.FirstChild("help").FirstChild("section");
@@ -74,8 +87,8 @@ bool cHelpPages::Load()
   else 
   {
     ok = false;
-    printf (" Error parsing %s : %s \n", fileName.c_str(), doc.ErrorDesc());
-    printf (" \t Col=%d Row=%d\n",doc.ErrorCol(), doc.ErrorRow());
+    DLOG (" Error parsing %s : %s \n", fileName.c_str(), doc.ErrorDesc());
+    DLOG (" \t Col=%d Row=%d\n",doc.ErrorCol(), doc.ErrorRow());
     esyslog(" Error parsing %s : %s ", fileName.c_str(), doc.ErrorDesc());
     esyslog(" Col=%d Row=%d\n",doc.ErrorCol(), doc.ErrorRow());
   }
@@ -92,7 +105,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
   TiXmlElement *elemSection = HandleSection.ToElement();
   if (!elemSection) 
   { 
-      //printf (" \t get Out ");
+      //DLOG (" \t get Out ");
       return; 
   }
 
@@ -101,7 +114,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
   
   for(; elemSection; elemSection=elemSection->NextSiblingElement("section"))
   {
-       //printf (" ping 1\n");
+       //DLOG (" ping 1\n");
        try 
        {
           const char *text =  NULL;
@@ -111,7 +124,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
           {
              section = attr->Value();
              text = elemSection->GetText();
-             //printf ("  %2d.) Get section: <%s> \n",Level, section);
+             //DLOG ("  %2d.) Get section: <%s> \n",Level, section);
           }
 
           // we have to parse each line for <br> resp. <br />
@@ -124,7 +137,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
              text = NULL;
              //TiXmlNode* paragraph = elemSection->FirstChild("p");
              TiXmlNode* nextLine = elemSection->FirstChild("br");
-             printf ("Text: [%s] \n", nextLine?"has <br />":"");
+             DLOG ("Text: [%s] \n", nextLine?"has <br />":"");
              for (; nextLine; nextLine = nextLine->NextSibling()) 
 			 {
                 if (nextLine->Type() == TiXmlNode::TEXT)
@@ -132,13 +145,13 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
                    text = NULL;
                    TiXmlText *pText = nextLine->ToText();
                    text = pText->Value(); 
-                   //printf( "Text: [%s] \n", text);
+                   //DLOG( "Text: [%s] \n", text);
                    //vText.push_back(string(text) +"\n");
                    vText.push_back(text);
                 }
                 else if (nextLine->Type() ==TiXmlNode::ELEMENT)
                 {
-                    printf (" is Element Node Val: %s \n", nextLine->Value());
+                    DLOG (" is Element Node Val: %s \n", nextLine->Value());
                     if (strstr(nextLine->Value(), "br") ==  nextLine->Value())
                         vText.push_back("\n");
                     else if (strstr(nextLine->Value(), "p") ==  nextLine->Value())
@@ -150,11 +163,12 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
                       {
                         TiXmlElement *e = nextLine->ToElement();
                         TiXmlAttribute *attr = e->FirstAttribute();
-                        const char *symbol = attr->Value();
-                        if (!symbol)
-                            symbol = " ";
 
                         string tmp("\n");
+                        const char *symbol = attr->Value();
+                        if (!symbol)
+                            string tmp("\n ");
+                        else 
                         tmp += symbol;
                         vText.push_back(tmp);
                       }
@@ -163,7 +177,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
 			 }
              /*
              TiXmlNode* paragraph = elemSection->FirstChild("p");
-             printf ("Text: [%s] \n", paragraph?"has <br />":"");
+             DLOG ("Text: [%s] \n", paragraph?"has <br />":"");
              for (; paragraph; paragraph = paragraph->NextSibling()) 
 			 {
                 if (paragraph->Type() == TiXmlNode::TEXT)
@@ -171,7 +185,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
                    text = NULL;
                    TiXmlText *pText = paragraph->ToText();
                    text = pText->Value(); 
-                   //printf( "Text: [%s] \n", text);
+                   //DLOG( "Text: [%s] \n", text);
                    vText.push_back(string(text) +"\n");
                 }
 			 } */
@@ -195,7 +209,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
               text = NULL;
               const char *title = nodePage->ToElement()->Attribute("title");
               const char *text = nodePage->ToElement()->GetText();
-              //printf ("\t  %2d.) page title: <%s>  \n",t, title);
+              //DLOG ("\t  %2d.) page title: <%s>  \n",t, title);
               if (text) vText.push_back(string(text) +"\n");
               TiXmlNode* nextLine = nodePage->FirstChild("br");
               for (; nextLine; nextLine = nextLine->NextSibling()) 
@@ -205,7 +219,7 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
                    text = NULL;
                    TiXmlText *pText = nextLine->ToText();
                    text = pText->Value(); 
-                   //printf( "Text: [%s] \n", text);
+                   //DLOG( "Text: [%s] \n", text);
                    vText.push_back(string(text) +"\n");
                 }
               }
@@ -237,15 +251,15 @@ void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level)
 
 cHelpPage *cHelpPages::GetByTitle(const char *Title) const
 {
-  //printf (" GetByTitle:  Title %s +++\n", Title);
+  //DLOG (" GetByTitle:  Title %s +++\n", Title);
   for (cHelpSection *hs = HelpMenus.First();hs; hs=HelpMenus.Next(hs))
   {
-    //printf ("\t parse HelpMenus:  Section %s +++\n", hs->Section());
+    //DLOG ("\t parse HelpMenus:  Section %s +++\n", hs->Section());
     for (cHelpPage *hp = hs->First();hp; hp=hs->cList<cHelpPage>::Next(hp))
     {
        if (strcmp(Title,hp->Title()) == 0)
        {
-           //printf("\t\t -- Title %s\n", hp->Title());
+           //DLOG("\t\t -- Title %s\n", hp->Title());
            return hp;
        }
     } 
@@ -256,16 +270,16 @@ cHelpPage *cHelpPages::GetByTitle(const char *Title) const
 cHelpSection *cHelpPages::GetSectionByTitle(const char *Title) const
 {
 
-  //printf (" GetSectioniByTitle:  Title %s +++\n", Title);
+  //DLOG (" GetSectioniByTitle:  Title %s +++\n", Title);
   for (cHelpSection *hs = HelpMenus.First();hs; hs=HelpMenus.Next(hs))
   {
-     // printf ("\t parse HelpMenus:  Section %s +++\n", hs->Section());
+     // DLOG ("\t parse HelpMenus:  Section %s +++\n", hs->Section());
 
     for (cHelpPage *hp = hs->First();hp; hp=hs->cList<cHelpPage>::Next(hp))
     {
        if (strcmp(Title,hp->Title()) == 0)
        {
-           //printf("\t\t -- Title %s\n", hp->Title());
+           //DLOG("\t\t -- Title %s\n", hp->Title());
            return hs;
        }
     } 
@@ -273,4 +287,6 @@ cHelpSection *cHelpPages::GetSectionByTitle(const char *Title) const
   return HelpMenus.First();
 }
   
+#undef  DBG
+#undef  ERR
 
