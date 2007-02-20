@@ -14,6 +14,7 @@
 #include "audio.h"
 #include "channels.h"
 #include "i18n.h"
+#include "livebuffer.h"
 #include "player.h"
 #include "receiver.h"
 #include "status.h"
@@ -629,6 +630,11 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
   // start replaying in Transfer Mode immediately after switching the channel:
   bool NeedsTransferMode = (LiveView && IsPrimaryDevice() && !ProvidesChannel(Channel, Setup.PrimaryLimit, &NeedsDetachReceivers));
 
+  NeedsTransferMode = LiveView;
+
+  if (LiveView && Setup.LiveBuffer)
+     NeedsTransferMode = true;   
+
   eSetChannelResult Result = scrOk;
 
   // If this DVB card can't receive this channel, let's see if we can
@@ -641,6 +647,9 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
         if (CaDevice->SetChannel(Channel, false) == scrOk) { // calling SetChannel() directly, not SwitchChannel()!
            if (NeedsDetachReceivers)
               CaDevice->DetachAllReceivers();
+           if (Setup.LiveBuffer)
+              cLiveBufferManager::ChannelSwitch(CaDevice,Channel);
+           else
            cControl::Launch(new cTransferControl(CaDevice, Channel->Vpid(), Channel->Apids(), Channel->Dpids(), Channel->Spids()));
            }
         else
@@ -970,7 +979,7 @@ bool cDevice::Replaying(void) const
 
 bool cDevice::Transferring(void) const
 {
-  return dynamic_cast<cTransfer *>(player) != NULL;
+  return dynamic_cast<cTransfer *>(player) != NULL || dynamic_cast<cLivePlayer *>(player) != NULL;
 }
 
 bool cDevice::AttachPlayer(cPlayer *Player)
@@ -1395,8 +1404,8 @@ void cDevice::Detach(cReceiver *Receiver)
          receiversLeft = true;
       }
   (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
-  if (!receiversLeft)
-     Cancel(3);
+//  if (!receiversLeft)
+//     Cancel(3);
 }
 
 void cDevice::DetachAll(int Pid)

@@ -4892,6 +4892,45 @@ eOSState cMenuSetupMisc::ProcessKey(eKeys Key)
   return state;
 }
 
+// --- cMenuSetupLiveBuffer --------------------------------------------------
+
+class cMenuSetupLiveBuffer : public cMenuSetupBase {
+private:
+  void Setup();
+public:
+  eOSState ProcessKey(eKeys Key);
+  cMenuSetupLiveBuffer(void);
+  };
+
+cMenuSetupLiveBuffer::cMenuSetupLiveBuffer(void)
+{ 
+  SetSection("permanentes Timeshift");
+  Setup();
+}
+
+void cMenuSetupLiveBuffer::Setup(void)
+{
+  int current=Current();
+  Clear();
+  Add(new cMenuEditBoolItem(tr("Permanent Timeshift"),                                &data.LiveBuffer));
+  if (data.LiveBuffer) {
+     Add(new cMenuEditIntItem(tr("Setup.LiveBuffer$Buffer size (MB)"),          &data.LiveBufferSize, 1, 100000));
+        }
+  SetCurrent(Get(current));
+  Display();
+}
+
+eOSState cMenuSetupLiveBuffer::ProcessKey(eKeys Key)
+{
+  int oldLiveBuffer = data.LiveBuffer;
+  eOSState state = cMenuSetupBase::ProcessKey(Key);
+
+  if (Key != kNone && (data.LiveBuffer != oldLiveBuffer))
+     Setup();
+  return state;
+}
+
+
 // --- cMenuSetupPluginItem --------------------------------------------------
 
 class cMenuSetupPluginItem : public cOsdItem {
@@ -4993,6 +5032,7 @@ void cMenuSetup::Set(void)
   Add(new cOsdItem(hk(tr("Recording settings")),     osUser6));
   Add(new cOsdItem(hk(tr("Replay settings")),        osUser7));
   Add(new cOsdItem(hk(tr("Miscellaneous")), osUser8));
+  Add(new cOsdItem(hk(tr("Permanent Timeshift")),osLiveBuffer));
   if (cPluginManager::HasPlugins())
   Add(new cOsdItem(hk(tr("Plugins")),       osUser9));
   Add(new cOsdItem(hk(tr("Restart")),       osUser10));
@@ -5025,6 +5065,7 @@ eOSState cMenuSetup::ProcessKey(eKeys Key)
     case osUser8: return AddSubMenu(new cMenuSetupMisc);
     case osUser9: return AddSubMenu(new cMenuSetupPlugins);
     case osUser10: return Restart();
+    case osLiveBuffer: return AddSubMenu(new cMenuSetupLiveBuffer);
     default: ;
     }
   if (Setup.OSDLanguage != osdLanguage) {
@@ -6002,7 +6043,22 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
   isyslog("record %s", fileName);
   if (MakeDirs(fileName, true)) {
      const cChannel *ch = timer->Channel();
-     recorder = new cRecorder(fileName, ch->Ca(), timer->Priority(), ch->Vpid(), ch->Apids(), ch->Dpids(), ch->Spids());
+     int startFrame=-1;
+     int endFrame=0;
+     cLiveBuffer *liveBuffer = cLiveBufferManager::InLiveBuffer(timer, &startFrame, &endFrame);
+     if (liveBuffer) {
+        liveBuffer->SetStartFrame(startFrame);
+        if (endFrame) {
+           liveBuffer->CreateIndexFile(fileName, 0, endFrame);
+           Timers.Del(timer);
+           Timers.SetModified();
+           timer = NULL;
+           Recording.WriteInfo();
+           Recordings.AddByName(fileName);
+           return;
+           }
+     }
+     recorder = new cRecorder(fileName, ch->Ca(), timer->Priority(), ch->Vpid(), ch->Apids(), ch->Dpids(), ch->Spids(), liveBuffer);
      if (device->AttachReceiver(recorder)) {
         Recording.WriteInfo();
         cStatus::MsgRecording(device, Recording.Name(), Recording.FileName(), true, ch->Number());
@@ -6120,7 +6176,7 @@ bool cRecordControls::Start(cTimer *Timer, bool Pause)
            cThread::EmergencyExit(true);
            return false;
            }
-        if (!Timer || Timer->Matches()) {
+        if (!Timer || Timer->Matches() || cLiveBufferManager::InLiveBuffer(Timer)) {
            for (int i = 0; i < MAXRECORDCONTROLS; i++) {
                if (!RecordControls[i]) {
                   RecordControls[i] = new cRecordControl(device, Timer, Pause);

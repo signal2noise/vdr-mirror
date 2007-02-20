@@ -30,6 +30,8 @@ public:
   };
 
 class cTransferControl : public cControl {
+friend class cLiveBufferControl;
+friend class cLiveBufferManager;
 private:
   cTransfer *transfer;
   static cDevice *receiverDevice;

@@ -20,6 +20,7 @@
 #include "tools.h"
 
 const char *VideoDirectory = VIDEODIR;
+const char *BufferDirectory = NULL;
 
 class cVideoDirectory {
 private:

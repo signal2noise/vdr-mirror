@@ -36,7 +36,7 @@ TXMLLIB  = $(TXMLDIR)/libtinyxml.a
 
 OBJS = audio.o channels.o ci.o config.o cutter.o device.o diseqc.o dvbdevice.o dvbosd.o\
        dvbplayer.o dvbspu.o eit.o eitscan.o epg.o filter.o font.o i18n.o interface.o keys.o\
-       lirc.o menu.o menuitems.o nit.o osdbase.o osd.o pat.o player.o plugin.o rcu.o\
+       lirc.o livebuffer.o menu.o menuitems.o nit.o osdbase.o osd.o pat.o player.o plugin.o rcu.o\
        receiver.o recorder.o recording.o reelcamlink.o reelboxbase.o remote.o remux.o  \
        ringbuffer.o sdt.o sections.o skinclassic.o skins.o skinsttng.o sources.o spu.o status.o \
        svdrp.o themes.o thread.o \

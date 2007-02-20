@@ -292,6 +292,8 @@ cSetup::cSetup(void)
   CurrentDolby = 0;
   InitialChannel = 0;
   InitialVolume = -1;
+  LiveBuffer = 0;
+  LiveBufferSize = 100;
   CAMEnabled=7;
   UseBouquetList = 1;
 }
@@ -474,6 +476,8 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "CurrentDolby"))        CurrentDolby       = atoi(Value);
   else if (!strcasecmp(Name, "InitialChannel"))      InitialChannel     = atoi(Value);
   else if (!strcasecmp(Name, "InitialVolume"))       InitialVolume      = atoi(Value);
+  else if (!strcasecmp(Name, "LiveBuffer"))        LiveBuffer         = atoi(Value);
+  else if (!strcasecmp(Name, "LiveBufferSize"))      LiveBufferSize     = atoi(Value);
   else if (!strcasecmp(Name, "CAMEnabled"))          CAMEnabled         = atoi(Value);
   else if (!strcasecmp(Name, "UseBouquetList"))      UseBouquetList	= atoi(Value);
   else
@@ -556,6 +560,8 @@ bool cSetup::Save(void)
   Store("CurrentDolby",       CurrentDolby);
   Store("InitialChannel",     InitialChannel);
   Store("InitialVolume",      InitialVolume);
+  Store("LiveBuffer",         LiveBuffer);
+  Store("LiveBufferSize",     LiveBufferSize);
   Store("CAMEnabled",         CAMEnabled);
   Store("UseBouquetList",     UseBouquetList);
 

@@ -10,6 +10,7 @@
 #ifndef __RECORDER_H
 #define __RECORDER_H
 
+#include "livebuffer.h"
 #include "receiver.h"
 #include "recording.h"
 #include "remux.h"
@@ -18,6 +19,7 @@
 
 class cFileWriter;
 
+/*
 class cRecorder : public cReceiver, cThread {
 private:
   cRingBufferLinear *ringBuffer;
@@ -31,6 +33,23 @@ public:
   cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids);
                // Creates a new recorder that requires conditional access Ca, has
                // the given Priority and will record the given PIDs into the file FileName.
+  virtual ~cRecorder();
+  };
+*/
+
+class cRecorder : public cReceiver, cThread {
+private:
+  cRingBufferLinear *ringBuffer;
+  cRemux *remux;
+  cFileWriter *writer;
+  char *fileName;
+  cLiveBuffer *liveBuffer;
+protected:
+  virtual void Activate(bool On);
+  virtual void Receive(uchar *Data, int Length);
+  virtual void Action(void);
+public:
+  cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids, cLiveBuffer *LiveBuffer = NULL);
   virtual ~cRecorder();
   };
 

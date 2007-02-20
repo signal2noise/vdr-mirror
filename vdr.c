@@ -49,6 +49,7 @@
 #include "keys.h"
 #include "libsi/si.h"
 #include "lirc.h"
+#include "livebuffer.h"
 #include "menu.h"
 #include "osdbase.h"
 #include "plugin.h"
@@ -220,6 +221,7 @@ int main(int argc, char *argv[])
 
   static struct option long_options[] = {
       { "audio",    required_argument, NULL, 'a' },
+      { "buffer",   required_argument, NULL, 'b' },
       { "config",   required_argument, NULL, 'c' },
       { "daemon",   no_argument,       NULL, 'd' },
       { "device",   required_argument, NULL, 'D' },
@@ -248,9 +250,13 @@ int main(int argc, char *argv[])
     };
 
   int c;
-  while ((c = getopt_long(argc, argv, "a:c:dD:E:g:hk:l:L:mp:P:r:s:t:Tu:v:Vw:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "a:b:c:dD:E:g:hk:l:L:mp:P:r:s:t:Tu:v:Vw:", long_options, NULL)) != -1) {
         switch (c) {
           case 'a': AudioCommand = optarg;
+                    break;
+          case 'b': BufferDirectory = optarg;
+                    while (optarg && *optarg && optarg[strlen(optarg) - 1] == '/')
+                          optarg[strlen(optarg) - 1] = 0;
                     break;
           case 'c': ConfigDirectory = optarg;
                     break;
@@ -388,6 +394,8 @@ int main(int argc, char *argv[])
      if (DisplayHelp) {
         printf("Usage: vdr [OPTIONS]\n\n"          // for easier orientation, this is column 80|
                "  -a CMD,   --audio=CMD    send Dolby Digital audio to stdin of command CMD\n"
+               "  -b DIR,   --buffer=DIR   use DIR as LiveBuffer directory (default is to write\n"
+               "                           it to the video directory)\n"
                "  -c DIR,   --config=DIR   read config files from DIR (default is to read them\n"
                "                           from the video directory)\n"
                "  -d,       --daemon       run in daemon mode\n"
@@ -554,6 +562,9 @@ int main(int argc, char *argv[])
 
   if (!PluginManager.LoadPlugins(true))
      EXIT(2);
+
+  if (!BufferDirectory)
+     BufferDirectory = VideoDirectory;
 
   // Configuration data:
 
@@ -784,8 +795,11 @@ int main(int argc, char *argv[])
            }
         // Channel display:
         if (!EITScanner.Active() && cDevice::CurrentChannel() != LastChannel) {
-           if (!Menu)
+           if (!Menu) {
+              if (cControl::Control(true))
+                     cControl::Control(true)->Hide();
               Menu = new cDisplayChannel(cDevice::CurrentChannel(), LastChannel >= 0 && !channelinfo_requested);
+              }
            LastChannel = cDevice::CurrentChannel();
            LastChannelChanged = time(NULL);
            }
@@ -907,7 +921,7 @@ int main(int argc, char *argv[])
               LastTimerCheck = time(NULL);
               }
            // Delete expired timers:
-           Timers.DeleteExpired();
+//           Timers.DeleteExpired();
            }
         if (!Menu && Recordings.NeedsUpdate()) {
            Recordings.Update();
@@ -929,8 +943,9 @@ int main(int argc, char *argv[])
         if (!Skins.IsOpen())
            Skins.ProcessQueuedMessages();
         // User Input:
-        cOsdObject *Interact = Menu ? Menu : cControl::Control();
+        cOsdObject *Interact = Menu ? Menu : cControl::Control(true);
         eKeys key = Interface->GetKey((!Interact || !Interact->NeedsFastResponse()) && time(NULL) - LastCamMenu > LASTCAMMENUTIMEOUT);
+        Interact = Menu ? Menu : cControl::Control();
         //Start by Klaus
         if (key == kMenu && cDevice::PrimaryDevice()->Replaying() && cDevice::PrimaryDevice()->PlayerCanHandleMenuCalls())
         {
@@ -958,9 +973,9 @@ int main(int argc, char *argv[])
                   active_function = osUnknown;
                   }
                   //End by Klaus
-               else if (cControl::Control()) {
+               else if (cControl::Control(true)) {
                   if (cOsd::IsOpen())
-                     cControl::Control()->Hide();
+                     cControl::Control(true)->Hide();
                   else
                      WasOpen = false;
                   }
@@ -971,8 +986,8 @@ int main(int argc, char *argv[])
           // Direct main menu functions:
           /*#define DirectMainFunction(function)\
             DELETE_MENU;\
-            if (cControl::Control())\
-               cControl::Control()->Hide();\
+            if (cControl::Control(true))\
+               cControl::Control(true)->Hide();\
             Menu = new cMenuMain(function);\
             key = kNone; // nobody else needs to see this key
           */
@@ -981,8 +996,8 @@ int main(int argc, char *argv[])
             printf("--------------DirectMainFunction, function = %d----------\n", active_function);\
             DELETE_MENU;\
             if (function != active_function) {\
-                        if (cControl::Control())\
-                            cControl::Control()->Hide();\
+                        if (cControl::Control(true))\
+                            cControl::Control(true)->Hide();\
                         active_function = function;\
                         Menu = new cMenuMain(function);\
                    }\
@@ -1071,8 +1086,8 @@ int main(int argc, char *argv[])
                const char *PluginName = cRemote::GetPlugin();
                if (PluginName) {
                   DELETE_MENU;
-                  if (cControl::Control())
-                     cControl::Control()->Hide();
+                  if (cControl::Control(true))
+                     cControl::Control(true)->Hide();
                   cPlugin *plugin = cPluginManager::GetPlugin(PluginName);
                   if (plugin) {
                    if (!cStatus::MsgPluginProtected(plugin)) {    // PIN PATCH
@@ -1092,8 +1107,11 @@ int main(int argc, char *argv[])
           case kChanUp:
           case kChanDn|k_Repeat:
           case kChanDn:
-               if (!Interact)
+               if (!Interact) {
+                  if (cControl::Control(true))
+                     cControl::Control(true)->Hide();
                   Menu = new cDisplayChannel(NORMALKEY(key));
+                  }
                else if (cDisplayChannel::IsOpen() /*Start by Klaus*/|| Setup.PipIsRunning /*End by Klaus*/) {
                   Interact->ProcessKey(key);
                   continue;
@@ -1123,8 +1141,8 @@ int main(int argc, char *argv[])
                break;
           // Audio track control:
           case kAudio:
-               if (cControl::Control())
-                  cControl::Control()->Hide();
+               if (cControl::Control(true))
+                  cControl::Control(true)->Hide();
                if (!cDisplayTracks::IsOpen()) {
                   DELETE_MENU;
                   Menu = cDisplayTracks::Create();
@@ -1143,7 +1161,7 @@ int main(int argc, char *argv[])
 
           // Pausing live video:
           case kPause:
-               if (!cControl::Control()) {
+               if (!cControl::Control() && !cLiveBufferManager::GetLiveBufferControl()) {
                   DELETE_MENU;
                   if (!cRecordControls::PauseLiveVideo())
                      Skins.Message(mtError, tr("No free DVB device to record!"));
@@ -1152,7 +1170,7 @@ int main(int argc, char *argv[])
                break;
           // Instant recording:
           case kRecord:
-               if (!cControl::Control()) {
+               if (!cControl::Control() && !cLiveBufferManager::GetLiveBufferControl()) {
                   if (cRecordControls::Start())
                      Skins.Message(mtInfo, tr("Recording started"));
                   key = kNone; // nobody else needs to see this key
@@ -1305,6 +1323,10 @@ int main(int argc, char *argv[])
              }
            }
         else {
+           eOSState state = osUnknown;
+           if (cLiveBufferManager::GetLiveBufferControl())
+             state = cLiveBufferManager::GetLiveBufferControl()->ProcessKey(key);
+           if (state == osUnknown) {
            // Key functions in "normal" viewing mode:
            if (key != kNone && KeyMacros.Get(key)) {
               cRemote::PutMacro(key);
@@ -1336,6 +1358,8 @@ int main(int argc, char *argv[])
              case kUp:
              case kDown|k_Repeat:
              case kDown:
+                  if (cControl::Control(true))
+                     cControl::Control(true)->Hide();
                   Menu = new cDisplayChannel(NORMALKEY(key));
                   break;
 	         case kInfo:
@@ -1396,7 +1420,7 @@ int main(int argc, char *argv[])
              default:    break;
              }
            }
-
+           }
         if (!Menu) {
            if (!InhibitEpgScan)
               EITScanner.Process();
@@ -1485,6 +1509,7 @@ int main(int argc, char *argv[])
 
 Exit:
 
+  cLiveBufferManager::Shutdown();
   PluginManager.StopPlugins();
   cRecordControls::Shutdown();
   cCutter::Stop();

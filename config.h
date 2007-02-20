@@ -277,6 +277,8 @@ public:
   int CurrentDolby;
   int InitialChannel;
   int InitialVolume;
+  int LiveBuffer;
+  int LiveBufferSize;
   int CAMEnabled;
   int UseBouquetList;
   int __EndData__;

@@ -81,7 +81,7 @@ public:
   static void Launch(cControl *Control);
   static void Attach(void);
   static void Shutdown(void);
-  static cControl *Control(void);
+  static cControl *Control(bool Hidden = false);
   };
 
 #endif //__PLAYER_H

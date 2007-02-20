@@ -13,6 +13,7 @@
 #include "device.h"
 #include "i18n.h"
 #include "libsi/si.h"
+#include "livebuffer.h"
 #include "remote.h"
 #include "status.h"             // PIN PATCH
 
@@ -649,7 +650,7 @@ cTimer *cTimers::GetMatch(time_t t)
   static int LastPending = -1;
   cTimer *t0 = NULL;
   for (cTimer *ti = First(); ti; ti = Next(ti)) {
-      if (!ti->Recording() && ti->Matches(t)) {
+      if (!ti->Recording() && (ti->Matches(t) || cLiveBufferManager::InLiveBuffer(ti))) {
          if (ti->Pending()) {
             if (ti->Index() > LastPending)
                LastPending = ti->Index();
@@ -739,7 +740,7 @@ void cTimers::DeleteExpired(void)
   cTimer *ti = First();
   while (ti) {
         cTimer *next = Next(ti);
-        if (ti->Expired()) {
+        if (ti->Expired() && !cLiveBufferManager::InLiveBuffer(ti)) {
            isyslog("deleting timer %s", *ti->ToDescr());
            Del(ti);
            SetModified();

@@ -60,10 +60,10 @@ cOsdObject *cControl::GetInfo(void)
   return NULL;
 }
 
-cControl *cControl::Control(void)
+cControl *cControl::Control(bool Hidden)
 {
   cMutexLock MutexLock(&mutex);
-  return (control && !control->hidden) ? control : NULL;
+  return (control && (!control->hidden || Hidden)) ? control : NULL;
 }
 
 void cControl::Launch(cControl *Control)

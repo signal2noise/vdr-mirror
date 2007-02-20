@@ -14,6 +14,7 @@
 #include "tools.h"
 
 extern const char *VideoDirectory;
+extern const char *BufferDirectory;
 
 cUnbufferedFile *OpenVideoFile(const char *FileName, int Flags);
 int CloseVideoFile(cUnbufferedFile *File);
