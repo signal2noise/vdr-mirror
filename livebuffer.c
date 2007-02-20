@@ -1598,10 +1598,14 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
         case kGreen|k_Repeat:
         case kGreen:   if (visible && !modeOnly && player)
                           player->SkipSeconds(-60);
+                       else
+                          return osUnknown;
                        break;
         case kYellow|k_Repeat:
         case kYellow:  if (visible && !modeOnly && player)
                           player->SkipSeconds(60);
+                       else
+                          return osUnknown;
                        break;  
         case kRecord:  {
                        cTimer *timer = new cTimer(true);
