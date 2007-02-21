@@ -921,7 +921,7 @@ int main(int argc, char *argv[])
               LastTimerCheck = time(NULL);
               }
            // Delete expired timers:
-//           Timers.DeleteExpired();
+           Timers.DeleteExpired();
            }
         if (!Menu && Recordings.NeedsUpdate()) {
            Recordings.Update();
