@@ -106,7 +106,7 @@ public:
   ///< returns first help page of section
   bool Load();
 private:
-  void cHelpPages::ParseSection(TiXmlHandle HandleSection, int Level = 0);
+  void ParseSection(TiXmlHandle HandleSection, int Level = 0);
   ///< recursiv parsing of xmlNodes "section" 
   void DumpHelp();
   ///< for debug purposes 

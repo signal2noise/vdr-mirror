@@ -40,7 +40,7 @@ private:
   cHelpPage *helpPage;
   eDvbFont font;
 public:
-  cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title);
+  cMenuHelp(cHelpSection *Section, const char *Title);
   virtual ~cMenuHelp();
   void SetText(const char *Text);
   void SetNextHelp();
@@ -333,7 +333,7 @@ public:
   ~cMenuBouquets(void);
   void AddFavourite(bool active);
   virtual eOSState ProcessKey(eKeys Key);
-  virtual void cMenuBouquets::Display(void);
+  virtual void Display(void);
   };
 
 #endif //__MENU_H
