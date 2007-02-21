@@ -3942,7 +3942,7 @@ eOSState cMenuSetupDVB::ProcessKey(eKeys Key)
 }
 
 // --- cMenuSetupLNB ---------------------------------------------------------
-#define  DBG "DEBUG [diseqc]: "
+// #define  DBG "DEBUG [diseqc]: "
 
 class cMenuSetupLNB : public cMenuSetupBase {
 private:
@@ -4904,7 +4904,7 @@ public:
 
 cMenuSetupLiveBuffer::cMenuSetupLiveBuffer(void)
 { 
-  SetSection("permanentes Timeshift");
+  SetSection(tr("Permanent Timeshift"));
   Setup();
 }
 

@@ -3192,7 +3192,7 @@ const tI18nPhrase Phrases[] = {
     "Rùzné",
   },
   { "Permanent Timeshift",
-    "Permanantes Timeshift",
+    "Permanentes Timeshift",
     "",
     "",
     "",
