@@ -1404,8 +1404,8 @@ void cDevice::Detach(cReceiver *Receiver)
          receiversLeft = true;
       }
   (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
-//  if (!receiversLeft)
-//     Cancel(3);
+  if (!receiversLeft)
+     Cancel(3);
 }
 
 void cDevice::DetachAll(int Pid)

@@ -6047,6 +6047,7 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
      int endFrame=0;
      cLiveBuffer *liveBuffer = cLiveBufferManager::InLiveBuffer(timer, &startFrame, &endFrame);
      if (liveBuffer) {
+        timer->SetFlags(tfhasLiveBuf);
         liveBuffer->SetStartFrame(startFrame);
         if (endFrame) {
            liveBuffer->CreateIndexFile(fileName, 0, endFrame);

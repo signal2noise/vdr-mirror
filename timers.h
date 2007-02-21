@@ -20,6 +20,7 @@ enum eTimerFlags { tfNone      = 0x0000,
                    tfInstant   = 0x0002,
                    tfVps       = 0x0004,
                    tfRecording = 0x0008,
+                   tfhasLiveBuf= 0x0010,
                    tfAll       = 0xFFFF,
                  };
 enum eTimerMatch { tmNone, tmPartial, tmFull };

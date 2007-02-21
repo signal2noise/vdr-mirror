@@ -215,6 +215,7 @@ public:
   void Play(void);
   void Forward(void);
   void Backward(void);
+  bool Stop(void);
   void SkipSeconds(int Seconds);
   virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
   virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);

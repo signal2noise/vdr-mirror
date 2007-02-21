@@ -757,7 +757,7 @@ void cLiveCutterThread::Action(void)
       }
     liveBuffer->index->RwLock->Unlock();
     Frame++; 
-    usleep(1500);
+    cCondWait::SleepMs(5);
     }
 }
 
@@ -1378,6 +1378,17 @@ void cLivePlayer::Backward(void)
     }
 }
 
+bool cLivePlayer::Stop(void)
+{
+  if (readIndex >= liveBuffer->LastIndex() - 25)
+     return false;
+  LOCK_THREAD;
+  Empty();
+  readIndex = writeIndex = liveBuffer->GetNextIFrame(liveBuffer->LastIndex()-1, false)-1;
+  Play();
+  return true;
+}
+
 void cLivePlayer::SkipSeconds(int Seconds)
 {
   if (Seconds) {
@@ -1595,6 +1606,14 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
         case kFastFwd: if (player)
                           player->Forward();
                        break;
+        case kStop:    if (player) 
+                          if (player->Stop())
+                             break;
+                       return osUnknown;
+        case kBack:    if (visible && !modeOnly && player)
+                          Hide();
+                       else
+                          return osUnknown;
         case kGreen|k_Repeat:
         case kGreen:   if (visible && !modeOnly && player)
                           player->SkipSeconds(-60);
@@ -1679,7 +1698,7 @@ void cLiveBufferManager::Shutdown(void)
 
 cLiveBuffer *cLiveBufferManager::InLiveBuffer(cTimer *timer, int *StartFrame, int *EndFrame)
 {
-  if (timer && liveReceiver && liveReceiver->GetChannel() == timer->Channel()) {
+  if (timer && !timer->HasFlags(tfhasLiveBuf) && liveReceiver && liveReceiver->GetChannel() == timer->Channel()) {
     int now = liveBuffer->LastIndex();
     int first = liveBuffer->FirstIndex() + 50;
     if (now-first < 250)  // Erst wenn LiveBuffer größer 10s

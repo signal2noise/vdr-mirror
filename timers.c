@@ -740,7 +740,7 @@ void cTimers::DeleteExpired(void)
   cTimer *ti = First();
   while (ti) {
         cTimer *next = Next(ti);
-        if (ti->Expired() && !cLiveBufferManager::InLiveBuffer(ti)) {
+        if (ti->Expired() && (!cLiveBufferManager::InLiveBuffer(ti) || !ti->HasFlags(tfActive))) {
            isyslog("deleting timer %s", *ti->ToDescr());
            Del(ti);
            SetModified();
