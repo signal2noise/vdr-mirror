@@ -1039,7 +1039,7 @@ int main(int argc, char *argv[])
                             DirectMainFunction(osActiveEvent); break;
           case kSchedule:   DirectMainFunction(osSchedule); break;
           case kChannels:   DirectMainFunction(osChannels); break;
-          case kTimers:     DirectMainFunction(osTimers); break;
+          //case kTimers:     DirectMainFunction(osTimers); break;
           case kSearch:     cRemote::CallPlugin("epgsearchonly"); break;
           case kRecordings: DirectMainFunction(osRecordings); break;
           case kSetup:      DELETE_MENU;
