@@ -1586,9 +1586,6 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
     case kPause: if (player)
                     player->Pause();
                  break;
-    default: {
-      DoShowMode = false;
-      switch (Key) {
         case kPlay:  if (visible && !modeOnly) {
                         Hide();
                         DoShowMode = true;
@@ -1608,14 +1605,6 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
         case kFastFwd: if (player)
                           player->Forward();
                        break;
-        case kStop:    if (player) 
-                          if (player->Stop())
-                             break;
-                       return osUnknown;
-        case kBack:    if (visible && !modeOnly && player)
-                          Hide();
-                       else
-                          return osUnknown;
         case kGreen|k_Repeat:
         case kGreen:   if (visible && !modeOnly && player) {
                           player->SkipSeconds(-60);
@@ -1632,6 +1621,17 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        else
                           return osUnknown;
                        break;  
+    default: {
+      DoShowMode = false;
+      switch (Key) {
+        case kStop:    if (player) 
+                          if (player->Stop())
+                             break;
+                       return osUnknown;
+        case kBack:    if (visible && !modeOnly && player)
+                          Hide();
+                       else
+                          return osUnknown;
         case kRecord:  {
                        cTimer *timer = new cTimer(true);
                        int Current, Total;
