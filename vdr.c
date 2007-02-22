@@ -66,7 +66,7 @@
 
 #define MINCHANNELWAIT     10 // seconds to wait between failed channel switchings
 #define ACTIVITYTIMEOUT    60 // seconds before starting housekeeping
-#define SHUTDOWNWAIT      300 // seconds to wait in user prompt before automatic shutdown
+#define SHUTDOWNWAIT       60 // seconds to wait in user prompt before automatic shutdown
 #define MANUALSTART       600 // seconds the next timer must be in the future to assume manual start
 #define CHANNELSAVEDELTA  600 // seconds before saving channels.conf after automatic modifications
 #define LASTCAMMENUTIMEOUT  3 // seconds to run the main loop 'fast' after a CAM menu has been closed
