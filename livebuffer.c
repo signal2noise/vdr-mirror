@@ -1454,6 +1454,7 @@ cLiveBufferControl::~cLiveBufferControl()
   Hide();
   cTransferControl::receiverDevice = NULL;
   cLiveBufferManager::livePlayer = NULL;
+  delete player;
   cLiveBufferManager::liveControl = NULL;
   cLiveBufferManager::liveReceiver->Detach();
   cLiveBufferManager::liveBuffer->SetNewRemux(NULL);
