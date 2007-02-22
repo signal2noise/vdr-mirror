@@ -122,8 +122,9 @@ void cFileWriter::Action(void)
         }
 }
 
-/*
-cRecorder::cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids)
+// ---
+
+cRecorder::cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids, cLiveBuffer *LiveBuffer)
 :cReceiver(Ca, Priority, VPid, APids, Setup.UseDolbyInRecordings ? DPids : NULL, SPids)
 ,cThread("recording")
 {
@@ -135,72 +136,6 @@ cRecorder::cRecorder(const char *FileName, int Ca, int Priority, int VPid, const
   ringBuffer->SetTimeouts(0, 100);
 #endif
   remux = new cRemux(VPid, APids, Setup.UseDolbyInRecordings ? DPids : NULL, SPids, true);
-  writer = new cFileWriter(FileName, remux);
-}
-
-cRecorder::~cRecorder()
-{
-  Detach();
-  delete writer;
-  delete remux;
-//  delete ringBuffer;
-}
-
-void cRecorder::Activate(bool On)
-{
-  if (On) {
-     writer->Start();
-     Start();
-     }
-  else
-     Cancel(3);
-}
-
-void cRecorder::Receive(uchar *Data, int Length)
-{
-  if (Running()) {
-#if 0
-     int p = ringBuffer->Put(Data, Length);
-     if (p != Length && Running())
-        ringBuffer->ReportOverflow(Length - p);
-#else
-     remux->Put(Data, Length);
-#endif
-  }
-}
-
-void cRecorder::Action(void)
-{
-  while (Running()) {
-#if 0	  
-        int r;
-        uchar *b = ringBuffer->Get(r);
-        if (b) {
-           int Count = remux->Put(b, r);
-           if (Count)
-              ringBuffer->Del(Count);
-           else
-              cCondWait::SleepMs(100); // avoid busy loop when resultBuffer is full in cRemux::Put()
-           }
-#endif
-	usleep(100*1000); // FIXME
-        }
-}
-*/
-
-// ---
-
-cRecorder::cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids, cLiveBuffer *LiveBuffer)
-:cReceiver(Ca, Priority, VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids)
-,cThread("recording")
-{
-  // Make sure the disk is up and running:
-
-  SpinUpDisk(FileName);
-
-  ringBuffer = new cRingBufferLinear(RECORDERBUFSIZE, TS_SIZE * 2, true, "Recorder");
-  ringBuffer->SetTimeouts(0, 100);
-  remux = new cRemux(VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids, true);
   fileName = strdup(FileName);
   writer = NULL;
   liveBuffer = LiveBuffer;
@@ -213,7 +148,7 @@ cRecorder::~cRecorder()
   Detach();
   delete writer;
   delete remux;
-  delete ringBuffer;
+//  delete ringBuffer;
   free(fileName);
 }
 
@@ -231,24 +166,25 @@ void cRecorder::Activate(bool On)
 void cRecorder::Receive(uchar *Data, int Length)
 {
   if (Running()) {
+#if 0
      int p = ringBuffer->Put(Data, Length);
      if (p != Length && Running())
         ringBuffer->ReportOverflow(Length - p);
+#else
+     remux->Put(Data, Length);
+#endif
      }
 }
 
 void cRecorder::Action(void)
 {
   while (Running()) {
-        int r;
-        uchar *b = ringBuffer->Get(r);
-        if (b) {
-           int Count = remux->Put(b, r);
            if (!writer && liveBuffer) {
               int c;
               uchar pictureType;
               uchar *p = remux->Get(c, &pictureType, 1);
-              if (pictureType == I_FRAME && p && p[0]==0x00 && p[1]==0x00 && p[2]==0x01 && (p[7] & 0x80) && p[3]>=0xC0 && p[3]<=0xEF) {
+        if (p) {
+           if (pictureType == I_FRAME && p[0]==0x00 && p[1]==0x00 && p[2]==0x01 && (p[7] & 0x80) && p[3]>=0xC0 && p[3]<=0xEF) {
                  int64_t pts  = (int64_t) (p[ 9] & 0x0E) << 29 ;
                  pts |= (int64_t)  p[ 10]         << 22 ;
                  pts |= (int64_t) (p[ 11] & 0xFE) << 14 ;
@@ -261,10 +197,20 @@ void cRecorder::Action(void)
               else
                  remux->Del(c);              
               }
+        continue;
+        }
+#if 0
+        int r;
+        uchar *b = ringBuffer->Get(r);
+        if (b) {
+           int Count = remux->Put(b, r);
            if (Count)
               ringBuffer->Del(Count);
            else
               cCondWait::SleepMs(100); // avoid busy loop when resultBuffer is full in cRemux::Put()
            }
+#endif
+        usleep(100*1000); // FIXME
         }
 }
+

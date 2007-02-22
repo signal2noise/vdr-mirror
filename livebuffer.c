@@ -958,8 +958,8 @@ cLiveReceiver::cLiveReceiver(const cChannel *Channel)
 :cReceiver(0, -1, Channel->Vpid(), Channel->Apids(), Setup.UseDolbyDigital ? Channel->Dpids() : NULL, Channel->Spids())
 {
   channel = Channel;
-  ringBuffer = new cRingBufferLinear(RECORDERBUFSIZE, TS_SIZE * 2, true, "Recorder");
-  ringBuffer->SetTimeouts(0, 20);
+//  ringBuffer = new cRingBufferLinear(RECORDERBUFSIZE, TS_SIZE * 2, true, "Recorder");
+//  ringBuffer->SetTimeouts(0, 20);
   remux = new cRemux(Channel->Vpid(), Channel->Apids(), Setup.UseDolbyDigital ? Channel->Dpids() : NULL, Channel->Spids());
   remux->SetTimeouts(0, 50);
 }
@@ -969,13 +969,13 @@ cLiveReceiver::~cLiveReceiver()
   Detach();
   Cancel(3);
   delete remux;
-  delete ringBuffer;
+//  delete ringBuffer;
 }
 
 void cLiveReceiver::Activate(bool On)
 {
   if (On) {
-     Start();
+//     Start();
      }
   else {
      Cancel(-1);
@@ -984,23 +984,24 @@ void cLiveReceiver::Activate(bool On)
 
 void cLiveReceiver::Receive(uchar *Data, int Length)
 {
-  int p = ringBuffer->Put(Data, Length);
-  if (p != Length && Running())
-     ringBuffer->ReportOverflow(Length - p);
+//  int p = ringBuffer->Put(Data, Length);
+//  if (p != Length && Running())
+//     ringBuffer->ReportOverflow(Length - p);
+    remux->Put(Data, Length);
 }
 
 void cLiveReceiver::Action(void)
 {
   while (Running()) {
-        int r;
+/*        int r;
         uchar *b = ringBuffer->Get(r);
         if (b) {
            int Count = remux->Put(b, r);
            if (Count)
               ringBuffer->Del(Count);
-           else
+           else*/
               cCondWait::SleepMs(20);
-           }
+//           }
         }
 }
 
@@ -1492,7 +1493,7 @@ void cLiveBufferControl::ShowTimed(int Seconds)
 
 void cLiveBufferControl::Show(void)
 {
-  ShowTimed();
+  ShowTimed(3);
 }
 
 void cLiveBufferControl::Hide(void)
@@ -1615,14 +1616,18 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        else
                           return osUnknown;
         case kGreen|k_Repeat:
-        case kGreen:   if (visible && !modeOnly && player)
+        case kGreen:   if (visible && !modeOnly && player) {
                           player->SkipSeconds(-60);
+                          timeoutShow = time(NULL) + 3;
+                          }
                        else
                           return osUnknown;
                        break;
         case kYellow|k_Repeat:
-        case kYellow:  if (visible && !modeOnly && player)
+        case kYellow:  if (visible && !modeOnly && player) {
                           player->SkipSeconds(60);
+                          timeoutShow = time(NULL) + 3;
+                          }
                        else
                           return osUnknown;
                        break;  

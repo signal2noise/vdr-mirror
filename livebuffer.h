@@ -225,7 +225,7 @@ class cLiveReceiver : public cReceiver, cThread {
 friend class cLiveBufferManager;
 friend class cLiveBufferControl;
 private:
-  cRingBufferLinear *ringBuffer;
+//  cRingBufferLinear *ringBuffer;
   cRemux *remux;
   const cChannel *channel;
 protected:
