@@ -1694,7 +1694,6 @@ void cLiveBufferManager::ChannelSwitch(cDevice *ReceiverDevice, const cChannel *
 
 void cLiveBufferManager::Shutdown(void)
 {
-  delete livePlayer;
   delete liveControl;
   delete liveBuffer;
   char FileName[256];
