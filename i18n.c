@@ -3831,7 +3831,7 @@ const tI18nPhrase Phrases[] = {
     "",
   },
   { "channellist",
-    "Kanaliste",
+    "Kanalliste",
     "",
     "",
     "",
