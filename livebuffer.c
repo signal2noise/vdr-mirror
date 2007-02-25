@@ -1586,12 +1586,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
     case kPause: if (player)
                     player->Pause();
                  break;
-        case kPlay:  if (visible && !modeOnly) {
-                        Hide();
-                        DoShowMode = true;
-                        }
-                     else 
-                        Show();
+        case kPlay:  
                      if (player)
                         player->Play(); 
                      break;
