@@ -180,15 +180,14 @@ bool cDvbTuner::GetFrontendStatus(fe_status_t &Status, int TimeoutMs)
               ; // just to clear the event queue - we'll read the actual status below
         }
      }
-  do {
-     int stat = ioctl(fd_frontend, FE_READ_STATUS, &Status);
-     if (stat == 0)
-        return true;
-     if (stat < 0) {
-        if (errno == EINTR)
+  while (1) {
+        int stat = ioctl(fd_frontend, FE_READ_STATUS, &Status);
+        if (stat == 0)
+           return true;
+        if (stat < 0 && errno == EINTR)
            continue;
+	   break;
         }
-     } while (0);
   return false;
 }
 
