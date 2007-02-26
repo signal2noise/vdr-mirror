@@ -889,9 +889,11 @@ int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
         size -= Off;
         off += Off;
         }
+      if (size > 0) {
       uchar *b = MALLOC(uchar, size);
       *Buffer = b;
       memcpy(b,&buffer[off],size);
+         }
       if (!index->HasFrame(Number)) 
          size = -size;
       }

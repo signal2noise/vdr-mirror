@@ -192,7 +192,10 @@ cSubMenuNode::~ cSubMenuNode()
 {
   if (_name != NULL ) free((void*)_name);
   if (_command != NULL ) free((void*)_command);
+  if (_help != NULL ) free((void*)_help);
+  if (_info != NULL ) free((void*)_info);
   if (_pluginMainMenuEntry != NULL ) free((void*)_pluginMainMenuEntry);
+  if (_setupLink != NULL ) free((void*)_setupLink);
 }
 
 
