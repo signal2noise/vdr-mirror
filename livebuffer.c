@@ -1594,11 +1594,15 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                      break;
         case kFastRew|k_Release:
                        if (Setup.MultiSpeedMode) break;
+        case kFastRew|k_Repeat:
+                       player->SkipSeconds( -5); break;
         case kFastRew: if (player)
                           player->Backward(); 
                        break;
         case kFastFwd|k_Release:
                        if (Setup.MultiSpeedMode) break;
+        case kFastFwd|k_Repeat:
+                        player->SkipSeconds( 5); break;
         case kFastFwd: if (player)
                           player->Forward();
                        break;
