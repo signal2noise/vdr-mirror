@@ -1260,12 +1260,22 @@ int main(int argc, char *argv[])
               LastActivity = time(NULL);
 
            switch (state) {
-             case osPause:  DELETE_MENU;
+             case osPause:  if (cLiveBufferManager::GetLiveBufferControl()) {
+                               if (cControl::Control(true))
+                                  cControl::Control(true)->ProcessKey(kPause);
+                               break;
+                               }
+                            DELETE_MENU;
                             cControl::Shutdown(); // just in case
                             if (!cRecordControls::PauseLiveVideo())
                                Skins.Message(mtError, tr("No free DVB device to record!"));
                             break;
-             case osRecord: DELETE_MENU;
+             case osRecord: if (cLiveBufferManager::GetLiveBufferControl()) {
+                               if (cControl::Control(true))
+                                  cControl::Control(true)->ProcessKey(kRecord);
+                               break;
+                               }
+                            DELETE_MENU;
                             if (cRecordControls::Start())
                                Skins.Message(mtInfo, tr("Recording started"));
                             break;
