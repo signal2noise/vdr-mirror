@@ -1448,6 +1448,7 @@ cLiveBufferControl::cLiveBufferControl(cLivePlayer *Player)
   lastCurrent = lastTotal = -1;
   lastPlay = lastForward = false;
   lastSpeed = -2; 
+  sk = 0;
   timeoutShow = 0;
 }
 
@@ -1529,6 +1530,10 @@ void cLiveBufferControl::ShowMode(void)
 
         if (modeOnly && !timeoutShow && NormalPlay)
            timeoutShow = time(NULL) + 3;
+        if (sk != 0) {
+           Speed = 0;
+           Forward = sk > 0;
+           }
         displayReplay->SetMode(Play, Forward, Speed);
         lastPlay = Play;
         lastForward = Forward;
@@ -1558,7 +1563,7 @@ bool cLiveBufferControl::ShowProgress(bool Initial)
         displayReplay->SetProgress(Current, Total);
         if (!Initial)
            displayReplay->Flush();
-int displayFrames = false;
+        int displayFrames = false;
         displayReplay->SetCurrent(IndexToHMSF(Current, displayFrames));
         displayReplay->Flush();
         lastCurrent = Current;
@@ -1593,16 +1598,20 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                         player->Play(); 
                      break;
         case kFastRew|k_Release:
+                       sk = 0;
                        if (Setup.MultiSpeedMode) break;
         case kFastRew|k_Repeat:
+                       sk = -1;
                        player->SkipSeconds( -5); break;
         case kFastRew: if (player)
                           player->Backward(); 
                        break;
         case kFastFwd|k_Release:
+                       sk = 0;
                        if (Setup.MultiSpeedMode) break;
         case kFastFwd|k_Repeat:
-                        player->SkipSeconds( 5); break;
+                       sk = 1;
+                       player->SkipSeconds( 5); break;
         case kFastFwd: if (player)
                           player->Forward();
                        break;

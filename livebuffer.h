@@ -246,6 +246,7 @@ private:
   int lastCurrent, lastTotal;
   bool lastPlay, lastForward;
   int lastSpeed;
+  int sk;
   time_t timeoutShow;
   void ShowTimed(int Seconds = 0);
   void ShowMode(void);

@@ -630,8 +630,6 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
   // start replaying in Transfer Mode immediately after switching the channel:
   bool NeedsTransferMode = (LiveView && IsPrimaryDevice() && !ProvidesChannel(Channel, Setup.PrimaryLimit, &NeedsDetachReceivers));
 
-  NeedsTransferMode = LiveView;
-
   if (LiveView && Setup.LiveBuffer)
      NeedsTransferMode = true;   
 
