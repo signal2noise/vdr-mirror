@@ -1635,26 +1635,9 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
     default: {
       DoShowMode = false;
       switch (Key) {
-        case kStop:    if (player) { //end livebuffer
+        case kStop:    if (player) 
                           if (player->Stop())
                              break;
-                       }
-                       else { //end instant recording
-                            const char *s = NULL;
-                            const char *last = NULL;
-                            while ((s = cRecordControls::GetInstantId(s)) != NULL) {
-                               if (s)
-                                  last = s;
-                            }
-                            if (last) {
-                               char *buffer;
-                               asprintf(&buffer,"%s \"%s\"?",tr("End recording"),last);
-                               if (Interface->Confirm(buffer)) {
-                                  cRecordControls::Stop(last);
-                               }
-                               free(buffer);
-                            }
-                       }
                        return osUnknown;
         case kBack:    if (visible && !modeOnly && player)
                           Hide();
