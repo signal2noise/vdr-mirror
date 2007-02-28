@@ -6012,6 +6012,8 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
      Timers.SetModified();
      asprintf(&instantId, cDevice::NumDevices() > 1 ? "%s - %d" : "%s", timer->Channel()->Name(), device->CardIndex() + 1);
      }
+  else if (timer->HasFlags(tfInstant))
+     asprintf(&instantId, cDevice::NumDevices() > 1 ? "%s - %d" : "%s", timer->Channel()->Name(), device->CardIndex() + 1);
   timer->SetPending(true);
   timer->SetRecording(true);
   event = timer->Event();
