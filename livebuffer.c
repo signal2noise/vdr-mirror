@@ -10,10 +10,11 @@
 #include <errno.h>
 #include <unistd.h>
 #include "videodir.h"
+#include "interface.h"
 
 #define MAXFILESPERRECORDING 255
 #define RECORDFILESUFFIX    "/%03d.vdr"
-#define RECORDFILESUFFIXLEN 20 
+#define RECORDFILESUFFIXLEN 20
 
 cFileName64::cFileName64(const char *FileName, bool Record, bool Blocking)
 {
@@ -46,7 +47,7 @@ cFileName64::cFileName64(const char *FileName, bool Record, bool Blocking)
                 }
              }
           }
-       else if (errno != ENOENT) 
+       else if (errno != ENOENT)
           LOG_ERROR_STR(fileName);
        }
     break;
@@ -132,7 +133,7 @@ int cUnbufferedFile64::Open(const char *FileName, int Flags, mode_t Mode)
   written = 0;
   totwritten = 0;
   if (fd >= 0)
-     posix_fadvise(fd, 0, 0, POSIX_FADV_RANDOM); 
+     posix_fadvise(fd, 0, 0, POSIX_FADV_RANDOM);
 #endif
   return fd;
 }
@@ -141,8 +142,8 @@ int cUnbufferedFile64::Close(void)
 {
 #ifdef USE_FADVISE
   if (fd >= 0) {
-     if (totwritten)    
-        fdatasync(fd);  
+     if (totwritten)
+        fdatasync(fd);
      posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
      }
 #endif
@@ -152,7 +153,7 @@ int cUnbufferedFile64::Close(void)
 }
 
 
-#define FADVGRAN   KILOBYTE(4) 
+#define FADVGRAN   KILOBYTE(4)
 #define READCHUNK  MEGABYTE(8)
 
 int cUnbufferedFile64::FadviseDrop(off64_t Offset, off64_t Len)
@@ -173,7 +174,7 @@ ssize_t cUnbufferedFile64::Read(void *Data, size_t Size)
 {
   if (fd >= 0) {
 #ifdef USE_FADVISE
-     off64_t jumped = curpos-lastpos; 
+     off64_t jumped = curpos-lastpos;
      if ((cachedstart < cachedend) && (curpos < cachedstart || curpos > cachedend)) {
         FadviseDrop(cachedstart, cachedend-cachedstart);
         cachedstart = curpos;
@@ -193,12 +194,12 @@ ssize_t cUnbufferedFile64::Read(void *Data, size_t Size)
               ahead = curpos + readahead;
               cachedend = max(cachedend, ahead);
               }
-           if (readahead < Size * 32) { 
+           if (readahead < Size * 32) {
               readahead = Size * 32;
               }
            }
         else
-           ahead = curpos; 
+           ahead = curpos;
         }
 
      if (cachedstart < cachedend) {
@@ -284,7 +285,7 @@ cLiveIndex::~cLiveIndex()
     block *n = tailblock->next;
     delete tailblock;
     tailblock = n;
-    } 
+    }
   delete headblock;
   delete RwLock;
 }
@@ -306,7 +307,7 @@ void cLiveIndex::Add(uchar pt, int pos)
     headblock->next = b;
     headblock = b;
     head = 0;
-    blockCount++; 
+    blockCount++;
     }
   RwLock->Unlock();
 }
@@ -314,7 +315,7 @@ void cLiveIndex::Add(uchar pt, int pos)
 void cLiveIndex::AddData(int pos)
 {
   RwLock->Lock(true);
-  DCount=pos-DPos; 
+  DCount=pos-DPos;
   RwLock->Unlock();
 }
 
@@ -376,7 +377,7 @@ void cLiveIndex::Clear(void)
   DCount = 0;
   lastFrame = -1;
   lastWrittenSize = lastCount = 0;
-  fileSize = 0; 
+  fileSize = 0;
   RwLock->Unlock();
 }
 
@@ -387,8 +388,8 @@ int cLiveIndex::NextWrite(void)
   int i = GetFrame(&b,writtenCount);
   int off = 0;
   if (i+1 == INDEXBLOCKSIZE)
-    off = b->next->Frame[0].offset; 
-  else 
+    off = b->next->Frame[0].offset;
+  else
     off = b->Frame[i+1].offset;
   int r = 0;
   if (off < b->Frame[i].offset)
@@ -471,7 +472,7 @@ int cLiveIndex::Size(int Number, uchar *PictureType)
           r = LIVEBUFSIZE - b->Frame[i].offset - blank;
         }
       else
-        r = off - b->Frame[i].offset;    
+        r = off - b->Frame[i].offset;
       }
     }
   else if (HasFrame(Number-1) && DPos >= 0)
@@ -494,7 +495,7 @@ int cLiveIndex::GetNextIFrame(int Index, bool Forward)
        return Index;
     Index +=d;
     }
-  return -1; 
+  return -1;
 }
 
 int cLiveIndex::FindIFrame(int64_t PTS, uchar *Buffer)
@@ -564,9 +565,9 @@ void cLiveFileReader::Action(void)
         length = r;
         hasData = true;
         }
-      } 
+      }
     Unlock();
-    newSet.Wait(1000);   
+    newSet.Wait(1000);
     }
 }
 
@@ -596,7 +597,7 @@ void cLiveFileReader::Clear(void)
 {
   Lock();
   delete buffer;
-  buffer = NULL; 
+  buffer = NULL;
   Unlock();
 }
 
@@ -647,7 +648,7 @@ bool cLiveFileWriter::LowDiskSpace()
   if (!full && time (NULL) > lastCheck + 60 || full && filePos >= fileSize) {
     int Free = FreeDiskSpaceMB(fileName->Name());
     lastCheck = time(NULL);
-    if (Free < MINFREE) 
+    if (Free < MINFREE)
       return true;
     }
   return false;
@@ -660,7 +661,7 @@ off64_t cLiveFileWriter::Write(uchar *Buffer, int Size, bool Wait)
     return filePos;
     }
   if (!buffer) {
-    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024 || LowDiskSpace()) { 
+    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024 || LowDiskSpace()) {
       fileSize = filePos > fileSize ? filePos : fileSize;
       filePos = 0;
       writeFile->Seek(0,0);
@@ -704,7 +705,7 @@ cLiveCutterThread::cLiveCutterThread(const char *FileName, int FileNumber, cLive
   readFileName = new cFileName64(LiveBuffer->filestring, false);
   readFileName->SetNumber(LiveBuffer->fileWriter->FileNumber());
   readFile = readFileName->Open();
- 
+
   writeFileName = new cFileName64(FileName, true);
   writeFileName->SetNumber(FileNumber);
   writeFile = writeFileName->Open();
@@ -736,7 +737,7 @@ void cLiveCutterThread::Action(void)
       writeFileName->Close();
       writeFileName->SetNumber(Number+1);
       writeFile = writeFileName->Open();
-      writePos = 0; 
+      writePos = 0;
       }
     if (liveBuffer->index->IsWritten(Frame)) {
       uchar b[MAXFRAMESIZE];
@@ -756,7 +757,7 @@ void cLiveCutterThread::Action(void)
       writePos+=size;
       }
     liveBuffer->index->RwLock->Unlock();
-    Frame++; 
+    Frame++;
     cCondWait::SleepMs(5);
     }
 }
@@ -773,7 +774,7 @@ cLiveBuffer::cLiveBuffer(const char *FileName, cRemux *Remux)
   startFrame = -1;
   liveCutter = NULL;
   MakeDirs(FileName, true);
-  SpinUpDisk(FileName);  
+  SpinUpDisk(FileName);
   fileWriter = new cLiveFileWriter(FileName);
   fileReader = new cLiveFileReader(FileName, fileWriter->FileNumber());
   Start();
@@ -811,7 +812,7 @@ void cLiveBuffer::Store(uchar *Data, int Count)
 
   if (pictureType != NO_PICTURE) {
     if (head + MAXFRAMESIZE > LIVEBUFSIZE) {
-      blank = LIVEBUFSIZE - head; 
+      blank = LIVEBUFSIZE - head;
       head = 0;
       index->SetBlank(blank);
       }
@@ -822,7 +823,7 @@ void cLiveBuffer::Store(uchar *Data, int Count)
   memcpy(&buffer[head], Data, Count);
   head += Count;
   if (head == LIVEBUFSIZE) {
-     head = blank = 0; 
+     head = blank = 0;
      index->SetBlank(blank);
      }
 
@@ -835,7 +836,7 @@ void cLiveBuffer::Store(uchar *Data, int Count)
 }
 
 void cLiveBuffer::Action(void)
-{  
+{
   while (Running()) {
     int Count;
     Lock();
@@ -856,7 +857,7 @@ void cLiveBuffer::SetNewRemux(cRemux *Remux, bool Clear)
   if (Clear) {
     index->Switched();
     }
-  if (!Remux) 
+  if (!Remux)
     Cancel(3);
   if (!remux && Remux) {
     remux = Remux;
@@ -880,7 +881,7 @@ int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
      return -2;
   if (!index->HasFrame(Number) && (Off < 0 || !index->HasFrame(Number-1)))
      return -1;
-  if (!index->IsWritten(Number)) {   
+  if (!index->IsWritten(Number)) {
     index->RwLock->Lock(false);
     int size=index->Size(Number);
     int off = index->GetOffset(Number);
@@ -894,17 +895,17 @@ int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
       *Buffer = b;
       memcpy(b,&buffer[off],size);
          }
-      if (!index->HasFrame(Number)) 
+      if (!index->HasFrame(Number))
          size = -size;
       }
     else
        size = -1;
     index->RwLock->Unlock();
-    return size; 
+    return size;
     }
-  else 
-    return fileReader->Read(Buffer,index->GetOffset(Number),index->Size(Number));  
-  return -1;  
+  else
+    return fileReader->Read(Buffer,index->GetOffset(Number),index->Size(Number));
+  return -1;
 }
 
 void cLiveBuffer::CreateIndexFile(const char *FileName, int64_t PTS, int EndFrame)
@@ -924,10 +925,10 @@ void cLiveBuffer::CreateIndexFile(const char *FileName, int64_t PTS, int EndFram
   cIndexFile *indexFile = new cIndexFile(FileName, true);
   if (!indexFile)
      return;
-  int endFrame = EndFrame ? EndFrame : index->FindIFrame(PTS, buffer); 
+  int endFrame = EndFrame ? EndFrame : index->FindIFrame(PTS, buffer);
   int timeout = 0;
-  while (endFrame < 0 && timeout < 50) {    
-    cCondWait::SleepMs(100);   
+  while (endFrame < 0 && timeout < 50) {
+    cCondWait::SleepMs(100);
     endFrame = index->FindIFrame(PTS, buffer);
     timeout++;
     }
@@ -942,7 +943,7 @@ void cLiveBuffer::CreateIndexFile(const char *FileName, int64_t PTS, int EndFram
     uchar pt;
     int size = index->Size(Frame, &pt);
     if (pt == I_FRAME && FileOffset > MEGABYTE(Setup.MaxVideoFileSize)) {
-      file = fileName.NextFile();   
+      file = fileName.NextFile();
       file->Write(data,10);
       FileOffset=0;
       }
@@ -981,7 +982,7 @@ void cLiveReceiver::Activate(bool On)
      }
   else {
      Cancel(-1);
-  } 
+  }
 }
 
 void cLiveReceiver::Receive(uchar *Data, int Length)
@@ -1009,8 +1010,8 @@ void cLiveReceiver::Action(void)
 
 // --- cLiveBackTrace --------------------------------------------------------
 
-#define AVG_FRAME_SIZE 15000 
-#define DVB_BUF_SIZE   (256 * 1024) 
+#define AVG_FRAME_SIZE 15000
+#define DVB_BUF_SIZE   (256 * 1024)
 #define BACKTRACE_ENTRIES (DVB_BUF_SIZE / AVG_FRAME_SIZE + 20)
 
 class cLiveBackTrace {
@@ -1123,7 +1124,7 @@ void cLivePlayer::Empty(void)
   liveBuffer->GetFrame(NULL,0);
   if ((readIndex = backTrace->Get(playDir == pdForward)) < 0)
      readIndex = writeIndex;
-  delete readFrame; 
+  delete readFrame;
   readFrame = NULL;
   playFrame = NULL;
   ringBuffer->Clear();
@@ -1135,7 +1136,7 @@ void cLivePlayer::Empty(void)
 
 void cLivePlayer::Activate(bool On)
 {
-  if (On) 
+  if (On)
      Start();
   else
      Cancel(-1);
@@ -1152,12 +1153,12 @@ void cLivePlayer::Action(void)
   readIndex = liveBuffer->LastIndex();
 
   bool Sleep = false;
-  bool WaitingForData = false;  
+  bool WaitingForData = false;
 
   while (Running()) {
     if (Sleep) {
       if (WaitingForData)
-         cCondWait::SleepMs(3);  
+         cCondWait::SleepMs(3);
       else
          cCondWait::SleepMs(3);
       Sleep = false;
@@ -1175,12 +1176,12 @@ void cLivePlayer::Action(void)
      DeviceClear();
      PlayPes(NULL, 0);
      }
- 
+
    LOCK_THREAD;
 
    if (playMode != pmStill && playMode != pmPause) {
      if (!readFrame) {
-       if (playMode == pmFast || (playMode == pmSlow && playDir == pdBackward)) { 
+       if (playMode == pmFast || (playMode == pmSlow && playDir == pdBackward)) {
          int Index = liveBuffer->GetNextIFrame(readIndex, playDir == pdForward);
          if (Index < 0) {
            if (!DeviceFlush(100))
@@ -1198,24 +1199,24 @@ void cLivePlayer::Action(void)
            b = NULL;
            }
          else
-           WaitingForData = true; 
+           WaitingForData = true;
          }
        else {
           int r=liveBuffer->GetFrame(pb, readIndex+1, Off);
-          if (r>0) 
+          if (r>0)
             readIndex++;
           if (r > 0 || r < -10) {
             WaitingForData = false;
             readFrame = new cFrame(b, -abs(r), ftUnknown, readIndex);
             b = NULL;
-            if (r<0) 
+            if (r<0)
                Off += -r;
             else
                Off = 0;
             }
           else if (r==-2)
              readIndex = liveBuffer->GetNextIFrame(liveBuffer->FirstIndex(), true)-1;
-          else  
+          else
             WaitingForData = true;
           }
        }
@@ -1225,7 +1226,7 @@ void cLivePlayer::Action(void)
         }
       }
     else
-      Sleep = true;        
+      Sleep = true;
     if (!playFrame) {
       playFrame = ringBuffer->Get();
       p = NULL;
@@ -1262,10 +1263,10 @@ void cLivePlayer::Action(void)
           ringBuffer->Drop(playFrame);
           playFrame = NULL;
           p = NULL;
-          } 
-      } 
+          }
+      }
     else
-      Sleep = true;  
+      Sleep = true;
   }
 }
 
@@ -1403,7 +1404,7 @@ void cLivePlayer::SkipSeconds(int Seconds)
         if (Index > liveBuffer->FirstIndex())
            Index = liveBuffer->GetNextIFrame(Index, false);
         if (Index >= 0)
-           readIndex = writeIndex = Index - 1; 
+           readIndex = writeIndex = Index - 1;
         }
      Play();
      }
@@ -1415,7 +1416,7 @@ bool cLivePlayer::GetIndex(int &Current, int &Total, bool SnapToIFrame)
     if (playMode == pmStill)
        Current = max(readIndex, 0);
     else {
-      Current = max(writeIndex, 0); 
+      Current = max(writeIndex, 0);
       // TODO SnapToIFrame
       }
     Total = liveBuffer->LastIndex() - liveBuffer->FirstIndex();
@@ -1431,7 +1432,7 @@ bool cLivePlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
   Play = (playMode == pmPlay || playMode == pmFast);
   Forward = (playDir == pdForward);
   if (playMode == pmFast || playMode == pmSlow)
-     Speed = Setup.MultiSpeedMode ? abs(trickSpeed - NORMAL_SPEED) : 0 ; 
+     Speed = Setup.MultiSpeedMode ? abs(trickSpeed - NORMAL_SPEED) : 0 ;
   else
      Speed = -1;
   return true;
@@ -1447,7 +1448,7 @@ cLiveBufferControl::cLiveBufferControl(cLivePlayer *Player)
   visible = modeOnly = shown = false;
   lastCurrent = lastTotal = -1;
   lastPlay = lastForward = false;
-  lastSpeed = -2; 
+  lastSpeed = -2;
   sk = 0;
   timeoutShow = 0;
 }
@@ -1523,7 +1524,7 @@ void cLiveBufferControl::ShowMode(void)
 
         if (!visible) {
            if (NormalPlay)
-              return; 
+              return;
            visible = modeOnly = true;
            displayReplay = Skins.Current()->DisplayReplay(modeOnly);
            }
@@ -1593,9 +1594,9 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
     case kPause: if (player)
                     player->Pause();
                  break;
-        case kPlay:  
+        case kPlay:
                      if (player)
-                        player->Play(); 
+                        player->Play();
                      break;
         case kFastRew|k_Release:
                        sk = 0;
@@ -1604,7 +1605,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        sk = -1;
                        player->SkipSeconds( -5); break;
         case kFastRew: if (player)
-                          player->Backward(); 
+                          player->Backward();
                        break;
         case kFastFwd|k_Release:
                        sk = 0;
@@ -1630,13 +1631,30 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                           }
                        else
                           return osUnknown;
-                       break;  
+                       break;
     default: {
       DoShowMode = false;
       switch (Key) {
-        case kStop:    if (player) 
+        case kStop:    if (player) { //end livebuffer
                           if (player->Stop())
                              break;
+                       }
+                       else { //end instant recording
+                            const char *s = NULL;
+                            const char *last = NULL;
+                            while ((s = cRecordControls::GetInstantId(s)) != NULL) {
+                               if (s)
+                                  last = s;
+                            }
+                            if (last) {
+                               char *buffer;
+                               asprintf(&buffer,"%s \"%s\"?",tr("End recording"),last);
+                               if (Interface->Confirm(buffer)) {
+                                  cRecordControls::Stop(last);
+                               }
+                               free(buffer);
+                            }
+                       }
                        return osUnknown;
         case kBack:    if (visible && !modeOnly && player)
                           Hide();
@@ -1729,9 +1747,9 @@ cLiveBuffer *cLiveBufferManager::InLiveBuffer(cTimer *timer, int *StartFrame, in
          if (time(NULL) > timer->StopTime())
            *EndFrame = now - (time(NULL) - timer->StopTime()) * FRAMESPERSEC;
          else
-           *EndFrame = 0;     
+           *EndFrame = 0;
          }
-       return liveBuffer; 
+       return liveBuffer;
        }
     }
   return NULL;
