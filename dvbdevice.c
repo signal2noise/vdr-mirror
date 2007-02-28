@@ -200,7 +200,6 @@ static unsigned int FrequencyToHz(unsigned int f)
 
 bool cDvbTuner::SetFrontend(void)
 {
-  dsyslog (" cDvbTuner::SetFrontend \n");
   dvb_frontend_parameters Frontend;
 
   memset(&Frontend, 0, sizeof(Frontend));
@@ -212,7 +211,6 @@ bool cDvbTuner::SetFrontend(void)
 
          if (Setup.DiSEqC) {
             cDiseqc *diseqc = Diseqcs.Get(channel.Source(), channel.Frequency(), channel.Polarization(), cardIndex+1); 
-            dsyslog (" DiSEqC %d cardIdx+1 %d \n", Setup.DiSEqC, cardIndex+1);
             if (!diseqc)
                diseqc = Diseqcs.Get(cSource::stSat, channel.Frequency(), channel.Polarization(), cardIndex+1); // default diseqc settings
             if (diseqc) {
@@ -320,7 +318,6 @@ bool cDvbTuner::SetFrontend(void)
 
 void cDvbTuner::Action(void)
 {
-  dsyslog ("[diseqc]: Action() %s \n",description); 
   cTimeMs Timer;
   bool LostLock = false;
   fe_status_t Status = (fe_status_t)0;
@@ -338,7 +335,6 @@ void cDvbTuner::Action(void)
                break;
           case tsSet:
                tunerStatus = SetFrontend() ? tsTuned : tsIdle;
-               dsyslog ("[diseqc]: %s SetFE %d Tuned %s \n", description,  cardIndex, tunerStatus == tsTuned?"YES":"NO"); 
                Timer.Set(tuneTimeout);
                continue;
           case tsTuned:
