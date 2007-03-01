@@ -11,17 +11,6 @@
 #define __DISEQC_H
 
 
-#define DBG " DEBUG DiSEqC -- "
-
-#if defined DEBUG_DISEQC 
-#   define DLOG(x...) dsyslog(x)
-#   define DPRINT(x...) fprintf(stderr,x)
-#else
-# define DPRINT(x...)
-# define DLOG(x...)
-#endif
-
-
 #define  NONE 0
 #define  MINI 1
 #define  FULL 2

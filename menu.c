@@ -164,6 +164,18 @@ eOSState cMenuEditSrcItem::ProcessKey(eKeys Key)
 }
 
 // --- cMenuEditSrcEItem ------------------------------------------------------
+#define DBG ""  
+
+#if defined DEBUG_DISEQC 
+#   define DBG " DEBUG [diseqc]:  -- "
+#   define DLOG(x...) dsyslog(x)
+#   define DPRINT(x...) fprintf(stderr,x)
+#else
+# define DPRINT(x...)
+# define DLOG(x...)
+#endif
+
+
 
 class cMenuEditSrcEItem : public cMenuEditIntItem {
 private:

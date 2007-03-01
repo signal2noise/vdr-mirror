@@ -16,6 +16,16 @@
 
 #define COMMANDS_MAX_LENGTH 400
 
+#define DBG " DEBUG DiSEqC -- "
+
+#if defined DEBUG_DISEQC 
+#   define DLOG(x...) dsyslog(x)
+#   define DPRINT(x...) fprintf(stderr,x)
+#else
+# define DPRINT(x...)
+# define DLOG(x...)
+#endif
+
 // -- cDiseqc ----------------------------------------------------------------
 
 cDiseqc::cDiseqc(void)
