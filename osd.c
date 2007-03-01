@@ -251,6 +251,7 @@ bool cBitmap::LoadXpm(const char *FileName)
         for (int i = 0; i < index; i++)
             free(Xpm[i]);
         }
+     free(Xpm);
      fclose(f);
      }
   else
