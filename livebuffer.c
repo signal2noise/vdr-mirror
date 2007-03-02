@@ -10,7 +10,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include "videodir.h"
-#include "interface.h"
 
 #define MAXFILESPERRECORDING 255
 #define RECORDFILESUFFIX    "/%03d.vdr"
@@ -1635,7 +1634,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
     default: {
       DoShowMode = false;
       switch (Key) {
-        case kStop:    if (player) 
+        case kStop:    if (player)
                           if (player->Stop())
                              break;
                        return osUnknown;
