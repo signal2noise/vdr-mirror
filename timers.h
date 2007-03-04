@@ -27,7 +27,7 @@ enum eTimerMatch { tmNone, tmPartial, tmFull };
 
 class cTimer : public cListObject {
   friend class cMenuEditTimer;
-  friend class cLiveBufferControl;
+  friend class cLiveBufferManager;
 private:
   mutable time_t startTime, stopTime;
   time_t lastSetEvent;

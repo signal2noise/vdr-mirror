@@ -1437,6 +1437,14 @@ bool cLivePlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
   return true;
 }
 
+bool cLivePlayer::NeedsPauseRec(void)
+{
+  if (playMode == pmPause && liveBuffer->LastDeleted() && readIndex < liveBuffer->LastDeleted() + 100) {
+     return true;
+     }
+  return false;
+}
+
 // --- cLiveBufferControl ----------------------------------------------------
 
 cLiveBufferControl::cLiveBufferControl(cLivePlayer *Player)
@@ -1643,27 +1651,16 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        else
                           return osUnknown;
         case kRecord:  {
-                       cTimer *timer = new cTimer(true);
                        int Current, Total;
                        GetIndex(Current,Total);
-                       time_t start = time(NULL) - (Total - Current) / FRAMESPERSEC;
-                       time_t t = start;
-                       struct tm tm_r;
-                       struct tm *now = localtime_r(&t, &tm_r);
-                       timer->start = now->tm_hour * 100 + now->tm_min;
-                       timer->stop = now->tm_hour * 60 + now->tm_min + Setup.InstantRecordTime;
-                       timer->stop = (timer->stop / 60) * 100 + (timer->stop % 60);
-                       if (timer->stop >= 2400)
-                          timer->stop -= 2400;
-                       timer->day = cTimer::SetTime(start, 0);
-                       timer->channel = Channels.GetByNumber(cDevice::CurrentChannel());
-                       Timers.Add(timer);
-                       Timers.SetModified();
+                       cTimer *timer = cLiveBufferManager::Timer(Total-Current);
                        if (cRecordControls::Start(timer))
                           Skins.Message(mtInfo, tr("Recording started"));
                        break;
                        }
-        default: return osUnknown;
+        default:       if (player->NeedsPauseRec())
+                          return osPause;
+                       return osUnknown;
         }
       }
     }
@@ -1740,4 +1737,28 @@ cLiveBuffer *cLiveBufferManager::InLiveBuffer(cTimer *timer, int *StartFrame, in
 bool cLiveBufferManager::AllowsChannelSwitch(void)
 {
   return !liveBuffer || !liveBuffer->LiveCutterActive();
+}
+
+cTimer *cLiveBufferManager::Timer(int n)
+{
+  cTimer *timer = new cTimer(true);
+  if (n == -1) {
+     int Current, Total;
+     liveControl->GetIndex(Current,Total);
+     n = Total-Current;     
+     }
+  time_t start = time(NULL) - n / FRAMESPERSEC;
+  time_t t = start;
+  struct tm tm_r;
+  struct tm *now = localtime_r(&t, &tm_r);
+  timer->start = now->tm_hour * 100 + now->tm_min;
+  timer->stop = now->tm_hour * 60 + now->tm_min + Setup.InstantRecordTime;
+  timer->stop = (timer->stop / 60) * 100 + (timer->stop % 60);
+  if (timer->stop >= 2400)
+     timer->stop -= 2400;
+  timer->day = cTimer::SetTime(start, 0);
+  timer->channel = Channels.GetByNumber(cDevice::CurrentChannel());
+  Timers.Add(timer);
+  Timers.SetModified();
+  return timer;
 }

@@ -1336,6 +1336,12 @@ int main(int argc, char *argv[])
            eOSState state = osUnknown;
            if (cLiveBufferManager::GetLiveBufferControl())
              state = cLiveBufferManager::GetLiveBufferControl()->ProcessKey(key);
+           if (state == osPause) {
+              DELETE_MENU;
+           //   cControl::Shutdown(); Don't do that here!
+              if (!cRecordControls::PauseLiveVideo(true))
+                 Skins.Message(mtError, tr("No free DVB device to record!"));
+              }
            if (state == osUnknown) {
            // Key functions in "normal" viewing mode:
            if (key != kNone && KeyMacros.Get(key)) {

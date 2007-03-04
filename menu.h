@@ -253,7 +253,7 @@ public:
   static bool Start(cTimer *Timer = NULL, bool Pause = false);
   static void Stop(const char *InstantId);
   static void Stop(cDevice *Device);
-  static bool PauseLiveVideo(void);
+  static bool PauseLiveVideo(bool fromLiveBuffer = false);
   static const char *GetInstantId(const char *LastInstantId);
   static cRecordControl *GetRecordControl(const char *FileName);
   static void Process(time_t t);

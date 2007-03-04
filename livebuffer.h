@@ -96,6 +96,7 @@ public:
   int GetNextIFrame(int Index, bool Forward);
   int FindIFrame(int64_t PTS, uchar *Buffer);
   void Switched();
+  int DelCount(void) { return delCount; }
   int Last(void) { return lastFrame+1; }
   int First(void) { return start > delCount ? start : delCount; }
 };
@@ -177,6 +178,7 @@ public:
   void SetNewRemux(cRemux *Remux, bool Clear = false);
   int GetFrame(uchar **Buffer, int Number, int Off = -1);
   int GetNextIFrame(int Index, bool Forward) { return index->GetNextIFrame(Index,Forward); }
+  int LastDeleted(void) { return index->DelCount(); }
   int LastIndex(void) { return index->Last(); }
   int FirstIndex(void) { return index->First(); }
   void CreateIndexFile(const char *FileName, int64_t PTS, int EndFrame = 0);
@@ -219,6 +221,7 @@ public:
   void SkipSeconds(int Seconds);
   virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
   virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
+  bool NeedsPauseRec(void);
 };
 
 class cLiveReceiver : public cReceiver, cThread {
@@ -276,6 +279,7 @@ public:
   static cLiveBufferControl *GetLiveBufferControl(void) { return liveControl; }
   static cLiveBuffer *InLiveBuffer(cTimer *timer, int *StartFrame = NULL, int *EndFrame = NULL);
   static bool AllowsChannelSwitch(void);
+  static cTimer *Timer(int n);
 };
 
 #endif //__LIVEBUFFER_H

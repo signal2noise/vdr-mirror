@@ -6077,7 +6077,7 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
      if (device->AttachReceiver(recorder)) {
         Recording.WriteInfo();
         cStatus::MsgRecording(device, Recording.Name(), Recording.FileName(), true, ch->Number());
-        if (!Timer && !cReplayControl::LastReplayed()) // an instant recording, maybe from cRecordControls::PauseLiveVideo()
+        if (!Timer || Timer->HasFlags(tfInstant) && !cReplayControl::LastReplayed()) // an instant recording, maybe from cRecordControls::PauseLiveVideo()
            cReplayControl::SetRecording(fileName, Recording.Name());
         Recordings.AddByName(fileName);
         return;
@@ -6244,11 +6244,14 @@ void cRecordControls::Stop(cDevice *Device)
       }
 }
 
-bool cRecordControls::PauseLiveVideo(void)
+bool cRecordControls::PauseLiveVideo(bool fromLiveBuffer)
 {
   Skins.Message(mtStatus, tr("Pausing live video..."));
   cReplayControl::SetRecording(NULL, NULL); // make sure the new cRecordControl will set cReplayControl::LastReplayed()
-  if (Start(NULL, true)) {
+  cTimer *timer = NULL;
+  if (fromLiveBuffer)
+     timer = cLiveBufferManager::Timer(-1);
+  if (Start(timer, true)) {
      sleep(2); // allow recorded file to fill up enough to start replaying
      cReplayControl *rc = new cReplayControl;
      cControl::Launch(rc);
