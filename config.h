@@ -21,8 +21,8 @@
 
 // VDR's own version number:
 
-#define VDRVERSION  "1.4.5" // 2007-02-01 / 1.4.5-1
-#define VDRVERSNUM   10405  // Version * 10000 + Major * 100 + Minor
+#define VDRVERSION  "1.4.6"
+#define VDRVERSNUM   10406  // Version * 10000 + Major * 100 + Minor
 
 // The plugin API's version number:
 
