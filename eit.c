@@ -371,6 +371,7 @@ cEitFilter::cEitFilter(void)
   Set(0x12, 0x50, 0xF0);  // event info, actual TS, schedule(0x50)/schedule for future days(0x5X)
   Set(0x12, 0x60, 0xF0);  // event info, other  TS, schedule(0x60)/schedule for future days(0x6X)
   Set(0x14, 0x70);        // TDT
+  Set(8191, 0xff);        // Premiere Radio EPG
 }
 
 void cEitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length)
