@@ -1194,6 +1194,15 @@ int main(int argc, char *argv[])
                   if (!Interface->Confirm(tr("Recording - shut down anyway?")))
                      break;
                }
+               //  -- Shutdown at mp3 playback by moviemax
+               if (cControl::Control()) {
+                   cControl::Control()->Shutdown();
+                   Skins.Message(mtInfo, tr(" Activated standby "));
+                   UserShutdown = true;
+                   break;
+               }
+               //  -- Shutdown at mp3 playback by moviemax end
+
                UserShutdown = true;
                if (cPluginManager::Active(tr("shut down anyway?")))
                   break;
