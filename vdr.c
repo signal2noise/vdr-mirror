@@ -1058,7 +1058,8 @@ int main(int argc, char *argv[])
           case kTT:
           case kPiP:
           case kEject:
-          case kUser1 ... kUser9:
+	  case kTimers:
+	  case kUser1 ... kUser9:
                             //Start by Klaus
                             if (key==kUser6 && Setup.PipIsRunning)
                             {
