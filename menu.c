@@ -55,12 +55,12 @@ class cMenuEditCaItem : public cMenuEditIntItem {
 protected:
   virtual void Set(void);
 public:
-  cMenuEditCaItem(const char *Name, int *Value);
+  cMenuEditCaItem(const char *Name, int *Value, bool EditingBouquet);
   eOSState ProcessKey(eKeys Key);
   };
 
-cMenuEditCaItem::cMenuEditCaItem(const char *Name, int *Value)
-:cMenuEditIntItem(Name, Value, 0)
+cMenuEditCaItem::cMenuEditCaItem(const char *Name, int *Value, bool EditingBouquet)
+:cMenuEditIntItem(Name, Value, 0, EditingBouquet ? 3 : CA_ENCRYPTED_MAX )
 {
   Set();
 }
@@ -463,7 +463,7 @@ void cMenuEditChannel::Setup(void)
     Add(new cMenuEditIntItem( tr("Ppid"),         &data.ppid,  0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Apid1"),        &data.apids[0], 0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Tpid"),         &data.tpid,  0, 0x1FFF));
-    Add(new cMenuEditCaItem(  "CI-Slot",           &data.caids[0]));//XXX
+    Add(new cMenuEditCaItem(  "CI-Slot",           &data.caids[0], false));//XXX
     Add(new cMenuEditIntItem( tr("Sid"),          &data.sid, 1, 0xFFFF));
     ST("C T")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValues, "QPSK"));
     ST("  T")  Add(new cMenuEditMapItem( tr("Bandwidth"),    &data.bandwidth,    BandwidthValues));
@@ -870,13 +870,14 @@ private:
   cChannel data;
   char name[256];
   void Setup(void);
+  int bouquetCaId;
 public:
   cMenuEditBouquet(cChannel *Channel, bool New);
   virtual eOSState ProcessKey(eKeys Key);
 };
 
 cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
-: cOsdMenu(tr("Edit Bouquet"), 14)
+: cOsdMenu(tr("Edit Bouquet"), 24)
 {
   channel = Channel;
   if (channel)
@@ -889,6 +890,7 @@ cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
     data.tid = 0;
     data.rid = 0;
     }
+  bouquetCaId = 0;
   Setup();
 }
 
@@ -899,6 +901,7 @@ void cMenuEditBouquet::Setup(void)
   Clear();
   strn0cpy(name, data.name, sizeof(name));
   Add(new cMenuEditStrItem( tr("Name"), name, sizeof(name), tr(FileNameChars)));
+  Add(new cMenuEditCaItem( tr("CI-Slot for all channels"), &bouquetCaId, true));//XXX
   SetCurrent(Get(current));
   Display();
 }
@@ -924,6 +927,16 @@ eOSState cMenuEditBouquet::ProcessKey(eKeys Key)
             isyslog("added bouquet %s", *data.ToText());
             state = osUser1;
             }
+	  if( bouquetCaId != 0){
+            cChannel *channelE;
+	    for(channelE = (cChannel*)channel->Next(); channelE && !channelE->GroupSep(); channelE = (cChannel*) channelE->Next()){
+              int caids[2] = {bouquetCaId, 0};
+	      if(channelE){
+		channelE->SetCaIds((const int*)&caids);
+		isyslog("editing complete bouquet: setting caid of channel %s to %i", channelE->Name(), bouquetCaId);
+	      }
+	    }
+	  }
           Channels.SetModified(true);
           }
         else {
