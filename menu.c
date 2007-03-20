@@ -71,11 +71,11 @@ void cMenuEditCaItem::Set(void)
   if (*value == CA_FTA)
     strcpy(s, tr("Free To Air"));
   else if (*value == 3)
-    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(2) ? "Neotion" : tr("off"), tr("internal CAM"));
+    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(2) ? "Neotion" : tr("no"), tr("internal CAM"));
   else if (*value == 2)
-    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) : tr("off"), tr("upper slot"));
+    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) : tr("No CI at"), tr("upper slot"));
   else if (*value == 1)
-    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) : tr("off"), tr("lower slot"));
+    sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) : tr("No CI at"), tr("lower slot"));
   
   if (*value <= 3)
      SetValue(s);
@@ -901,7 +901,13 @@ void cMenuEditBouquet::Setup(void)
   Clear();
   strn0cpy(name, data.name, sizeof(name));
   Add(new cMenuEditStrItem( tr("Name"), name, sizeof(name), tr(FileNameChars)));
-  Add(new cMenuEditCaItem( tr("CI-Slot for all channels"), &bouquetCaId, true));//XXX
+  Add(new cMenuEditCaItem( tr("CI-Slot for this Bouquet"), &bouquetCaId, true));//XXX
+  Add(new cOsdItem(" ", osUnknown, false), false, NULL);
+  Add(new cOsdItem(" ", osUnknown, false), false, NULL);
+  Add(new cOsdItem(" ", osUnknown, false), false, NULL);
+  Add(new cOsdItem(tr("Note:"), osUnknown, false), false, NULL);
+  Add(new cOsdItem(tr("Select CI-Slot for current Bouquet."), osUnknown, false), false, NULL);
+  Add(new cOsdItem(tr(""), osUnknown, false), false, NULL);
   SetCurrent(Get(current));
   Display();
 }
