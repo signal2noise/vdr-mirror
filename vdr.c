@@ -156,6 +156,26 @@ static void Watchdog(int signum)
   exit(1);
 }
 
+#define MOUNTSH "/sbin/mount.sh" 
+
+static void Eject()
+{
+    Skins.Message(mtStatus, tr("eject DVD"),5);
+    const char *cmd1 = MOUNTSH " unmount /mnt/dvd";
+    const char *cmd2 = MOUNTSH " eject /dev/hda";
+
+    if (SystemExec(cmd1)!=0) {
+        Skins.Message(mtError, tr("DVD device in use"),3);
+        Skins.Message(mtStatus, NULL);
+        return; 
+    }
+    if (SystemExec(cmd2)!=0) {
+        Skins.Message(mtError, tr("eject failed"),3);
+    }
+    Skins.Message(mtStatus, NULL);
+}
+
+
 int main(int argc, char *argv[])
 {
   // Save terminal settings:
@@ -1050,6 +1070,7 @@ int main(int argc, char *argv[])
                             else
                                 active_function = osUnknown;
                             break;
+          case kEject:      Eject(); key = kNone; break; 
           case kCommands:   DirectMainFunction(osCommands); break;
           case kDVB:
           case kDVD:
@@ -1057,7 +1078,7 @@ int main(int argc, char *argv[])
           case kReel:
           case kTT:
           case kPiP:
-          case kEject:
+          //case kEject:
 	  case kTimers:
 	  case kUser1 ... kUser9:
                             //Start by Klaus
