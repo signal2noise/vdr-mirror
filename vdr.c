@@ -160,19 +160,31 @@ static void Watchdog(int signum)
 
 static void Eject()
 {
-    Skins.Message(mtStatus, tr("eject DVD"),5);
-    const char *cmd1 = MOUNTSH " unmount /mnt/dvd";
-    const char *cmd2 = MOUNTSH " eject /dev/hda";
+  const char *cmd1 = MOUNTSH " unmount /mnt/dvd";
+  const char *cmd2 = MOUNTSH " eject /dev/hda";
 
-    if (SystemExec(cmd1)!=0) {
-        Skins.Message(mtError, tr("DVD device in use"),3);
-        Skins.Message(mtStatus, NULL);
-        return; 
-    }
-    if (SystemExec(cmd2)!=0) {
-        Skins.Message(mtError, tr("eject failed"),3);
-    }
-    Skins.Message(mtStatus, NULL);
+  int ret = system(MOUNTSH " status");
+
+  // if media is mounted 
+  if (WEXITSTATUS(ret) == 0) {
+     // Test if MP3 Player runs  
+     // 
+     ret = system(cmd1);
+     }
+  else if (WEXITSTATUS(ret) == 2) {
+     Skins.Message(mtStatus, tr("close tray"));
+     }
+  else {
+     Skins.Message(mtStatus, tr("eject DVD"));
+     }
+      
+  ret = system(cmd2);
+
+  if (WEXITSTATUS(ret) !=0) {
+     Skins.Message(mtError, tr("eject failed"),3);
+  }
+
+  Skins.Message(mtStatus, NULL);
 }
 
 
