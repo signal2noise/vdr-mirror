@@ -9172,6 +9172,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  { "eject DVD",
+    "Laufwerk wird geöffnet",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
  { NULL }
   };
 
