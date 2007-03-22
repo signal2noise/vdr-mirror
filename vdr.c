@@ -161,7 +161,7 @@ static void Watchdog(int signum)
 static void Eject()
 {
   Skins.Message(mtInfo, tr("eject DVD"));
-  const char *cmd1 = MOUNTSH " eject /dev/hda";
+  const char *cmd1 = MOUNTSH " unmount /mnt/dvd ; eject /dev/hda";
   system(cmd1);
 }
 
