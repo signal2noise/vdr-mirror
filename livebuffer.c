@@ -660,7 +660,7 @@ off64_t cLiveFileWriter::Write(uchar *Buffer, int Size, bool Wait)
     return filePos;
     }
   if (!buffer) {
-    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024 || LowDiskSpace()) {
+    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024*11 || LowDiskSpace()) {
       fileSize = filePos > fileSize ? filePos : fileSize;
       filePos = 0;
       writeFile->Seek(0,0);
