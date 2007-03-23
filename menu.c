@@ -4942,10 +4942,21 @@ cMenuSetupLiveBuffer::cMenuSetupLiveBuffer(void)
 void cMenuSetupLiveBuffer::Setup(void)
 {
   int current=Current();
-  Clear();
+ Clear();
   Add(new cMenuEditBoolItem(tr("Permanent Timeshift"),                                &data.LiveBuffer));
   if (data.LiveBuffer) {
-     Add(new cMenuEditIntItem(tr("Setup.LiveBuffer$Buffer size (MB)"),          &data.LiveBufferSize, 1, 100000));
+    static const char* liveSize[10];
+    liveSize[00] = "1";
+    liveSize[1] = "2";
+    liveSize[2] = "3";
+    liveSize[3] = "4";
+    liveSize[4] = "5";
+    liveSize[5] = "6";
+    liveSize[6] = "7";
+    liveSize[7] = "8";
+    liveSize[8] = "9";
+    liveSize[9] = "10";
+     Add(new cMenuEditStraItem(tr("Setup.LiveBuffer$Buffer (MIN)"),          &data.LiveBufferSize, 10, liveSize));
         }
   SetCurrent(Get(current));
   Display();

@@ -6552,8 +6552,8 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
   },
-  { "Setup.LiveBuffer$Buffer size (MB)",
-    "Puffergröße (MB)",
+  { "Setup.LiveBuffer$Buffer (MIN)",
+    "Aufnahme (Minuten)",
     "",
     "",
     "",
