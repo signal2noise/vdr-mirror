@@ -14,6 +14,8 @@
 #define MAXFILESPERRECORDING 255
 #define RECORDFILESUFFIX    "/%03d.vdr"
 #define RECORDFILESUFFIXLEN 20
+#define MB_PER_MINUTE 25.75 // this is just an estimate!
+
 
 cFileName64::cFileName64(const char *FileName, bool Record, bool Blocking)
 {
@@ -660,7 +662,7 @@ off64_t cLiveFileWriter::Write(uchar *Buffer, int Size, bool Wait)
     return filePos;
     }
   if (!buffer) {
-    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024*11 || LowDiskSpace()) {
+    if (filePos + Size > (off64_t)Setup.LiveBufferSize*1024*1024*MB_PER_MINUTE || LowDiskSpace()) {
       fileSize = filePos > fileSize ? filePos : fileSize;
       filePos = 0;
       writeFile->Seek(0,0);
