@@ -961,7 +961,7 @@ int main(int argc, char *argv[])
         {
             if (!Menu && !cDevice::PrimaryDevice()->DVDPlayerIsInMenuDomain())
             {
-                key = k8;
+                key = k3;
             }
         }
         //End by Klaus
