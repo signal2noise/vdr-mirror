@@ -16,7 +16,6 @@
 #define RECORDFILESUFFIXLEN 20
 #define MB_PER_MINUTE 25.75 // this is just an estimate!
 
-
 cFileName64::cFileName64(const char *FileName, bool Record, bool Blocking)
 {
   file = NULL;

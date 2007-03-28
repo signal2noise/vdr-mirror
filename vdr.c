@@ -156,12 +156,12 @@ static void Watchdog(int signum)
   exit(1);
 }
 
-#define MOUNTSH "/sbin/mount.sh" 
+#define MOUNTSH "mount.sh" 
 
 static void Eject()
 {
   Skins.Message(mtInfo, tr("eject DVD"));
-  const char *cmd1 = MOUNTSH " unmount /mnt/dvd ; eject /dev/hda";
+  const char *cmd1 = MOUNTSH " eject";
   system(cmd1);
 }
 
