@@ -1847,7 +1847,7 @@ bool cCiHandler::ProvidesCa(const unsigned short *CaSystemIds)
 void cCiHandler::SetSource(int Source, int Transponder, int Slot)
 {
   cMutexLock MutexLock(&mutex);
-  if ((Slot >= 0 && Slot <=2 ) && (source != Source || transponder != Transponder)) {
+  if (source != Source || transponder != Transponder) {
      //XXX if there are active entries, send an empty CA_PMT
      caProgramList[Slot].Clear();
      }
