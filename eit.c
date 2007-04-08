@@ -241,13 +241,13 @@ cEIT::cEIT(cSchedules *Schedules, int Source, u_char Tid, const u_char *Data, bo
                           dsyslog("[eit] Linkage %s %4d %4d %5d %5d %5d %5d  %02X  '%s'\n", hit ? "*" : "", channel->Number(), link ? link->Number() : -1, SiEitEvent.getEventId(), ld->getOriginalNetworkId(), ld->getTransportStreamId(), ld->getServiceId(), ld->getLinkageType(), linkName);//XXX
 #endif
                           if (link) {
-                             //if (Setup.UpdateChannels == 1 || Setup.UpdateChannels >= 3) // Update in any case!
+                             if (Setup.UpdateChannels == 1 || Setup.UpdateChannels >= 3) // Update in any case!
                                 link->SetName(linkName, "", "");
                              }
-                          else //if (Setup.UpdateChannels >= 4) {
+                          else if (Setup.UpdateChannels >= 4) {
                              link = Channels.NewChannel(channel, linkName, "", "", ld->getOriginalNetworkId(), ld->getTransportStreamId(), ld->getServiceId());
                              //XXX patFilter->Trigger();
-                             //}
+                            }
                           if (link) {
                              if (!LinkChannels)
                                 LinkChannels = new cLinkChannels;
