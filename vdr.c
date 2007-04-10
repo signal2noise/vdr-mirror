@@ -160,8 +160,8 @@ static void Watchdog(int signum)
 
 static void Eject()
 {
-  Skins.Message(mtInfo, tr("eject DVD"));
   const char *cmd1 = MOUNTSH " eject";
+  Skins.Message(mtInfo, tr("eject DVD"));
   system(cmd1);
 }
 
