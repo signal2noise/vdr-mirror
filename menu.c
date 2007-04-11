@@ -3859,8 +3859,7 @@ private:
   int originalNumAudioLanguages;
   int numAudioLanguages;
   void Setup(void);
-  const char *videoDisplayFormatTexts[3];
-  const char *updateChannelsTexts[6];
+  //const char *updateChannelsTexts[6];
 public:
   cMenuSetupDVB(void);
   virtual eOSState ProcessKey(eKeys Key);
@@ -4895,6 +4894,10 @@ void cMenuSetupReplay::Store(void)
 // --- cMenuSetupMisc --------------------------------------------------------
 
 class cMenuSetupMisc : public cMenuSetupBase {
+private:
+  const char *updateChannelsTexts[3];
+  int tmpUpdateChannels;
+  virtual void Store(void);
 public:
   cMenuSetupMisc(void);
   virtual eOSState ProcessKey(eKeys Key);
@@ -4902,6 +4905,12 @@ public:
 
 cMenuSetupMisc::cMenuSetupMisc(void)
 {
+  updateChannelsTexts[0] = tr("off");
+  updateChannelsTexts[1] = tr("names and PIDs"); // 3
+  updateChannelsTexts[2] = tr("add new transponders"); // 5
+
+  tmpUpdateChannels = (int) data.UpdateChannels / 2;
+
   SetSection(tr("Inactivity"));
   SetHelp(tr("Button$Scan EPG"));
   Add(new cMenuEditIntItem( tr("Setup.EPG$EPG scan timeout (h)"),      &data.EPGScanTimeout, 0, INT_MAX, tr("off")));
@@ -4909,6 +4918,7 @@ cMenuSetupMisc::cMenuSetupMisc(void)
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. user inactivity (min)"), &data.MinUserInactivity, 0, INT_MAX, tr("off")));
   //Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$SVDRP timeout (s)"),          &data.SVDRPTimeout));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),            &data.ZapTimeout, 0, INT_MAX, tr("off")));
+  Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),        &tmpUpdateChannels, 3, updateChannelsTexts));
   Add(new cMenuEditChanItem(tr("Setup.Miscellaneous$Initial channel"),            &data.InitialChannel, tr("Setup.Miscellaneous$as before")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Initial volume"),             &data.InitialVolume, -1, 255, tr("Setup.Miscellaneous$as before")));
 }
@@ -4922,6 +4932,18 @@ eOSState cMenuSetupMisc::ProcessKey(eKeys Key)
      }
   return state;
 }
+
+void cMenuSetupMisc::Store(void)
+{
+  if ( tmpUpdateChannels == 0 )
+	 data.UpdateChannels = 0;
+  else if  ( tmpUpdateChannels == 1 )
+	 data.UpdateChannels = 3;
+  else if  ( tmpUpdateChannels == 2 )
+	 data.UpdateChannels = 5;
+  cMenuSetupBase::Store();
+}
+
 
 // --- cMenuSetupLiveBuffer --------------------------------------------------
 
