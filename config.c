@@ -254,7 +254,7 @@ cSetup::cSetup(void)
   RecordingDirs = 1;
   VideoDisplayFormat = 1;
   VideoFormat = 0;
-  UpdateChannels = 5;
+  UpdateChannels = 3;
   UseDolbyDigital = 0;
   UseDolbyInRecordings = 1;
   LiveDelay = 20;
