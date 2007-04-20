@@ -1870,7 +1870,7 @@ const tI18nPhrase Phrases[] = {
     "Apid1",
   },
   { "Apid2",
-    "Apid2",
+    "Audio-PID2",
     "Apid2",
     "PID Audio (2)",
     "Apid2",

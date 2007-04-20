@@ -462,6 +462,7 @@ void cMenuEditChannel::Setup(void)
     Add(new cMenuEditIntItem( tr("Vpid"),         &data.vpid,  0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Ppid"),         &data.ppid,  0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Apid1"),        &data.apids[0], 0, 0x1FFF));
+    Add(new cMenuEditIntItem( tr("Apid2"),        &data.apids[1], 0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Tpid"),         &data.tpid,  0, 0x1FFF));
     Add(new cMenuEditCaItem(  "CI-Slot",           &data.caids[0], false));//XXX
     Add(new cMenuEditIntItem( tr("Sid"),          &data.sid, 1, 0xFFFF));
