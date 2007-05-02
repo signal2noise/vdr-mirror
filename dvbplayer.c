@@ -419,9 +419,11 @@ void cDvbPlayer::Action(void)
                        bool TimeShiftMode = index->IsStillRecording();
                        int Index = index->GetNextIFrame(readIndex, playDir == pdForward, &FileNumber, &FileOffset, &Length, TimeShiftMode);
                        if (Index >= 0) {
-                          if (!NextFile(FileNumber, FileOffset))
+                          if (!NextFile(FileNumber, FileOffset)) {
+                             readIndex = Index;
                              continue;
                           }
+		    }	  
                        else {
                           if (!TimeShiftMode && playDir == pdForward) {
                              // hit end of recording: signal end of file but don't change playMode

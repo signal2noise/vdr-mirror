@@ -957,7 +957,7 @@ void cCiCaPmt::AddCaDescriptors(int Length, const uint8_t *Data)
 
 // --- cCiConditionalAccessSupport -------------------------------------------
 
-#define MAXCASYSTEMIDS 16
+#define MAXCASYSTEMIDS 64
 
 // CA Enable Ids:
 
