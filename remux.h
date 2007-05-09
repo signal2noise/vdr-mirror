@@ -44,6 +44,7 @@ private:
   bool isRadio;
   int numUPTerrors;
   bool synced;
+  bool syncEarly;
   int skipped;
   int getTimeout;
   int lastGet;
@@ -58,12 +59,13 @@ private:
   inline int GetPid(const uchar *Data) 
 	  {return ((Data[0] & 0xf) << 8) | (Data[1] & 0xff);};
 public:
-  cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure = false);
+  cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure = false, bool SyncEarly = false);
        ///< Creates a new remuxer for the given PIDs. VPid is the video PID, while
        ///< APids, DPids and SPids are pointers to zero terminated lists of audio,
        ///< dolby and subtitle PIDs (the pointers may be NULL if there is no such
        ///< PID). If ExitOnFailure is true, the remuxer will initiate an "emergency
-       ///< exit" in case of problems with the data stream.
+       ///< exit" in case of problems with the data stream. SyncEarly causes cRemux
+       ///< to sync as soon as a video or audio frame is seen.
   ~cRemux();
   void SetTimeouts(int PutTimeout, int GetTimeout);
        ///< By default cRemux assumes that Put() and Get() are called from different

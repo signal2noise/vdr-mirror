@@ -712,7 +712,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            for (int i = 0; i < MAXDPIDS; i++)
                SetAvailableTrack(ttDolby, i, Channel->Dpid(i), Channel->Dlang(i));
            }
-        if (!NeedsTransferMode)
+	if (!NeedsTransferMode || GetCurrentAudioTrack() == ttNone)
            EnsureAudioTrack(true);
         }
      cStatus::MsgChannelSwitch(this, Channel->Number()); // only report status if channel switch successfull

@@ -1049,14 +1049,13 @@ int cRepackerAC3Fast::Put(const uchar *Data, int Count, int Flag, uint64 timesta
 //--------------------------------------------------------------------------
 // cRemux
 //--------------------------------------------------------------------------
-
-cRemux::cRemux(int VPid, const int *APids, const int *DPids, 
-	       const int *SPids, bool ExitOnFailure)
+cRemux::cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure, bool SyncEarly)	       
 {
 	exitOnFailure = ExitOnFailure;
 	isRadio = VPid == 0 || VPid == 1 || VPid == 0x1FFF;
 	numUPTerrors = 0;
 	synced = false;
+	syncEarly = SyncEarly;
 	skipped = 0;
 	numTracks = 0;
 	resultSkipped = 0;
@@ -1242,30 +1241,33 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 			}
 #endif
 			if (!synced) {
-				if (pt == I_FRAME) {
-					SetBrokenLink(resultData, l);
+				if (pt == I_FRAME || syncEarly) {
 					synced=true;
 					printf("REMUX SYNCED\n");
-				}
-			}			
-		}
-		else {
-			if (isRadio) {
-				pt=I_FRAME;
-				synced=true;
-			}
-			else {
-				if (!synced) {
-					lastGet=-1; // Hold back audio to get faster AV-sync
+					if (pt == I_FRAME) // syncEarly: it's ok but there is no need to call SetBrokenLink()
+					   SetBrokenLink(resultData, l);
+					else 
+					fprintf(stderr, "video: synced early\n");
 				}
 			}
 		}
-	}
+		else if (isRadio || (!synced && syncEarly)) {
+		  pt=I_FRAME;
+		  synced=true;
+		  if (!isRadio) 
+              fprintf(stderr, "audio: synced early\n");	
+		}
+	    else if (!synced && PictureType && isRadio) {
+		   lastGet=-1; // Hold back audio to get faster AV-sync
+		}
+    }
+	
 
 	if (!synced) {
 		Del(0);
 		return NULL;
 	}
+
 
 	if (PictureType)
 		*PictureType = pt;
