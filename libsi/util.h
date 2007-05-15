@@ -148,9 +148,9 @@ public:
    CRC32(const char *d, int len, u_int32_t CRCvalue=0xFFFFFFFF);
    bool isValid() { return crc32(data, length, value) == 0; }
    static bool isValid(const char *d, int len, u_int32_t CRCvalue=0xFFFFFFFF) { return crc32(d, len, CRCvalue) == 0; }
+   static u_int32_t crc32 (const char *d, int len, u_int32_t CRCvalue);
 protected:
    static u_int32_t crc_table[256];
-   static u_int32_t crc32 (const char *d, int len, u_int32_t CRCvalue);
 
    const char *data;
    int length;
