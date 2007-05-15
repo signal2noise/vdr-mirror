@@ -18,8 +18,9 @@ LSIDIR   = ./libsi
 TXMLDIR  = ./tinyxml
 MANDIR   = /usr/local/man
 BINDIR   = /usr/local/bin
+SBINDIR  = /usr/local/sbin
 LIBS     = -ljpeg -lpthread -ldl -lcap
-INCLUDES =
+INCLUDES = 
 
 PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
@@ -30,6 +31,8 @@ DOXYGEN  = /usr/bin/doxygen
 DOXYFILE = Doxyfile
 
 -include ../Make.config
+
+INCLUDES += -I$(DVBDIR)
 
 SILIB    = $(LSIDIR)/libsi.a
 TXMLLIB  = $(TXMLDIR)/libtinyxml.a
@@ -219,9 +222,11 @@ install: install-bin install-plugins
 
 # VDR binary:
 
+install-vdr: install-bin
+
 install-bin: vdr
-	@mkdir -p $(BINDIR)
-	@install -sp vdr $(BINDIR)
+	@mkdir -p $(SBINDIR)
+	install -sp vdr $(SBINDIR)
 
 # Configuration files:
 
@@ -229,7 +234,7 @@ install-conf:
 	@if [ ! -d $(VIDEODIR) ]; then\
 	    mkdir -p $(VIDEODIR);\
 	    cp *.conf $(VIDEODIR);\
-	    fi
+	 fi
 
 # Documentation:
 
@@ -244,7 +249,7 @@ plugins-install: install-plugins
 
 install-plugins: plugins
 	@mkdir -p $(PLUGINLIBDIR)
-	@install -sp $(PLUGINDIR)/lib/lib*-*.so.$(APIVERSION) $(PLUGINLIBDIR)
+	install -sp $(PLUGINDIR)/lib/lib*-*.so.$(APIVERSION) $(PLUGINLIBDIR)
 
 # Source documentation:
 

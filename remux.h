@@ -23,6 +23,11 @@ enum ePesHeader {
 
 ePesHeader AnalyzePesHeader(const uchar *Data, int Count, int &PesPayloadOffset, bool *ContinuationHeader = NULL);
 
+enum eRemuxMode {
+  rAuto, // auto detect, MPEG2->PES, h.264->TS
+  rPES,  // Force PES
+  rTS    // Force TS
+};
 #define TS_SIZE 188
   
 // Picture types:
@@ -58,8 +63,23 @@ private:
   int resultSkipped;
   inline int GetPid(const uchar *Data) 
 	  {return ((Data[0] & 0xf) << 8) | (Data[1] & 0xff);};
+	  
+  // RMM extensions
+  enum eRemuxMode rmode;
+  int tsmode;
+  int tsmode_valid;
+  int sfmode;
+  
+  uchar patpmt[2*188];
+  int patpmt_valid;
+  int tsindex;
+  int vpid;
+  int apids[16];
+  int dpids[16];
+  
 public:
-  cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure = false, bool SyncEarly = false);
+  cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure = false, 
+                   enum eRemuxMode Rmode=rPES, bool SyncEarly = false);
        ///< Creates a new remuxer for the given PIDs. VPid is the video PID, while
        ///< APids, DPids and SPids are pointers to zero terminated lists of audio,
        ///< dolby and subtitle PIDs (the pointers may be NULL if there is no such
@@ -92,12 +112,24 @@ public:
        ///< settings as they are.
   static void SetBrokenLink(uchar *Data, int Length);
   static int GetPacketLength(const uchar *Data, int Count, int Offset);
-  static int ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &PictureType);
+  static int ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &PictureType, int &StreamFormat);
+  static int ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, int &StreamFormat);
+
+  // RMM extension: Mixed TS/PES handling
+  int TSmode(void) {return tsmode;}
+  int makeStreamType(uchar *data, int type, int pid);
+  int GetPATPMT(uchar *data, int maxlen);
+
   };
 
 // Start codes:
 #define SC_SEQUENCE 0xB3  // "sequence header code"
 #define SC_GROUP    0xB8  // "group start code"
 #define SC_PICTURE  0x00  // "picture start code"
+
+// Stream formats
+#define SF_UNKNOWN 0
+#define SF_MPEG2 1
+#define SF_H264 2
 
 #endif // __REMUX_H

@@ -33,6 +33,7 @@
 #include "diseqc.h"
 #include "help.h"
 
+#define DVBSETUPTEMP
 
 #define MAXWAIT4EPGINFO   3 // seconds
 #define MODETIMEOUT       3 // seconds
@@ -457,7 +458,8 @@ void cMenuEditChannel::Setup(void)
     Add(new cMenuEditIntItem( tr("Frequency"),    &data.frequency));
     ST(" S ")  Add(new cMenuEditChrItem( tr("Polarization"), &data.polarization, "hvlr"));
     ST("CS ")  Add(new cMenuEditIntItem( tr("Srate"),        &data.srate));
-    ST("CST")  Add(new cMenuEditMapItem( tr("CoderateH"),    &data.coderateH,    CoderateValues, tr("none")));
+    ST("C T")  Add(new cMenuEditMapItem( tr("CoderateH"),    &data.coderateH,    CoderateValues, tr("none")));
+    ST(" S ")  Add(new cMenuEditMapItem( tr("CoderateH"),    &data.coderateH,    CoderateValuesS, tr("none")));
     ST("  T")  Add(new cMenuEditMapItem( tr("CoderateL"),    &data.coderateL,    CoderateValues, tr("none")));
     Add(new cMenuEditIntItem( tr("Vpid"),         &data.vpid,  0, 0x1FFF));
     Add(new cMenuEditIntItem( tr("Ppid"),         &data.ppid,  0, 0x1FFF));
@@ -467,10 +469,12 @@ void cMenuEditChannel::Setup(void)
     Add(new cMenuEditCaItem(  "CI-Slot",           &data.caids[0], false));//XXX
     Add(new cMenuEditIntItem( tr("Sid"),          &data.sid, 1, 0xFFFF));
     ST("C T")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValues, "QPSK"));
+    ST(" S ")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValuesS, "4"));    
     ST("  T")  Add(new cMenuEditMapItem( tr("Bandwidth"),    &data.bandwidth,    BandwidthValues));
     ST("  T")  Add(new cMenuEditMapItem( tr("Transmission"), &data.transmission, TransmissionValues));
     ST("  T")  Add(new cMenuEditMapItem( tr("Guard"),        &data.guard,        GuardValues));
     ST("  T")  Add(new cMenuEditMapItem( tr("Hierarchy"),    &data.hierarchy,    HierarchyValues, tr("none")));
+    ST(" S ")  Add(new cMenuEditMapItem( tr("Rolloff"),      &data.rolloff,      RolloffValues, "35"));
 /*
   // Parameters for all types of sources:
   strn0cpy(name, data.name, sizeof(name));
@@ -3860,7 +3864,10 @@ private:
   int originalNumAudioLanguages;
   int numAudioLanguages;
   void Setup(void);
-  //const char *updateChannelsTexts[6];
+#ifdef DVBSETUPTEMP
+  const char *videoDisplayFormatTexts[3];
+  const char *updateChannelsTexts[6];
+#endif
 public:
   cMenuSetupDVB(void);
   virtual eOSState ProcessKey(eKeys Key);
@@ -3873,6 +3880,8 @@ cMenuSetupDVB::cMenuSetupDVB(void)
   for (numAudioLanguages = 0; numAudioLanguages < I18nNumLanguages && data.AudioLanguages[numAudioLanguages] >= 0; numAudioLanguages++)
       ;
   originalNumAudioLanguages = numAudioLanguages;
+*/
+#ifdef DVBSETUPTEMP
   videoDisplayFormatTexts[0] = tr("pan&scan");
   videoDisplayFormatTexts[1] = tr("letterbox");
   videoDisplayFormatTexts[2] = tr("center cut out");
@@ -3882,9 +3891,8 @@ cMenuSetupDVB::cMenuSetupDVB(void)
   updateChannelsTexts[3] = tr("names and PIDs");
   updateChannelsTexts[4] = tr("add new channels");
   updateChannelsTexts[5] = tr("add new transponders");
-
+#endif
   //SetSection(tr("DVB"));
-  */
   SetSection(tr("Audio"));
   Setup();
 }
@@ -3895,13 +3903,13 @@ void cMenuSetupDVB::Setup(void)
 
   Clear();
 
-/*
+#ifdef DVBSETUPTEMP
   Add(new cMenuEditIntItem( tr("Setup.DVB$Primary DVB interface"), &data.PrimaryDVB, 1, cDevice::NumDevices()));
   Add(new cMenuEditBoolItem(tr("Setup.DVB$Video format"),          &data.VideoFormat, "4:3", "16:9"));
   if (data.VideoFormat == 0)
      Add(new cMenuEditStraItem(tr("Setup.DVB$Video display format"), &data.VideoDisplayFormat, 3, videoDisplayFormatTexts));
-  Add(new cMenuEditBoolItem(tr("Setup.DVB$Use Dolby Digital"),     &data.UseDolbyDigital));
-  Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),       &data.UpdateChannels, 6, updateChannelsTexts));
+#endif
+/*
   Add(new cMenuEditIntItem( tr("Setup.DVB$Audio languages"),       &numAudioLanguages, 0, I18nNumLanguages));
   for (int i = 0; i < numAudioLanguages; i++)
       Add(new cMenuEditStraItem(tr("Setup.DVB$Audio language"),    &data.AudioLanguages[i], I18nNumLanguages, I18nLanguages()));
@@ -3917,11 +3925,11 @@ void cMenuSetupDVB::Setup(void)
 
 eOSState cMenuSetupDVB::ProcessKey(eKeys Key)
 {
-  /*
   int oldPrimaryDVB = ::Setup.PrimaryDVB;
   int oldVideoDisplayFormat = ::Setup.VideoDisplayFormat;
   bool oldVideoFormat = ::Setup.VideoFormat;
   bool newVideoFormat = data.VideoFormat;
+  /*
   int oldnumAudioLanguages = numAudioLanguages;
   */
 

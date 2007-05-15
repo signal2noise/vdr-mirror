@@ -1,9 +1,12 @@
 /*
- * remux.c: A streaming MPEG2 remultiplexer
+ * remux.c: A streaming MPEG2/h.264 remultiplexer
  *
  * This code is a CPU efficient but still compatible replacement for 
  * vdr's original remux.c and is used in the vdr implementation of the Reelbox
  * 
+ * The remuxer can automatically detect h.264 and outputs the data
+ * unchanged as TS.
+ *
  * Parts were adopted from the original remux.c, done
  * by Reinhard Nissl <rnissl@gmx.de> and Klaus.Schmidinger@cadsoft.de
  *
@@ -22,10 +25,13 @@
 #include "tools.h"
 
 #include "remux.h"
+#include "libsi/util.h" // for crc
 
-typedef unsigned long long uint64;
+//typedef unsigned long long uint64;
 
 #define ENABLE_AC3_REPACKER
+
+#define ENABLE_TS_MODE
 
 #define MPEG_FRAME_TYPE(x) (((x) >> 3) & 0x07)
 //--------------------------------------------------------------------------
@@ -157,11 +163,12 @@ int cRemux::GetPacketLength(const uchar *Data, int Count, int Offset)
 //--------------------------------------------------------------------------
 // Using tuned subroutine in tools.c for FindPacketHeader
 //--------------------------------------------------------------------------
-int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &PictureType)
+int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &PictureType, int &StreamFormat)
 {
 	// Scans the video packet starting at Offset and returns its length.
 	// If the return value is -1 the packet was not completely in the buffer.
 	int Length = GetPacketLength(Data, Count, Offset);
+	StreamFormat = SF_UNKNOWN;
 	if (Length > 0) {
 		int PesPayloadOffset = 0;
 		if (AnalyzePesHeader(Data + Offset, Length, PesPayloadOffset) >= phMPEG1) {
@@ -175,7 +182,15 @@ int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &Pic
 					p+=x+2;
 					switch (p[1]) {
 					case SC_PICTURE: PictureType = (p[3] >> 3) & 0x07;
+						StreamFormat = SF_MPEG2;
 						return Length;
+					case 9: // Access Unit Delimiter AUD in h.264
+						StreamFormat = SF_H264;
+						if (p[2]==0x10)
+                                                        PictureType=I_FRAME;
+                                                else
+                                                        PictureType=B_FRAME;
+                                                return 0;
 					}
 				}
 				else
@@ -186,6 +201,61 @@ int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &Pic
 		PictureType = NO_PICTURE;
 		return Length;
 	}
+	return -1;
+}
+//--------------------------------------------------------------------------
+// like ScanVideoPacket, but searches in TS packets
+// Hack: Looks only at two TS packets
+int cRemux::ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, int &StreamFormat)
+{
+	uchar buffer[2*188];
+	int l=0;
+
+	for(int n=0;n<Count && n<2*188; n+=188) {
+		int offset;
+		int adapfield=Data[3]&0x30;
+		
+		if (adapfield==0 || adapfield==0x20)
+			continue;
+
+		if (adapfield==0x30) {
+			offset=5+Data[4];
+			if (offset>188)
+				continue;
+		}
+		else
+			offset=4;
+
+		memcpy(buffer+l, Data, 188-offset);
+		l+=188-offset;
+
+		Data+=188;
+	}
+
+	const uchar *p = buffer;
+	const uchar *pLimit = buffer +l - 3;
+	
+	while (p < pLimit) {
+		int x;
+		x=FindPacketHeader(p, 0, pLimit - p);
+		if (x!=-1) {           // found 0x000001
+			p+=x+2;
+			switch (p[1]) {
+			case SC_PICTURE: PictureType = (p[3] >> 3) & 0x07;
+				StreamFormat = SF_MPEG2;
+				return 0;
+			case 9: // Access Unit Delimiter AUD in h.264
+				StreamFormat = SF_H264;
+				if (p[2]==0x10)
+					PictureType=I_FRAME;
+				else
+					PictureType=B_FRAME;
+				return 0;
+			}
+		}
+		else
+			break;
+	}		
 	return -1;
 }
 //--------------------------------------------------------------------------
@@ -503,6 +573,7 @@ void cPacketBuffer::Invalidate(void)
 //--------------------------------------------------------------------------
 
 #define MAX_PACKET_SIZE 2048
+#define MAX_TS_PACKET_SIZE (64*188)
 
 class cRepacker {
 protected:
@@ -516,7 +587,10 @@ public:
 	cPacketBuffer *packetBuffer;
 	cRepacker(void) {};
 	virtual ~cRepacker(void) {};
+	// Puts data into buffer, assemble PES packets
 	virtual int Put(const uchar *Data, int Count, int Flag, uint64) {return 0;};
+	// Puts raw TS data into buffer, packetized only by flag
+	virtual int PutRaw(const uchar *Data, int Count, int Flag, uint64) {return 0;};
 	void SetMaxPacketSize(int MaxPacketSize) { maxPacketSize = MaxPacketSize; }
 	inline int GetPid(void) {return pid;}
 };
@@ -537,6 +611,8 @@ public:
 	virtual ~cRepackerFast(void);
 	cRepackerFast(int Pid, int RewriteCid, int SubStreamId, int MaxPacketSize=MAX_PACKET_SIZE);
 	virtual int Put(const uchar *Data, int Count, int Flag, uint64);
+	virtual int PutRaw(const uchar *Data, int Count, int Flag, uint64);
+	
 };
 //--------------------------------------------------------------------------
 
@@ -798,6 +874,29 @@ int cRepackerFast::Put(const uchar *Data, int Count, int Flag, uint64 timestamp)
 	return 0;
 }
 //--------------------------------------------------------------------------
+
+int cRepackerFast::PutRaw(const uchar *Data, int Count, int Flag, uint64 timestamp) 
+{
+	if (Flag || (len+Count) > maxPacketSize) {
+		packetBuffer->PutEnd(len, startFlag, timestamp);
+		maxPacketSize=MAX_TS_PACKET_SIZE;
+		buffer=packetBuffer->PutStart(maxPacketSize);
+		startFlag=Flag;
+		len=0;
+	}
+
+	if (!buffer) {
+		return 1;
+	}
+	memcpy(buffer, Data, Count);
+
+	buffer+=Count;
+	len+=Count;
+
+	return 0;
+}
+
+//--------------------------------------------------------------------------
 // cRepackerAC3Fast
 //--------------------------------------------------------------------------
 // Purpose: Split one PES packet up into multiple PES with one AC3-frame each.
@@ -818,12 +917,14 @@ protected:
 	uchar part_buffer[PART_BUF_LEN];
 	int part_len;
 	int part_framesize;
+	uchar *buffer; // for RawPut
 	int FlushBuffer(int, uint64 );
 	int GenAC3Packet(uchar* data, int frame_size, int first, uint64 timestamp);
 public:
 	cRepackerAC3Fast(int Pid, int RewriteCid, int SubStreamId, int MaxPacketSize=MAX_PACKET_SIZE);
 	virtual ~cRepackerAC3Fast(void);
 	virtual int Put(const uchar *Data, int Count, int Flag, uint64);
+	virtual int PutRaw(const uchar *Data, int Count, int Flag, uint64);
 };
 
 // taken from old remux.c
@@ -867,6 +968,7 @@ cRepackerAC3Fast::cRepackerAC3Fast(int Pid, int RewriteCid, int SubStreamId, int
 	packetBuffer = new cPacketBuffer(512*1024, 2048);
 	
 	packetBuffer->SetTimeouts(20,0);
+	buffer=NULL;
 }
 //--------------------------------------------------------------------------
 cRepackerAC3Fast::~cRepackerAC3Fast(void)
@@ -1044,12 +1146,38 @@ int cRepackerAC3Fast::Put(const uchar *Data, int Count, int Flag, uint64 timesta
 	}
 	return 0;
 }
+//--------------------------------------------------------------------------
+
+int cRepackerAC3Fast::PutRaw(const uchar *Data, int Count, int Flag, uint64 timestamp)
+{
+	if (!buffer) 
+		buffer=packetBuffer->PutStart(maxPacketSize);
+
+	if (Flag || part_len+Count>maxPacketSize) {
+		packetBuffer->PutEnd(part_len, 0, timestamp);
+		maxPacketSize=MAX_TS_PACKET_SIZE;
+		buffer=packetBuffer->PutStart(maxPacketSize);
+		part_len=0;
+	}
+
+	if (!buffer) {
+		return 1;
+	}
+	memcpy(buffer, Data, Count);
+	buffer+=Count;
+	part_len+=Count;
+
+	return 0;
+}
+
 #endif
 
 //--------------------------------------------------------------------------
 // cRemux
 //--------------------------------------------------------------------------
-cRemux::cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, bool ExitOnFailure, bool SyncEarly)	       
+
+cRemux::cRemux(int VPid, const int *APids, const int *DPids, 
+	       const int *SPids, bool ExitOnFailure, enum eRemuxMode Rmode, bool SyncEarly)
 {
 	exitOnFailure = ExitOnFailure;
 	isRadio = VPid == 0 || VPid == 1 || VPid == 0x1FFF;
@@ -1060,7 +1188,26 @@ cRemux::cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, b
 	numTracks = 0;
 	resultSkipped = 0;
 	timestamp=0;
+	rmode=Rmode;
+	tsindex=0;
+	
+	tsmode=rAuto;
+	sfmode=SF_UNKNOWN;
+	tsmode_valid=0;
 
+	if (rmode==rPES) {
+		tsmode=rPES;
+	}
+	if (rmode==rTS) {
+		tsmode=rTS;
+	}
+	
+	vpid=0;
+	for(int n=0;n<8;n++) {
+		apids[n]=0;
+		dpids[n]=0;
+	}
+	
 	for(int n=0;n<MAXTRACKS;n++) {
 		repacker[n]=NULL;
 		rp_data[n]=NULL;
@@ -1071,20 +1218,27 @@ cRemux::cRemux(int VPid, const int *APids, const int *DPids, const int *SPids, b
 
 	lastGet=-1;
 
-	if (VPid)
+	if (VPid) {
 		repacker[numTracks++] = new cRepackerFast(VPid, 0xE0, 0x00);
-
+		vpid=VPid;
+	}
+	
 	if (APids) {
 		int n = 0;
 		while (*APids && numTracks < MAXTRACKS && n < MAXAPIDS) {
+			if (n<16)
+				apids[n]=*APids;
 			repacker[numTracks++] = new cRepackerFast(*APids++, 0xC0 + n++, 0x00);
 		}
 	}
 #ifdef ENABLE_AC3_REPACKER
 	if (DPids) {
 		int n = 0;
-		while (*DPids && numTracks < MAXTRACKS && n < MAXDPIDS)
+		while (*DPids && numTracks < MAXTRACKS && n < MAXDPIDS) {
+			if (n<16)
+				dpids[n]=*DPids;
 			repacker[numTracks++] = new cRepackerAC3Fast(*DPids++, 0xbd, 0x80 + n++, 65535+6);
+		}
 	}
 #endif
 	/* future...
@@ -1147,9 +1301,26 @@ int cRemux::Put(const uchar *Data, int Count)
 		
 		pid=((Data[1]&0x1f)<<8)|Data[2];
 		for (int t = 0; t < numTracks; t++) {
-			if (repacker[t]->GetPid() == pid) {						
-				if (repacker[t]->Put(Data+offset, 188-offset, pes_start,timestamp++)) 
-					Clear();
+			if (repacker[t]->GetPid() == pid) {
+#ifdef ENABLE_TS_MODE
+				// Do we need raw TS?
+				if (tsmode_valid>0 && (tsmode==rTS)) {
+					if (tsmode_valid==1) {
+						printf("READER %i %i\n",tsmode,sfmode);
+						Clear();
+						tsmode_valid=2;
+					}
+					if (repacker[t]->PutRaw(Data, 188, pes_start,timestamp++)) {
+						printf("CLEAR PID %x\n",pid);
+						Clear();
+					}
+				}
+				else 
+#endif				
+				{
+					if (repacker[t]->Put(Data+offset, 188-offset, pes_start,timestamp++)) 
+						Clear();
+				}
 				break;
 			}
 		}
@@ -1163,6 +1334,7 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 	uint64 starttime=0;
 	uchar *resultData=NULL;
 	uchar pt= NO_PICTURE;
+	int sf;	
 	int flags=0;
 	int resultCount=0;
 	int data_available=0;
@@ -1190,7 +1362,7 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 			break;
 		
 		if (!getTimeout) {
-			//usleep(10*1000);
+//			usleep(1000);
 			return NULL;
 		}
 
@@ -1227,11 +1399,65 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 	resultCount=rp_count[n];
 	lastGet=n;
 
+#ifdef ENABLE_TS_MODE
+	if (tsmode_valid==2 && (tsmode==rTS)) {
+		if (n==0 && flags) { 
+			/* Assumption/HACK: only a flagged PES packet starts a new frame
+			   and frame type fits in the first packet
+			*/
+			if (PictureType) {
+				int l=ScanVideoPacketTS(resultData, (resultCount>2*188?2*188:resultCount), pt, sf);
+				// UGLY HACK: If no frame found, fake an I-FRAME
+				if (pt==NO_PICTURE)
+					pt=I_FRAME;
+				*PictureType = pt;
+			}
+		}
+		Count=resultCount;
+		synced=1; // FIXME: Start sync at I-Frame!
+		return resultData;
+	}
+#endif
+
 	if (resultData && flags) { // Only a flagged packet can start a sequence/picture
 //		printf("GOT %i %p\n",lastGet,data);
 		uchar StreamType = resultData[3];
 		if (VIDEO_STREAM_S <= StreamType && StreamType <= VIDEO_STREAM_E) {
-			int l=ScanVideoPacket(resultData, resultCount, 0, pt);
+			int l=ScanVideoPacket(resultData, resultCount, 0, pt, sf);
+
+#ifdef ENABLE_TS_MODE
+			if (!tsmode_valid) { // Find type (MPEG2/h264)
+				if (sf!=SF_UNKNOWN) {
+					printf("\n\n\n\n======================= DETECTED %i\n\n\n\n",sf);
+					sfmode=sf;
+					switch(rmode) {
+					case rAuto:
+						if (sf==SF_MPEG2) {
+							tsmode=rPES;
+							tsmode_valid=1;
+						}
+						if (sf==SF_H264) {
+							tsmode=rTS;
+							Clear(); // Throw away already packed PES buffers
+							tsmode_valid=1;
+							return NULL;
+						}
+						break;
+					case rPES:
+						tsmode=rPES;
+						tsmode_valid=1;
+						break;
+					case rTS:
+						tsmode=rTS;
+						Clear();
+						tsmode_valid=1;
+						return NULL;
+					}
+				}
+				else
+					return NULL; // Wait until detection
+			}
+#endif
 
 #if 0
 			if (!synced) {
@@ -1297,5 +1523,150 @@ void cRemux::Clear(void)
 		repacker[i]->packetBuffer->Invalidate();
 	}
 	synced=0;
+}
+//--------------------------------------------------------------------------
+// taken from streamdev
+static uchar tspid0[TS_SIZE] = { 
+        0x47, 0x40, 0x00, 0x10, 0x00, 0x00, 0xb0, 0x11, 
+        0x00, 0x00, 0xcb, 0x00, 0x00, 0x00, 0x00, 0xe0, 
+        0x10, 0x00, 0x01, 0xe0, 0x1c, 0xcc, 0xcc, 0xcc, 
+        0xcc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff};
+//--------------------------------------------------------------------------
+int cRemux::makeStreamType(uchar *data, int type, int pid)
+{
+	switch (type) {
+	case 0: // MPEG2-Video
+		data[0]=0x02;
+		data[1]=0xe0|(pid>>8)&0xf;
+		data[2]=pid&0xff;
+		data[3]=0xf0;
+		data[4]=0x00;
+		return 5;
+	case 1: // H264-Video
+		data[0]=0x1b;
+		data[1]=0xe0|(pid>>8)&0xf;
+		data[2]=pid&0xff;
+		data[3]=0xf0;
+		data[4]=0x00;
+		return 5;
+	case 2: // MPEG-Audio
+		data[0]=0x04;
+		data[1]=0xe0|(pid>>8)&0xf;
+		data[2]=pid&0xff;
+		data[3]=0xf0;
+		data[4]=0x00;
+		return 5;
+	case 3: // AC3
+		data[0]=0x06;
+		data[1]=0xe0|(pid>>8)&0xf;
+		data[2]=pid&0xff;
+		data[3]=0xf0;
+		data[4]=0x03;
+		data[5]=0x6a;
+		data[6]=0x01;
+		data[7]=0x00;
+		return 8;
+		
+	}
+	
+	// VIDEO 02 e0 65 f0 06 11 01 fe 52 01 01
+        //           PPPP             
+	// H264  1b e0 ff f0 00
+	//       1b e3 ff f0 00
+	//           PPPP
+	// Audio 04 e0 66 f0 09 0a 04 64 65 75 01 52 01 02 05 e8 19 f0
+	//       04 e0 66 f0 00
+        //           PPPP
+	// Dolby 06 e0 6a f0 0c 0a 04 64 65 75 01 52 01 11 6a 01 00
+	//       06 e4 03 f0 03 6a 01 00
+	//           PPPP
+
+	return 0;
+}
+//--------------------------------------------------------------------------
+int cRemux::GetPATPMT(uchar *data, int maxlen)
+{
+	int len,n;
+	int crc;
+
+	if (maxlen<188)
+		return 0;
+	memcpy(data,tspid0,TS_SIZE);
+	data[3]|=tsindex&0xf;
+	crc=SI::CRC32::crc32 ((const char*)&tspid0[5], tspid0[7] - 4, 0xffffffff);
+	data[21]=crc>>24;
+	data[22]=crc>>16;
+	data[23]=crc>>8;
+	data[24]=crc;
+
+	data+=188;
+	memset(data,255,TS_SIZE);
+	
+	data[0]=0x47;
+	data[1]=0x40;
+	data[2]=0x1c;
+	data[3]=0x10 | (tsindex&0xf);
+	data[4]=0x00;
+	data[5]=0x02;
+	data[6]=0xb0;
+	// 7 length
+	data[8]=0x00; // Programm number 0x001c
+	data[9]=0x1c;
+	data[10]=0xc3;
+	data[11]=0x00;
+	data[12]=0x00;
+	data[13]=0xe0 | (vpid>>8); // PCR
+	data[14]=(vpid);
+	data[15]=0xf0;
+	data[16]=0;
+	
+	len=17;
+
+	if (sfmode==SF_H264)
+		len+=makeStreamType(data+len, 1, vpid);
+	else
+		len+=makeStreamType(data+len, 0, vpid);
+
+	for(n=0;n<16;n++) {
+		if (!apids[n])
+			break;
+		len+=makeStreamType(data+len, 2, apids[n]);
+	}
+
+	for(n=0;n<16;n++) {
+		if (!dpids[n])
+			break;
+		len+=makeStreamType(data+len, 3, dpids[n]);
+	}
+       
+	data[7]=len-8+4;
+	crc=SI::CRC32::crc32 ((const char*)data+5, data[7] - 4, 0xffffffff);
+	data[len]=crc>>24;
+	data[len+1]=crc>>16;
+	data[len+2]=crc>>8;
+	data[len+3]=crc;
+
+	tsindex++;
+	return 2*TS_SIZE;
 }
 //--------------------------------------------------------------------------

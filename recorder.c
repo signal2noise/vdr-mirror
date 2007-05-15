@@ -96,10 +96,27 @@ void cFileWriter::Action(void)
   while (Running()) {
         int Count;
         uchar *p = remux->Get(Count, &pictureType, 1);
-        if (p) {
+	
+        if (p && Count) {
+//		esyslog("COUNT %i\n", Count);
            if (!Running() && pictureType == I_FRAME) // finish the recording before the next 'I' frame
               break;
            if (NextFile()) {
+#if 1
+              // Add PAT+PMT at every filestart
+              if (!fileSize && remux->TSmode()==SF_H264) {
+		      uchar patpmt[4*188];
+		      int plen;
+		      plen=remux->GetPATPMT(patpmt, 4*188);
+		      if (plen) {
+			      if (recordFile->Write(patpmt, plen) < 0) {
+				      LOG_ERROR_STR(fileName->Name());
+				      break;
+			      }
+			      fileSize+=plen;
+		      }
+	      }
+#endif
               if (index && pictureType != NO_PICTURE)
                  index->Write(pictureType, fileName->Number(), fileSize);
               if (recordFile->Write(p, Count) < 0) {

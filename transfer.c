@@ -19,7 +19,7 @@ cTransfer::cTransfer(int VPid, const int *APids, const int *DPids, const int *SP
 ,cThread("transfer")
 {
 //  ringBuffer = new cRingBufferLinear(TRANSFERBUFSIZE, TS_SIZE * 2, true, "Transfer");
-  remux = new cRemux(VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids, false, true);
+  remux = new cRemux(VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids, false, rAuto, true);
   remux->SetTimeouts(50, 20);
 }
 

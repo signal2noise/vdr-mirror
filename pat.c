@@ -338,8 +338,11 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
         int NumDpids = 0;
         for (SI::Loop::Iterator it; pmt.streamLoop.getNext(stream, it); ) {
             switch (stream.getStreamType()) {
+
               case 1: // STREAMTYPE_11172_VIDEO
               case 2: // STREAMTYPE_13818_VIDEO
+              case 0x10: // 14496-2 Visual MPEG-4
+              case 0x1b: // 14496-10 Video h.264
                       Vpid = stream.getPid();
                       break;
               case 3: // STREAMTYPE_11172_AUDIO

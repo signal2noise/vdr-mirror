@@ -49,8 +49,47 @@ const tChannelParameterMap CoderateValues[] = {
   { -1 }
   };
 
+const tChannelParameterMap CoderateValuesS[] = {
+  {   0, FEC_NONE },
+  {  12, FEC_1_2 },
+  {  23, FEC_2_3 },
+  {  34, FEC_3_4 },
+  {  45, FEC_4_5 },
+  {  56, FEC_5_6 },
+  {  67, FEC_6_7 },
+  {  78, FEC_7_8 },
+  {  89, FEC_8_9 },
+  {  13, FEC_1_3 }, //S2
+  {  14, FEC_1_4 }, //S2
+  {  25, FEC_2_5 }, //S2
+  {  35, FEC_3_5 }, //S2
+  {  910, FEC_9_10 },//S2        
+  { 999, FEC_AUTO },
+  { -1 }
+  };
+
+const tChannelParameterMap RolloffValues[] = {
+  {35, FE_ROLLOFF_35},
+  {25, FE_ROLLOFF_25},
+  {20, FE_ROLLOFF_20},
+  { -1 }
+};
+
 const tChannelParameterMap ModulationValues[] = {
   {   0, QPSK },
+  {  16, QAM_16 },
+  {  32, QAM_32 },
+  {  64, QAM_64 },
+  { 128, QAM_128 },
+  { 256, QAM_256 },
+  { 999, QAM_AUTO },
+  { -1 }
+  };
+
+const tChannelParameterMap ModulationValuesS[] = {
+  {   4, QPSK },
+  {   42, QPSK_S2 },
+  {   8, PSK8},
   {  16, QAM_16 },
   {  32, QAM_32 },
   {  64, QAM_64 },
@@ -172,6 +211,7 @@ cChannel::cChannel(void)
   coderateH    = FEC_AUTO;
   coderateL    = FEC_AUTO;
   modulation   = QAM_AUTO;
+  rolloff      = 0; // S2
   transmission = TRANSMISSION_MODE_AUTO;
   guard        = GUARD_INTERVAL_AUTO;
   hierarchy    = HIERARCHY_AUTO;
@@ -197,7 +237,9 @@ cChannel::~cChannel()
 {
   delete linkChannels;
   linkChannels = NULL; // more than one channel can link to this one, so we need the following loop
+#if 1
   for (cChannel *Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)) {
+
       if (Channel->linkChannels) {
          for (cLinkChannel *lc = Channel->linkChannels->First(); lc; lc = Channel->linkChannels->Next(lc)) {
              if (lc->Channel() == this) {
@@ -211,6 +253,7 @@ cChannel::~cChannel()
             }
          }
       }
+#endif
   free(name);
   free(shortName);
   free(provider);
@@ -277,13 +320,14 @@ void cChannel::CopyTransponderData(const cChannel *Channel)
      coderateH    = Channel->coderateH;
      coderateL    = Channel->coderateL;
      modulation   = Channel->modulation;
+     rolloff      = Channel->rolloff;
      transmission = Channel->transmission;
      guard        = Channel->guard;
      hierarchy    = Channel->hierarchy;
      }
 }
 
-bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH)
+bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH, int Modulation, int Rolloff)
 {
   // Workarounds for broadcaster stupidity:
   // Some providers broadcast the transponder frequency of their channels with two different
@@ -297,7 +341,8 @@ bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarizatio
   if (abs(srate - Srate) <= 1)
      Srate = srate;
 
-  if (source != Source || frequency != Frequency || polarization != Polarization || srate != Srate || coderateH != CoderateH) {
+  if (source != Source || frequency != Frequency || polarization != Polarization || srate != Srate ||
+      coderateH != CoderateH || modulation != Modulation || rolloff != Rolloff) {
      if (Number()) {
         dsyslog("changing transponder data of channel %d from %s:%d:%c:%d:%d to %s:%d:%c:%d:%d", Number(), *cSource::ToString(source), frequency, polarization, srate, coderateH, *cSource::ToString(Source), Frequency, Polarization, Srate, CoderateH);
         modification |= CHANNELMOD_TRANSP;
@@ -308,7 +353,8 @@ bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarizatio
      polarization = Polarization;
      srate = Srate;
      coderateH = CoderateH;
-     modulation = QPSK;
+     modulation = Modulation;
+     rolloff = Rolloff;
      schedule = NULL;
      }
   return true;
@@ -584,9 +630,12 @@ cString cChannel::ParametersToString(void) const
   *q = 0;
   ST(" S ")  q += sprintf(q, "%c", polarization);
   ST("CST")  q += PrintParameter(q, 'I', MapToUser(inversion, InversionValues));
-  ST("CST")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValues));
+  ST("C T")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValues));
+  ST(" S ")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValuesS));
+  ST(" S ")  q += PrintParameter(q, 'E', MapToUser(rolloff, RolloffValues));
   ST("  T")  q += PrintParameter(q, 'D', MapToUser(coderateL, CoderateValues));
   ST("C T")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValues));
+  ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
   ST("  T")  q += PrintParameter(q, 'B', MapToUser(bandwidth, BandwidthValues));
   ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
   ST("  T")  q += PrintParameter(q, 'G', MapToUser(guard, GuardValues));
@@ -615,13 +664,14 @@ bool cChannel::StringToParameters(const char *s)
   while (s && *s) {
         switch (toupper(*s)) {
           case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
-          case 'C': s = ParseParameter(s, coderateH, CoderateValues); break;
+          case 'C': s = ParseParameter(s, coderateH, CoderateValuesS); break;
           case 'D': s = ParseParameter(s, coderateL, CoderateValues); break;
+	  case 'E': s = ParseParameter(s, rolloff, RolloffValues); break;
           case 'G': s = ParseParameter(s, guard, GuardValues); break;
           case 'H': polarization = *s++; break;
           case 'I': s = ParseParameter(s, inversion, InversionValues); break;
           case 'L': polarization = *s++; break;
-          case 'M': s = ParseParameter(s, modulation, ModulationValues); break;
+          case 'M': s = ParseParameter(s, modulation, ModulationValuesS); break;
           case 'R': polarization = *s++; break;
           case 'T': s = ParseParameter(s, transmission, TransmissionValues); break;
           case 'V': polarization = *s++; break;

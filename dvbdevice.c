@@ -113,7 +113,7 @@ cDvbTuner::cDvbTuner(int Fd_Frontend, int CardIndex, fe_type_t FrontendType, cCi
   diseqcCommands = NULL;
   description = NULL;
   tunerStatus = tsIdle;
-  if (frontendType == FE_QPSK)
+  if (frontendType == FE_QPSK || frontendType==FE_DVBS2)
      CHECK(ioctl(fd_frontend, FE_SET_VOLTAGE, SEC_VOLTAGE_13)); // must explicitly turn on LNB power
   SetDescription("tuner on device %d", cardIndex + 1);
   asprintf (&description, "tuner on device %d", cardIndex + 1);
@@ -205,6 +205,7 @@ bool cDvbTuner::SetFrontend(void)
   memset(&Frontend, 0, sizeof(Frontend));
 
   switch (frontendType) {
+    case FE_DVBS2:
     case FE_QPSK: { // DVB-S
 
          unsigned int frequency = channel.Frequency();
@@ -267,7 +268,7 @@ bool cDvbTuner::SetFrontend(void)
          Frontend.frequency = frequency * 1000UL;
          Frontend.inversion = fe_spectral_inversion_t(channel.Inversion());
          Frontend.u.qpsk.symbol_rate = channel.Srate() * 1000UL;
-         Frontend.u.qpsk.fec_inner = fe_code_rate_t(channel.CoderateH());
+         Frontend.u.qpsk.fec_inner = fe_code_rate_t(channel.CoderateH() | (channel.Modulation()<<16)); // HACK DVB-S2 for old API
 
          tuneTimeout = DVBS_TUNE_TIMEOUT;
          lockTimeout = DVBS_LOCK_TIMEOUT;
@@ -447,7 +448,11 @@ cDvbDevice::cDvbDevice(int n)
   if (fd_frontend >= 0) {
      dvb_frontend_info feinfo;
      if (ioctl(fd_frontend, FE_GET_INFO, &feinfo) >= 0) {
-        frontendType = feinfo.type;
+        // Reelbox ugly S2 Hack
+        if (strstr(feinfo.name,"DVB-S2"))
+          frontendType = FE_DVBS2;
+        else
+          frontendType = feinfo.type;
         ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
         dvbTuner = new cDvbTuner(fd_frontend, CardIndex(), frontendType, ciHandler);
         }
@@ -798,6 +803,7 @@ bool cDvbDevice::ProvidesSource(int Source) const
   return type == cSource::stNone
       || type == cSource::stCable && frontendType == FE_QAM
       || type == cSource::stSat   && frontendType == FE_QPSK
+      || type == cSource::stSat   && frontendType == FE_DVBS2
       || type == cSource::stTerr  && frontendType == FE_OFDM;
 }
 

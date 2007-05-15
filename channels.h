@@ -62,7 +62,10 @@ int DriverIndex(int Value, const tChannelParameterMap *Map);
 extern const tChannelParameterMap InversionValues[];
 extern const tChannelParameterMap BandwidthValues[];
 extern const tChannelParameterMap CoderateValues[];
+extern const tChannelParameterMap CoderateValuesS[];
+extern const tChannelParameterMap RolloffValues[];
 extern const tChannelParameterMap ModulationValues[];
+extern const tChannelParameterMap ModulationValuesS[];
 extern const tChannelParameterMap TransmissionValues[];
 extern const tChannelParameterMap GuardValues[];
 extern const tChannelParameterMap HierarchyValues[];
@@ -144,6 +147,7 @@ private:
   int coderateH;
   int coderateL;
   int modulation;
+  int rolloff; // S2
   int transmission;
   int guard;
   int hierarchy;
@@ -197,6 +201,7 @@ public:
   int CoderateH(void) const { return coderateH; }
   int CoderateL(void) const { return coderateL; }
   int Modulation(void) const { return modulation; }
+  int Rolloff(void) const { return rolloff; } // S2
   int Transmission(void) const { return transmission; }
   int Guard(void) const { return guard; }
   int Hierarchy(void) const { return hierarchy; }
@@ -209,7 +214,7 @@ public:
   bool HasTimer(void) const;
   int Modification(int Mask = CHANNELMOD_ALL);
   void CopyTransponderData(const cChannel *Channel);
-  bool SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH);
+  bool SetSatTransponderData(int Source, int Frequency, char Polarization, int Srate, int CoderateH, int Modulation=0, int Rolloff=0);
   bool SetCableTransponderData(int Source, int Frequency, int Modulation, int Srate, int CoderateH);
   bool SetTerrTransponderData(int Source, int Frequency, int Bandwidth, int Modulation, int Hierarchy, int CodeRateH, int CodeRateL, int Guard, int Transmission);
   void SetId(int Nid, int Tid, int Sid, int Rid = 0);
