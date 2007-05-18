@@ -42,8 +42,9 @@ void cTransfer::Activate(bool On)
 void cTransfer::Receive(uchar *Data, int Length)
 {
   if (IsAttached() && Running()) {
+/*  
     static FILE *tsOut = NULL;
-/*    
+    
     if (!tsOut)
     {
     tsOut = ::fopen("/mnt/hd/video/aufnahme.ts", "wb");
