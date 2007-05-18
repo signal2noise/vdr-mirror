@@ -78,6 +78,10 @@ ifdef VDR_USER
 DEFINES += -DVDR_USER=\"$(VDR_USER)\"
 endif
 
+ifdef RBLITE
+DEFINES += -DRBLITE
+endif
+
 LIRC_DEVICE ?= /dev/lircd
 RCU_DEVICE  ?= /dev/ttyS1
 
