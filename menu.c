@@ -3620,7 +3620,7 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
     */
     //dsyslog (" cMenuSetupOSD --------- kOK NumThemes  %d Theme %s  ", themes.NumThemes(), Skins.Current()->Theme()?"YES":"NO");
          if (themes.NumThemes() && Skins.Current()->Theme()) {
-          data.UseSmallFont=3;
+          data.UseSmallFont=2;
           Skins.SetCurrent("Reel");
           Skins.Current()->Theme()->Load(themes.FileName(themeIndex));
           //dsyslog (" cMenuSetupOSD save SkinTheme %s   ", themes.Name(themeIndex));

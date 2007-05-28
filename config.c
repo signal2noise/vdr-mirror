@@ -270,7 +270,7 @@ cSetup::cSetup(void)
   OSDRandom = 0;
   OSDMessageTime = 2;
   OSDRemainTime = 0;  // bool for channelInfo
-  UseSmallFont = 3;
+  UseSmallFont = 2;
   MaxVideoFileSize = MAXVIDEOFILESIZE;
   SplitEditedFiles = 0;
   MinEventTimeout = 30;
