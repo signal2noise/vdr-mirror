@@ -32,7 +32,7 @@ DOXYFILE = Doxyfile
 
 -include ../Make.config
 
-INCLUDES += -I$(DVBDIR)
+INCLUDES += -I$(DVBDIR)/include
 
 SILIB    = $(LSIDIR)/libsi.a
 TXMLLIB  = $(TXMLDIR)/libtinyxml.a
