@@ -1033,6 +1033,11 @@ int cDevice::PlayVideo(const uchar *Data, int Length)
   return -1;
 }
 
+int cDevice::PlayVideoTs(const uchar *Data, int Length, bool VideoOnly, uchar *PATPMT)
+{
+	  return -1;
+}
+
 int cDevice::PlayAudio(const uchar *Data, int Length, uchar Id)
 {
   return -1;
@@ -1124,6 +1129,26 @@ pre_1_3_19_PrivateStreamDeteced:
         }
   return Length;
 }
+
+time_t curtime = 0;
+unsigned int bps = 0;
+
+int cDevice::PlayTS(const uchar *Data, int Length, bool VideoOnly, uchar *PATPMT)
+{
+/*       bps+=Length;
+
+    if(time(0) > curtime){
+        printf("TS-data: %i bytes/s\n", bps);
+        bps=0;
+        curtime = time(0);
+    }*/ 
+
+
+   return PlayVideoTs(Data, Length, VideoOnly, PATPMT);
+   //esyslog("ERROR: device does not support TS stream");
+   //return 0;
+}
+
 
 int cDevice::PlayPes(const uchar *Data, int Length, bool VideoOnly)
 {

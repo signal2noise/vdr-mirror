@@ -105,9 +105,9 @@ void cFileWriter::Action(void)
 #if 1
               // Add PAT+PMT at every filestart
               if (!fileSize && remux->TSmode()==SF_H264) {
-		      uchar patpmt[4*188];
+		      uchar patpmt[2*188];
 		      int plen;
-		      plen=remux->GetPATPMT(patpmt, 4*188);
+		      plen=remux->GetPATPMT(patpmt, 2*188);
 		      if (plen) {
 			      if (recordFile->Write(patpmt, plen) < 0) {
 				      LOG_ERROR_STR(fileName->Name());

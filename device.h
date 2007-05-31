@@ -441,6 +441,7 @@ protected:
   virtual bool SetPlayMode(ePlayMode PlayMode);
        ///< Sets the device into the given play mode.
        ///< \return true if the operation was successful.
+  virtual int PlayVideoTs(const uchar *Data, int Length, bool VideoOnly, uchar *PATPMT);
   virtual int PlayVideo(const uchar *Data, int Length);
        ///< Plays the given data block as video.
        ///< Data points to exactly one complete PES packet of the given Length.
@@ -508,6 +509,8 @@ public:
        ///< to a complete packet with data from the next call to PlayPes().
        ///< That way any functions called from within PlayPes() will be
        ///< guaranteed to always receive complete PES packets.
+  virtual int PlayTS(const uchar *Data, int Length, bool VideoOnly = false, uchar *PATPMT = NULL);
+       ///< Plays all valid TS packets in Data with the given Length.
   bool Replaying(void) const;
        ///< Returns true if we are currently replaying.
   bool Transferring(void) const;

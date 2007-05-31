@@ -31,6 +31,16 @@ int cPlayer::PlayPes(const uchar *Data, int Length, bool VideoOnly)
   return -1;
 }
 
+int cPlayer::PlayTS(const uchar *Data, int Length, bool VideoOnly, unsigned char* PATPMT)
+{
+  if (device){
+     device->PlayTS(Data, Length, VideoOnly, PATPMT);
+     return Length;
+  }
+  esyslog("ERROR: attempt to use cPlayer::PlayTS() without attaching to a cDevice!");
+  return -1;
+}
+
 void cPlayer::Detach(void)
 {
   if (device)

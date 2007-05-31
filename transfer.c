@@ -42,9 +42,8 @@ void cTransfer::Activate(bool On)
 void cTransfer::Receive(uchar *Data, int Length)
 {
   if (IsAttached() && Running()) {
-/*  
     static FILE *tsOut = NULL;
-    
+/*    
     if (!tsOut)
     {
     tsOut = ::fopen("/mnt/hd/video/aufnahme.ts", "wb");
@@ -69,7 +68,10 @@ void cTransfer::Action(void)
 {
   int PollTimeouts = 0;
   uchar *p = NULL;
+  int firstTime = 0;
   int Result = 0;
+  uchar patpmt[188*2];
+  patpmt[0]=0x47;
   while (Running()) {
         if (!p)
            //p = remux->Get(Result);
@@ -77,8 +79,20 @@ void cTransfer::Action(void)
         if (p) {
            cPoller Poller;
            if (DevicePoll(Poller, 100)) {
+              int w;
               PollTimeouts = 0;
-              int w = PlayPes(p, Result);
+              if(remux->TSmode()==SF_H264){
+                 if(firstTime++==0){
+		 remux->GetPATPMT(patpmt, 2*188);
+                 //printf("cTransfer::Action() calls PlayTS\n");
+                 w = PlayTS(p, Result, false, (unsigned char*)&patpmt);
+		 } else
+	         w = PlayTS(p, Result, false, NULL);
+	      } else {
+                 //printf("cTransfer::Action() calls PlayPS\n");
+                 w = PlayPes(p, Result);
+              }
+
               if (w > 0) {
                  p += w;
                  Result -= w;
@@ -96,7 +110,10 @@ void cTransfer::Action(void)
                  DeviceClear();
 //                 ringBuffer->Clear();
                  remux->Clear();
-                 PlayPes(NULL, 0);
+                 if(remux->TSmode()==SF_H264)
+                    PlayTS(NULL, 0);
+                 else
+                    PlayPes(NULL, 0);
                  p = NULL;
                  }
               }

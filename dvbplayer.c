@@ -204,6 +204,7 @@ private:
   ePlayDirs playDir;
   int trickSpeed;
   int readIndex, writeIndex;
+  uchar *PATPMT;
   cFrame *readFrame;
   cFrame *playFrame;
   void TrickSpeed(int Increment);
@@ -211,6 +212,8 @@ private:
   bool NextFile(uchar FileNumber = 0, int FileOffset = -1);
   int Resume(void);
   bool Save(void);
+  void CheckTS(void);
+       // Check for TS File
 protected:
   virtual void Activate(bool On);
   virtual void Action(void);
@@ -264,6 +267,8 @@ cDvbPlayer::cDvbPlayer(const char *FileName)
      delete index;
      index = NULL;
      }
+  // Check for TS Data
+  CheckTS(); 
   backTrace = new cBackTrace;
 }
 
@@ -271,6 +276,9 @@ cDvbPlayer::~cDvbPlayer()
 {
   Detach();
   Save();
+
+  if( PATPMT != NULL )
+     free(PATPMT);
   delete readFrame; // might not have been stored in the buffer in Action()
   delete index;
   delete fileName;
@@ -549,14 +557,23 @@ void cDvbPlayer::Action(void)
                  pc = playFrame->Count();
                  if (p) {
                     if (firstPacket) {
-                       PlayPes(NULL, 0);
+                       if( PATPMT != NULL )
+                          PlayTS(NULL,0, false, PATPMT);
+                       else
+                          PlayPes(NULL, 0);
+
                        cRemux::SetBrokenLink(p, pc);
                        firstPacket = false;
                        }
                     }
                  }
               if (p) {
-                 int w = PlayPes(p, pc, playMode != pmPlay);
+                 int w = 0;
+                 if( PATPMT != NULL )
+                    w += PlayTS(p, pc, playMode != pmPlay);
+                 else
+                    w += PlayPes(p, pc, playMode != pmPlay);
+
                  if (w > 0) {
                     p += w;
                     pc -= w;
@@ -818,6 +835,25 @@ bool cDvbPlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
   else
      Speed = -1;
   return true;
+}
+
+
+void cDvbPlayer::CheckTS()
+{
+   uchar * pp = NULL;
+   pp = MALLOC(uchar, 2*TS_SIZE);
+   if( pp != NULL) {
+      if( replayFile->Read( pp, 2*TS_SIZE ) == 2*TS_SIZE ) {
+	 if( (*pp == 0x47 && *(pp+1) == 0x40) && (*(pp+TS_SIZE) == 0x47 && *(pp+TS_SIZE+1) == 0x40)) {
+            PATPMT = pp;
+         } else {
+	    free(pp);
+	    PATPMT = NULL;
+	 }
+      }
+      if(PATPMT == NULL)
+         replayFile->Seek(0,SEEK_SET);
+   }
 }
 
 // --- cDvbPlayerControl -----------------------------------------------------

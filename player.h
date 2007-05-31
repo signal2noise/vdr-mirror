@@ -40,6 +40,10 @@ protected:
        // Sends the given PES Data to the device and returns the number of
        // bytes that have actually been accepted by the device (or a
        // negative value in case of an error).
+  int PlayTS(const uchar *Data, int Length, bool VideoOnly = false, unsigned char* PATPMT=0);
+       // Sends the given TS Data to the device and returns the number of
+       // bytes that have actually been accepted by the device (or a
+       // negative value in case of an error).
 public:
   cPlayer(ePlayMode PlayMode = pmAudioVideo);
   virtual ~cPlayer();
