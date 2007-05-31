@@ -268,7 +268,10 @@ bool cDvbTuner::SetFrontend(void)
          Frontend.frequency = frequency * 1000UL;
          Frontend.inversion = fe_spectral_inversion_t(channel.Inversion());
          Frontend.u.qpsk.symbol_rate = channel.Srate() * 1000UL;
-         Frontend.u.qpsk.fec_inner = fe_code_rate_t(channel.CoderateH() | (channel.Modulation()<<16)); // HACK DVB-S2 for old API
+         if (frontendType == FE_QPSK)
+             Frontend.u.qpsk.fec_inner = fe_code_rate_t(channel.CoderateH());
+         else
+             Frontend.u.qpsk.fec_inner = fe_code_rate_t(channel.CoderateH() | (channel.Modulation()<<16)); // HACK DVB-S2 for old API
 
          tuneTimeout = DVBS_TUNE_TIMEOUT;
          lockTimeout = DVBS_LOCK_TIMEOUT;

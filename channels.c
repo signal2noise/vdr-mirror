@@ -635,7 +635,9 @@ cString cChannel::ParametersToString(void) const
   ST(" S ")  q += PrintParameter(q, 'E', MapToUser(rolloff, RolloffValues));
   ST("  T")  q += PrintParameter(q, 'D', MapToUser(coderateL, CoderateValues));
   ST("C T")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValues));
-  ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
+  if (modulation != QPSK && modulation != QAM_AUTO)
+      ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
+  // ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
   ST("  T")  q += PrintParameter(q, 'B', MapToUser(bandwidth, BandwidthValues));
   ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
   ST("  T")  q += PrintParameter(q, 'G', MapToUser(guard, GuardValues));
