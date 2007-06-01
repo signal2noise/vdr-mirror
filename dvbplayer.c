@@ -844,12 +844,14 @@ void cDvbPlayer::CheckTS()
    pp = MALLOC(uchar, 2*TS_SIZE);
    if( pp != NULL) {
       if( replayFile->Read( pp, 2*TS_SIZE ) == 2*TS_SIZE ) {
-	 if( (*pp == 0x47 && *(pp+1) == 0x40) && (*(pp+TS_SIZE) == 0x47 && *(pp+TS_SIZE+1) == 0x40)) {
+         if( (*pp == 0x47 && *(pp+1) == 0x40) && (*(pp+TS_SIZE) == 0x47 && *(pp+TS_SIZE+1) == 0x40)) {
+            printf("CheckTS(): TS recognized\n");
             PATPMT = pp;
          } else {
-	    free(pp);
-	    PATPMT = NULL;
-	 }
+            printf("CheckTS(): PES recognized\n");
+            PATPMT = NULL;
+            free(pp);
+         }
       }
       if(PATPMT == NULL)
          replayFile->Seek(0,SEEK_SET);

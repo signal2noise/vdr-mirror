@@ -1454,8 +1454,9 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 						return NULL;
 					}
 				}
-				else
-					return NULL; // Wait until detection
+				else {
+				//	return NULL; // Wait until detection // TB: slows down channelswitching on crypted channels
+                                }
 			}
 #endif
 
