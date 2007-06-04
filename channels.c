@@ -342,7 +342,7 @@ bool cChannel::SetSatTransponderData(int Source, int Frequency, char Polarizatio
      Srate = srate;
 
   if (source != Source || frequency != Frequency || polarization != Polarization || srate != Srate ||
-      coderateH != CoderateH || modulation != Modulation || rolloff != Rolloff) {
+      coderateH != CoderateH || (modulation != Modulation && modulation!=QAM_AUTO) || rolloff != Rolloff) {
      if (Number()) {
         dsyslog("changing transponder data of channel %d from %s:%d:%c:%d:%d to %s:%d:%c:%d:%d", Number(), *cSource::ToString(source), frequency, polarization, srate, coderateH, *cSource::ToString(Source), Frequency, Polarization, Srate, CoderateH);
         modification |= CHANNELMOD_TRANSP;
