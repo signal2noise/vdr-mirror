@@ -1428,8 +1428,9 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 #ifdef ENABLE_TS_MODE
 			if (!tsmode_valid) { // Find type (MPEG2/h264)
 				if (sf!=SF_UNKNOWN) {
-					printf("\n\n\n\n======================= DETECTED %i\n\n\n\n",sf);
+					printf("\n\n======================= DETECTED %i\n\n",sf);
 					sfmode=sf;
+                                        rmode = rAuto; // TB: hack to force rmode to rAuto
 					switch(rmode) {
 					case rAuto:
 						if (sf==SF_MPEG2) {
@@ -1528,10 +1529,10 @@ void cRemux::Clear(void)
 //--------------------------------------------------------------------------
 // taken from streamdev
 static uchar tspid0[TS_SIZE] = { 
-        0x47, 0x40, 0x00, 0x10, 0x00, 0x00, 0xb0, 0x11, 
-        0x00, 0x00, 0xcb, 0x00, 0x00, 0x00, 0x00, 0xe0, 
-        0x10, 0x00, 0x01, 0xe0, 0x1c, 0xcc, 0xcc, 0xcc, 
-        0xcc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0x47, 0x40, 0x00, 0x10, 0x00, 0x00, 0xb0, 0x0d, 
+        0x80, 0x08, 0xc3, 0x00, 0x00, 0x00, 0x84, 0xe0, 
+        0x84, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -1614,32 +1615,32 @@ int cRemux::GetPATPMT(uchar *data, int maxlen)
 		return 0;
 	memcpy(data,tspid0,TS_SIZE);
 	data[3]|=tsindex&0xf;
-	crc=SI::CRC32::crc32 ((const char*)&tspid0[5], tspid0[7] - 4, 0xffffffff);
-	data[21]=crc>>24;
-	data[22]=crc>>16;
-	data[23]=crc>>8;
-	data[24]=crc;
+	crc=SI::CRC32::crc32 ((const char*)data + 5, data[7]-1, 0xffffffff);
+	data[17]=crc>>24;
+	data[18]=crc>>16;
+	data[19]=crc>>8;
+	data[20]=crc;
 
 	data+=188;
 	memset(data,255,TS_SIZE);
 	
 	data[0]=0x47;
 	data[1]=0x40;
-	data[2]=0x1c;
+	data[2]=0x84;
 	data[3]=0x10 | (tsindex&0xf);
 	data[4]=0x00;
 	data[5]=0x02;
 	data[6]=0xb0;
 	// 7 length
-	data[8]=0x00; // Programm number 0x001c
-	data[9]=0x1c;
+	data[8]=0x00; // Programm number 0x0084
+	data[9]=0x84;
 	data[10]=0xc3;
 	data[11]=0x00;
 	data[12]=0x00;
 	data[13]=0xe0 | (vpid>>8); // PCR
 	data[14]=(vpid);
 	data[15]=0xf0;
-	data[16]=0;
+	data[16]=00;
 	
 	len=17;
 
@@ -1661,7 +1662,7 @@ int cRemux::GetPATPMT(uchar *data, int maxlen)
 	}
        
 	data[7]=len-8+4;
-	crc=SI::CRC32::crc32 ((const char*)data+5, data[7] - 4, 0xffffffff);
+	crc=SI::CRC32::crc32 ((const char*)data+5, data[7]-1, 0xffffffff);
 	data[len]=crc>>24;
 	data[len+1]=crc>>16;
 	data[len+2]=crc>>8;

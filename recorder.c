@@ -93,9 +93,16 @@ bool cFileWriter::NextFile(void)
 void cFileWriter::Action(void)
 {
   time_t t = time(NULL);
+  unsigned int skipped = 0;
+
   while (Running()) {
         int Count;
         uchar *p = remux->Get(Count, &pictureType, 1);
+        while(skipped < 10 && (remux->SFmode() == SF_UNKNOWN || remux->TSmode() == rAuto)){ // TB: give remuxer a chance to detect the stream type
+           skipped++;
+           Count = 0;
+           continue;
+        }
 	
         if (p && Count) {
 //		esyslog("COUNT %i\n", Count);

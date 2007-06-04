@@ -116,7 +116,8 @@ public:
   static int ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, int &StreamFormat);
 
   // RMM extension: Mixed TS/PES handling
-  int TSmode(void) {return tsmode;}
+  int TSmode(void) { return tsmode;}
+  int SFmode(void) { return sfmode;}
   int makeStreamType(uchar *data, int type, int pid);
   int GetPATPMT(uchar *data, int maxlen);
 
