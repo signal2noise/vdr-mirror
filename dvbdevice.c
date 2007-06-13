@@ -812,7 +812,7 @@ bool cDvbDevice::ProvidesSource(int Source) const
 
 bool cDvbDevice::ProvidesTransponder(const cChannel *Channel) const
 {
-  return ProvidesSource(Channel->Source()) && (!cSource::IsSat(Channel->Source()) || !Setup.DiSEqC || Diseqcs.Get(Channel->Source(), Channel->Frequency(), Channel->Polarization(), CardIndex()+1));  
+  return ProvidesSource(Channel->Source()) && ((Channel->Modulation()==QPSK_S2 || Channel->Modulation()==PSK8) ? (frontendType==FE_DVBS2) : true) && (!cSource::IsSat(Channel->Source()) || !Setup.DiSEqC || Diseqcs.Get(Channel->Source(), Channel->Frequency(), Channel->Polarization(), CardIndex()+1));  
 }
 
 bool cDvbDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
@@ -822,7 +822,7 @@ bool cDvbDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *Ne
   bool needsDetachReceivers = false;
 
 
-  if (ProvidesSource(Channel->Source()) && ProvidesCa(Channel) /* && (Channel->Modulation()==QPSK_S2 || Channel->Modulation()==PSK8) ? (frontendType==FE_DVBS2) : true */) { // TB: hack - only use DVBS2-tuners for S2-channels
+  if (ProvidesSource(Channel->Source()) && ((Channel->Modulation()==QPSK_S2 || Channel->Modulation()==PSK8) ? (frontendType==FE_DVBS2) : true) && ProvidesCa(Channel) ) { // TB: hack - only use DVBS2-tuners for S2-channels
      result = hasPriority;
      if (Priority >= 0 && Receiving(true)) {
         if (dvbTuner->IsTunedTo(Channel)) {
