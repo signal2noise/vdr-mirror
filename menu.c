@@ -4118,7 +4118,7 @@ void cMenuSetupLNB::Setup(void)
                }
 
              if (extended)
-                Add(new cMenuEditIntItem(tr("Delay (ms)"), &waitMs[tuner], 0, 100));
+                Add(new cMenuEditIntItem(tr("Delay (ms)"), &waitMs[tuner], 15, 100));
              break;
      case FULL:
              Add(new cMenuEditIntItem(tr("Number of LNBs"), &lnbNumberAtTuner[tuner],MINLNBS,MAXLNBS));
@@ -4131,7 +4131,7 @@ void cMenuSetupLNB::Setup(void)
                }
 
               if (extended) {
-                 Add(new cMenuEditIntItem(tr("Delay (ms)"), &waitMs[tuner], 0, 100));
+                 Add(new cMenuEditIntItem(tr("Delay (ms)"), &waitMs[tuner], 15, 100));
                  Add(new cMenuEditIntItem(tr("Repeat"), &repeat[tuner], 0, 3));
                  }
               else if (((data.DiSEqC & (SWITCHMASK << (tuner ? (tuner-1)*TUNERBITS : 0))) >> (tuner ? (tuner-1)*TUNERBITS : 0))==MINI)
@@ -4220,7 +4220,7 @@ void cMenuSetupLNB::Init()
   for (int t=0;t<MAXTUNERS+1;t++) {
      lnbNumberAtTuner[t] = 0; 
      waitMs[t] = Diseqcs.WaitMs(t);
-     repeat[t] = 0;  //fixme Diseqcs.RepeatCmd(t);
+     repeat[t] = Diseqcs.RepeatCmd(t);
      for (int lnb=0;lnb<64;lnb++) {  // MAXLNBs
         lnbTypesAtTuner[t][lnb].source = 0;
         lnbTypesAtTuner[t][lnb].lnbType = 0;
