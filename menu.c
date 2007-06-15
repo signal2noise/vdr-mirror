@@ -91,7 +91,7 @@ eOSState cMenuEditCaItem::ProcessKey(eKeys Key)
   eOSState state = cMenuEditItem::ProcessKey(Key);
 
   if (state == osUnknown) {
-     if (NORMALKEY(Key) == kLeft && *value >= CA_ENCRYPTED_MIN)
+     if ((NORMALKEY(Key) == kLeft || NORMALKEY(Key) == kRight) && *value >= CA_ENCRYPTED_MIN)
         *value = CA_FTA;
      else
         return cMenuEditIntItem::ProcessKey(Key);
