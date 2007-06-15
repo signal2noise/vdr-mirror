@@ -1501,11 +1501,12 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   hasUserIO = false;
   for (int i = 0; i < MAX_CI_SESSION; i++)
       sessions[i] = NULL;
-  for (int i = 0; i < MAX_CI_SLOT; i++)
+  for (int i = 0; i < MAX_CI_SLOT; i++){
       moduleReady[i] = false;
+      source[i] = transponder[i] = 0;
+  }
   tpl = new cCiTransportLayer(Fd, numSlots);
   tc = NULL;
-  source = transponder = 0;
 }
 
 cCiHandler::~cCiHandler()
@@ -1749,7 +1750,7 @@ void cCiHandler::SendCaPmt(void)
             cList<cCiCaPmt> CaPmtList;
             for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
                 bool Active = false;
-                cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source, transponder, p->programNumber, GetCaSystemIds(Slot));
+                cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));
                 if (CaPmt->Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
                        if (q->active) {
@@ -1847,12 +1848,12 @@ bool cCiHandler::ProvidesCa(const unsigned short *CaSystemIds)
 void cCiHandler::SetSource(int Source, int Transponder, int Slot)
 {
   cMutexLock MutexLock(&mutex);
-  if ((Slot >= 0) && (source != Source || transponder != Transponder)) {
+  if ((Slot >= 0) && (source[Slot] != Source || transponder[Slot] != Transponder)) {
      //XXX if there are active entries, send an empty CA_PMT
      caProgramList[Slot].Clear();
      }
-  source = Source;
-  transponder = Transponder;
+  source[Slot] = Source;
+  transponder[Slot] = Transponder;
 }
 
 void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType, int Slot)
@@ -1898,7 +1899,7 @@ bool cCiHandler::CanDecrypt(int ProgramNumber)
       if (cas) {
          for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
              if (p->programNumber == ProgramNumber) {
-                cCiCaPmt CaPmt(CPCI_QUERY, source, transponder, p->programNumber, GetCaSystemIds(Slot));//XXX???
+                cCiCaPmt CaPmt(CPCI_QUERY, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));//XXX???
                 if (CaPmt.Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
 //XXX                       if (q->active)

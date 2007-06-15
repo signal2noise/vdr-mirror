@@ -107,15 +107,11 @@ private:
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
-  int source;
-  int transponder;
+  int source[MAX_CI_SLOT];
+  int transponder[MAX_CI_SLOT];
   cList<cCiCaProgramData> caProgramList[MAX_CI_SLOT];
   uint32_t ResourceIdToInt(const uint8_t *Data);
   bool Send(uint8_t Tag, uint16_t SessionId, uint32_t ResourceId = 0, int Status = -1);
-  /*cCiSession *GetSessionBySessionId(int SessionId);
-  cCiSession *GetSessionByResourceId(int ResourceId, int Slot);
-  cCiSession *CreateSession(int ResourceId);
-  */
   cCiSession *GetSessionBySessionId(uint16_t SessionId);
   cCiSession *GetSessionByResourceId(uint32_t ResourceId, int Slot);
   cCiSession *CreateSession(uint32_t ResourceId);
