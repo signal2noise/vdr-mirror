@@ -533,6 +533,11 @@ bool cDevice::ProvidesSource(int Source) const
   return false;
 }
 
+bool cDevice::ProvidesS2() const
+{
+  return false;
+}
+
 bool cDevice::ProvidesTransponder(const cChannel *Channel) const
 {
   return false;

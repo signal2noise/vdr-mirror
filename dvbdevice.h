@@ -60,6 +60,7 @@ private:
   void TurnOffLiveMode(bool LiveView);
 public:
   virtual bool ProvidesSource(int Source) const;
+  virtual bool ProvidesS2() const;
   virtual bool ProvidesTransponder(const cChannel *Channel) const;
   virtual bool ProvidesChannel(const cChannel *Channel, int Priority = -1, bool *NeedsDetachReceivers = NULL) const;
   virtual bool IsTunedToTransponder(const cChannel *Channel);
@@ -140,6 +141,7 @@ public:
 
 // Receiver facilities
 
+public:
 private:
   cTSBuffer *tsBuffer;
   cPoller *Poller;

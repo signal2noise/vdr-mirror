@@ -810,10 +810,20 @@ bool cDvbDevice::ProvidesSource(int Source) const
       || type == cSource::stTerr  && frontendType == FE_OFDM;
 }
 
+
+bool cDvbDevice::ProvidesS2() const
+{
+   return frontendType == FE_DVBS2;
+}
+
+
 bool cDvbDevice::ProvidesTransponder(const cChannel *Channel) const
 {
   return ProvidesSource(Channel->Source()) && ((Channel->Modulation()==QPSK_S2 || Channel->Modulation()==PSK8) ? (frontendType==FE_DVBS2) : true) && (!cSource::IsSat(Channel->Source()) || !Setup.DiSEqC || Diseqcs.Get(Channel->Source(), Channel->Frequency(), Channel->Polarization(), CardIndex()+1));  
 }
+
+
+
 
 bool cDvbDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *NeedsDetachReceivers) const
 {

@@ -205,6 +205,8 @@ protected:
 public:
   virtual bool ProvidesSource(int Source) const;
          ///< Returns true if this device can provide the given source.
+  virtual bool ProvidesS2() const;
+         ///<  returns true if device is S2 Tuner MH  
   virtual bool ProvidesTransponder(const cChannel *Channel) const;
          ///< XXX -> PLUGINS.html!
   virtual bool ProvidesTransponderExclusively(const cChannel *Channel) const;

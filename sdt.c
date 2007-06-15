@@ -55,6 +55,9 @@ void cSdtFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                    case 0x02: // digital radio sound service
                    case 0x04: // NVOD reference service
                    case 0x05: // NVOD time-shifted service
+                   case 0x11: // digital television service MPEG-2 HD
+                   case 0x13: // digital television service MPEG-4 HD
+                   case 0xC3: // some french channels like kiosk
                         {
                         char NameBuf[1024];
                         char ShortNameBuf[1024];
