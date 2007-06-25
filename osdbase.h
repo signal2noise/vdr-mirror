@@ -103,6 +103,7 @@ protected:
   static int displayMenuItems;//Mod by Klaus
   cSkinDisplayMenu *DisplayMenu(void) { return displayMenu; }
   const char *hk(const char *s);
+  const char *GetTitle(void) { return title; }
   void SetCols(int c0, int c1 = 0, int c2 = 0, int c3 = 0, int c4 = 0);
   void SetHasHotkeys(void);
   virtual void Clear(void);

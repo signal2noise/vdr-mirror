@@ -51,6 +51,7 @@ private:
 public:
   ~cRecordingInfo();
   tChannelID ChannelID(void) const { return channelID; }
+  void SetTitle(const char *Title);
   const char *Title(void) const { return event->Title(); }
   const char *ShortText(void) const { return event->ShortText(); }
   const char *Description(void) const { return event->Description(); }
@@ -84,6 +85,7 @@ public:
   virtual int Compare(const cListObject &ListObject) const;
   const char *Name(void) const { return name; }
   const char *FileName(void) const;
+  void SetTitle(const char *Title);
   const char *Title(char Delimiter = ' ', bool NewIndicator = false, int Level = -1) const;
   const cRecordingInfo *Info(void) const { return info; }
   void SetStartTime(time_t Start);

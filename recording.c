@@ -317,6 +317,12 @@ void cRecordingInfo::SetData(const char *Title, const char *ShortText, const cha
      ((cEvent *)event)->SetDescription(Description);
 }
 
+void cRecordingInfo::SetTitle(const char *Title)
+{
+  if (!isempty(Title))
+     ((cEvent *)event)->SetTitle(Title);
+}
+
 void cRecordingInfo::SetAux(const char *Aux)
 {
   free(aux);
@@ -702,6 +708,11 @@ const char *cRecording::FileName(void) const
      name = ExchangeChars(name, false);
      }
   return fileName;
+}
+
+void cRecording::SetTitle(const char *Title)
+{
+  info->SetTitle(Title);
 }
 
 const char *cRecording::Title(char Delimiter, bool NewIndicator, int Level) const
