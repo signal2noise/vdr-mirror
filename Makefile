@@ -26,13 +26,16 @@ PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
 
 VIDEODIR = /video
+#DVBDIR   = ../kernel/linux-2.6.11.11/include
 
 DOXYGEN  = /usr/bin/doxygen
 DOXYFILE = Doxyfile
 
+INCLUDES += -I$(DVBDIR)/include
+
+
 -include ../Make.config
 
-INCLUDES += -I$(DVBDIR)/include
 
 SILIB    = $(LSIDIR)/libsi.a
 TXMLLIB  = $(TXMLDIR)/libtinyxml.a
