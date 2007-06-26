@@ -15,11 +15,11 @@
 // --- cTransfer -------------------------------------------------------------
 
 cTransfer::cTransfer(int VPid, const int *APids, const int *DPids, const int *SPids)
-:cReceiver(0, -1, VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids)
+:cReceiver(0, -1, VPid, APids, DPids, SPids)
 ,cThread("transfer")
 {
 //  ringBuffer = new cRingBufferLinear(TRANSFERBUFSIZE, TS_SIZE * 2, true, "Transfer");
-  remux = new cRemux(VPid, APids, Setup.UseDolbyDigital ? DPids : NULL, SPids, false, rAuto, true);
+  remux = new cRemux(VPid, APids, DPids, SPids, false, rAuto, true);
   remux->SetTimeouts(50, 20);
 }
 
