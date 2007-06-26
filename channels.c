@@ -211,7 +211,7 @@ cChannel::cChannel(void)
   coderateH    = FEC_AUTO;
   coderateL    = FEC_AUTO;
   modulation   = QAM_AUTO;
-  rolloff      = 0; // S2
+  rolloff      = FE_ROLLOFF_35; // S2
   transmission = TRANSMISSION_MODE_AUTO;
   guard        = GUARD_INTERVAL_AUTO;
   hierarchy    = HIERARCHY_AUTO;
@@ -636,7 +636,8 @@ cString cChannel::ParametersToString(void) const
   ST("CST")  q += PrintParameter(q, 'I', MapToUser(inversion, InversionValues));
   ST("C T")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValues));
   ST(" S ")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValuesS));
-  ST(" S ")  q += PrintParameter(q, 'E', MapToUser(rolloff, RolloffValues));
+  if (rolloff != FE_ROLLOFF_35)
+      ST(" S ")  q += PrintParameter(q, 'E', MapToUser(rolloff, RolloffValues));
   ST("  T")  q += PrintParameter(q, 'D', MapToUser(coderateL, CoderateValues));
   ST("C T")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValues));
   if (modulation != QPSK && modulation != QAM_AUTO)

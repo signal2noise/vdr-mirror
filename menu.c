@@ -4918,7 +4918,7 @@ cMenuSetupMisc::cMenuSetupMisc(void)
 
   tmpUpdateChannels = (int) data.UpdateChannels / 2;
 
-  SetSection(tr("Inactivity"));
+  SetSection(tr("Background activity"));
   SetHelp(tr("Button$Scan EPG"));
   Add(new cMenuEditIntItem( tr("Setup.EPG$EPG scan timeout (h)"),      &data.EPGScanTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. event timeout (min)"),   &data.MinEventTimeout, 0, INT_MAX, tr("off")));

@@ -6507,7 +6507,7 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
   },
   {
-    "Inactivity",
+    "Background activity",
     "Hintergrundaktivität"
     "",// TODO
     "",// TODO
