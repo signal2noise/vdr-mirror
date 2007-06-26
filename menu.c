@@ -943,7 +943,7 @@ eOSState cMenuEditBouquet::ProcessKey(eKeys Key)
 	    for(channelE = (cChannel*)channel->Next(); channelE && !channelE->GroupSep(); channelE = (cChannel*) channelE->Next()){
               int caids[2] = {bouquetCaId, 0};
 	      if(channelE){
-		channelE->SetCaIds((const int*)&caids);
+		channelE->ForceCaIds((const int*)&caids);
 		isyslog("editing complete bouquet: setting caid of channel %s to %i", channelE->Name(), bouquetCaId);
 	      }
 	    }
@@ -5842,7 +5842,7 @@ eOSState cDisplayChannel::ProcessKey(eKeys Key)
             return osEnd;
             }
     };
-  if (!timeout || lastTime.Elapsed() < (uint64_t)(Setup.ChannelInfoTime * 1000)) {
+  if (!timeout || lastTime.Elapsed() < (uint64_t)(Setup.ChannelInfoTime * 5000)) {
      if (Key == kNone && !number && group < 0 && !NewChannel && channel && channel->Number() != cDevice::CurrentChannel()) {
         // makes sure a channel switch through the SVDRP CHAN command is displayed
         channel = Channels.GetByNumber(cDevice::CurrentChannel());

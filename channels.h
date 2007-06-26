@@ -222,6 +222,7 @@ public:
   void SetPortalName(const char *PortalName);
   void SetPids(int Vpid, int Ppid, int *Apids, char ALangs[][MAXLANGCODE2], int *Dpids, char DLangs[][MAXLANGCODE2], int Tpid);
   void SetCaIds(const int *CaIds); // list must be zero-terminated
+  void ForceCaIds(const int *CaIds); // list must be zero-terminated // TB: does not check for reserved values
   void SetCaDescriptors(int Level);
   void SetLinkChannels(cLinkChannels *LinkChannels);
   cLinkChannels* GetLinkChannels(void){return linkChannels;};

@@ -533,10 +533,14 @@ void cChannel::SetPids(int Vpid, int Ppid, int *Apids, char ALangs[][MAXLANGCODE
      }
 }
 
-void cChannel::SetCaIds(const int *CaIds)
-{
+void cChannel::SetCaIds(const int *CaIds){
   if (caids[0] && caids[0] <= 0x00FF)
-     return; // special values will not be overwritten
+     return;
+  ForceCaIds(CaIds);
+}
+
+void cChannel::ForceCaIds(const int *CaIds)
+{
   if (IntArraysDiffer(caids, CaIds)) {
      char OldCaIdsBuf[MAXCAIDS * 5 + 10]; // 5: 4 digits plus delimiting ',', 10: paranoia
      char NewCaIdsBuf[MAXCAIDS * 5 + 10];
