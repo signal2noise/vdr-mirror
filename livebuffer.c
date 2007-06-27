@@ -1606,6 +1606,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                      if (player)
                         player->Play();
                      break;
+        case kPrev|k_Release:
         case kFastRew|k_Release:
                        sk = 0;
                        if (Setup.MultiSpeedMode) break;
@@ -1617,6 +1618,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
         case kFastRew: if (player)
                           player->Backward();
                        break;
+        case kNext|k_Release:
         case kFastFwd|k_Release:
                        sk = 0;
                        if (Setup.MultiSpeedMode) break;
