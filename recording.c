@@ -319,14 +319,12 @@ void cRecordingInfo::SetData(const char *Title, const char *ShortText, const cha
 
 void cRecordingInfo::SetShortText(const char *ShortText)
 {
-  if (!isempty(ShortText))
-     ((cEvent *)event)->SetShortText(ShortText);
+  ((cEvent *)event)->SetShortText(ShortText);
 }
 
 void cRecordingInfo::SetTitle(const char *Title)
 {
-  if (!isempty(Title))
-     ((cEvent *)event)->SetTitle(Title);
+  ((cEvent *)event)->SetTitle(Title);
 }
 
 void cRecordingInfo::SetAux(const char *Aux)

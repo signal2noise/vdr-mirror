@@ -323,12 +323,24 @@ void cEvent::SetRunningStatus(int RunningStatus, cChannel *Channel)
 
 void cEvent::SetTitle(const char *Title)
 {
-  title = strcpyrealloc(title, Title);
+  if(strlen(Title)==0) {
+    if(title)
+      free(title);
+    title = NULL;
+  }
+  else
+    title = strcpyrealloc(title, Title);
 }
 
 void cEvent::SetShortText(const char *ShortText)
 {
-  shortText = strcpyrealloc(shortText, ShortText);
+  if(strlen(ShortText)==0) {
+    if(shortText)
+      free(shortText);
+    shortText = NULL;
+  }
+  else
+    shortText = strcpyrealloc(shortText, ShortText);
 }
 
 void cEvent::SetDescription(const char *Description)
