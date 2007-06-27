@@ -1385,11 +1385,6 @@ int main(int argc, char *argv[])
              case kLeft:
              case kRight|k_Repeat:
              case kRight:
-             // Previous/Next rotates through channel groups:
-             case kPrev|k_Repeat:
-             case kPrev:
-             case kNext|k_Repeat:
-             case kNext:
              // Up/Down Channel Select:
              case kUp|k_Repeat:
              case kUp:
