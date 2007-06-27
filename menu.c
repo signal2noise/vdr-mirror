@@ -5842,7 +5842,7 @@ eOSState cDisplayChannel::ProcessKey(eKeys Key)
             return osEnd;
             }
     };
-  if (!timeout || lastTime.Elapsed() < (uint64_t)(Setup.ChannelInfoTime * 5000)) {
+  if (!timeout || lastTime.Elapsed() < (uint64_t)(Setup.ChannelInfoTime * 1000)) {
      if (Key == kNone && !number && group < 0 && !NewChannel && channel && channel->Number() != cDevice::CurrentChannel()) {
         // makes sure a channel switch through the SVDRP CHAN command is displayed
         channel = Channels.GetByNumber(cDevice::CurrentChannel());
