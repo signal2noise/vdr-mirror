@@ -154,17 +154,19 @@ char *strreplace(char *s, const char *s1, const char *s2)
   char *p = strstr(s, s1);
   if (p) {
      int of = p - s;
+     char* s_plus_of = s + of; 
      int l  = strlen(s);
      int l1 = strlen(s1);
      int l2 = strlen(s2);
      if (l2 > l1)
-        s = (char *)realloc(s, strlen(s) + l2 - l1 + 1);
+        s = (char *)realloc(s, l + l2 - l1 + 1);
      if (l2 != l1)
-        memmove(s + of + l2, s + of + l1, l - of - l1 + 1);
-     strncpy(s + of, s2, l2);
+        memmove(s_plus_of + l2, s_plus_of + l1, l - of - l1 + 1);
+     strncpy(s_plus_of, s2, l2);
      }
   return s;
 }
+
 #if 0
 char *skipspace(const char *s)
 {
@@ -252,20 +254,29 @@ bool isempty(const char *s)
 
 int numdigits(int n)
 {
+#if 0
   char buf[16];
   snprintf(buf, sizeof(buf), "%d", n);
   return strlen(buf);
+#else
+/* TB: faster implementation */
+  int res = 1;
+  while(n >= 10){
+    n/=10;
+    res++;
+  }
+  return res;
+#endif
 }
 
 bool isnumber(const char *s)
 {
   if (!*s)
      return false;
-  while (*s) {
+  do {
         if (!isdigit(*s))
            return false;
-        s++;
-        }
+  } while (*++s);
   return true;
 }
 
@@ -569,9 +580,10 @@ cTimeMs::cTimeMs(void)
   Set();
 }
 
+static struct timeval t;
+
 uint64_t cTimeMs::Now(void)
 {
-  struct timeval t;
   if (gettimeofday(&t, NULL) == 0)
      return (uint64_t(t.tv_sec)) * 1000 + t.tv_usec / 1000;
   return 0;
