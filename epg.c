@@ -323,7 +323,7 @@ void cEvent::SetRunningStatus(int RunningStatus, cChannel *Channel)
 
 void cEvent::SetTitle(const char *Title)
 {
-  if(strlen(Title)==0) {
+  if(Title==NULL || strlen(Title)==0) {
     if(title)
       free(title);
     title = NULL;
@@ -334,7 +334,7 @@ void cEvent::SetTitle(const char *Title)
 
 void cEvent::SetShortText(const char *ShortText)
 {
-  if(strlen(ShortText)==0) {
+  if(ShortText==NULL || strlen(ShortText)==0) {
     if(shortText)
       free(shortText);
     shortText = NULL;
