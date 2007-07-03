@@ -1020,10 +1020,10 @@ int main(int argc, char *argv[])
 	                if (!channelinfo_requested /*Start by Klaus*/&& !channelinfo_was_requested/*End by Klaus*/) {
                        // we do nothing if channelInfo _was_  requested;
                      bool WasInfoMenu = IsInfoMenu;
-                     //DELETE_MENU;
                      if (!WasInfoMenu) {
                         IsInfoMenu = true;
                         if (cControl::Control()) {
+			    DELETE_MENU;
                            cControl::Control()->Hide();
                            Menu = cControl::Control()->GetInfo();
       		             if (Menu) {
