@@ -9,6 +9,7 @@
 #include "tinyxml/tinyxml.h"
 #include "submenu.h" // dynamicmenuEnt
 #include "help.h"
+#include "i18n.h"
 
 
 #undef  DBG
@@ -65,7 +66,7 @@ bool cHelpPages::Load()
   bool ok = false;
 
   HelpMenus.Clear();
-  const char *notAviable = "No help available";
+  const char *notAviable = tr("No help available");
   cHelpSection *s = new cHelpSection(notAviable);
   cHelpPage *help = new cHelpPage(notAviable, notAviable); 
   s->Add(help);
