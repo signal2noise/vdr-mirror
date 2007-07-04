@@ -1124,6 +1124,19 @@ cChannel *cChannels::GetByChannelID(tChannelID ChannelID, bool TryWithoutRid, bo
      }
   return NULL;
 }
+cChannel *cChannels::GetByTransponderID(tChannelID ChannelID)
+{
+  int source = ChannelID.Source();
+  int nid = ChannelID.Nid(); // networkd
+  int tid = ChannelID.Tid(); // transponderId 
+
+     for (cChannel *channel = Channels.First(); channel; channel = Channels.Next(channel)) {
+        if (channel->Tid() == tid &&  channel->Nid() == nid && channel->Source() == source)
+           return channel;
+        }
+    return NULL;
+}
+
 
 bool cChannels::HasUniqueChannelID(cChannel *NewChannel, cChannel *OldChannel)
 {

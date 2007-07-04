@@ -188,42 +188,8 @@ cEIT::cEIT(cSchedules *Schedules, int Source, u_char Tid, const u_char *Data, bo
                  dsyslog("[eit]: Linkage Type %X  (0xB0) == Premiere ", ld->getLinkageType());  
 #endif
                  if (ld->getLinkageType() == 0xB0) { // Premiere World
-                    // wenn StartZeit jetzt oder später _UND_  jetzt kleiner als ( StartZeit + dauer )
                     time_t now = time(NULL);
-#ifdef DBG_EIT_LINKS
-                    time_t tStart = SiEitEvent.getStartTime(); 
-                    time_t tDuration = SiEitEvent.getDuration(); 
-                    const size_t MAX = 256;
-                    char s[MAX];
 
-                    dsyslog("[eit]: now %s   \n", ctime(&now));
-                    dsyslog("[eit]: start %s   \n", ctime(&tStart));
-                    dsyslog("[eit]: duration %s   \n", ctime(&tDuration));
-#endif
-
-                    /*
-                    struct tm sStart = *localtime(&tStart);
-                    struct tm sDuration = *localtime(&tDuration);
-                    struct tm sNow = *localtime(&now);
-                    if (strftime(s,MAX,"System  Jetzt Zeit: %X %d. %h %Y ",&sNow) !=  0)
-                    {
-                        strn0cpy(s, "System  Jetzt Zeit: 0", MAX);
-                    }
-                    isyslog ("[eit]:  %s ",s);
-
-                    if ((strftime(s ,MAX,"    Eit Start Zeit: %X %d. %h %Y",&sStart) != 0))
-                    {
-                        strn0cpy(s, "  Eit Start Zeit: 0", MAX);
-                    }
-                    isyslog ("[eit]:  %s ",s);
-
-                    if (strftime(s ,MAX,"    Eit Zeit Dauer: %X %d. %h %Y ",&sDuration) != 0)
-                    {
-                       strn0cpy(s, "  Eit Zeit Dauer : 0", MAX);
-                    }
-                    isyslog ("[eit]:  %s ",s);
-
-                    */
                     bool hit = SiEitEvent.getStartTime() <= now && now < SiEitEvent.getStartTime() + SiEitEvent.getDuration();
                     if (hit) {
 #ifdef DBG_EIT_LINKS
@@ -245,7 +211,12 @@ cEIT::cEIT(cSchedules *Schedules, int Source, u_char Tid, const u_char *Data, bo
                                 link->SetName(linkName, "", "");
                              }
                           else if (Setup.UpdateChannels >= 4) {
-                             link = Channels.NewChannel(channel, linkName, "", "", ld->getOriginalNetworkId(), ld->getTransportStreamId(), ld->getServiceId());
+
+                              if (channel->Tid() != ld->getTransportStreamId()) {
+                                 cChannel *transponder = Channels.GetByTransponderID(linkID);
+                                  link = Channels.NewChannel(transponder, linkName, "", "", ld->getOriginalNetworkId(), ld->getTransportStreamId(), ld->getServiceId());
+                                 }
+                              link = Channels.NewChannel(channel, linkName, "", "", ld->getOriginalNetworkId(), ld->getTransportStreamId(), ld->getServiceId());
                              //XXX patFilter->Trigger();
                             }
                           if (link) {
