@@ -1279,10 +1279,9 @@ int cRemux::Put(const uchar *Data, int Count)
 #if 0
 		if (Data[1]&0x80) // Error
 			continue;
-
+#endif
 		if (Data[3]&0xc0) // Scrambled 
 			continue;
-#endif
 
 		adapfield=Data[3]&0x30;
 		
