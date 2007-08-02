@@ -36,7 +36,6 @@ INCLUDES += -I$(DVBDIR)/include
 
 -include ../Make.config
 
-
 SILIB    = $(LSIDIR)/libsi.a
 TXMLLIB  = $(TXMLDIR)/libtinyxml.a
 
