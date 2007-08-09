@@ -102,7 +102,9 @@ char *strreplace(char *s, const char *s1, const char *s2); ///< re-allocates 's'
 //char *skipspace(const char *s);
 inline char *skipspace(const char *s)
 {
-  while (*s && isspace(*s))
+  if (*s > ' ') // most strings don't have any leading space, so handle this case as fast as possible
+     return (char *)s;
+  while (*s && *s <= ' ') // avoiding isspace() here, because it is much slower
         s++;
   return (char *)s;
 }
