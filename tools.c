@@ -262,6 +262,7 @@ bool isnumber(const char *s)
      if (!isdigit(*s))
         return false;
      } while (*++s);
+  return true;
 }
 
 cString AddDirectory(const char *DirName, const char *FileName)
