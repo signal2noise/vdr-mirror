@@ -167,7 +167,7 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                                   }
                               }
                            if (ISTRANSPONDER(cChannel::Transponder(Frequency, Polarization), Transponder())) // only modify channels if we're actually receiving this transponder
-                              Channel->SetSatTransponderData(Source, Frequency, Polarization, SymbolRate, CodeRate);
+                              Channel->SetSatTransponderData(Source, Frequency, Polarization, SymbolRate, CodeRate, Modulation, Rolloff);
                            }
                         found = true;
                         }
