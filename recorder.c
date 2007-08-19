@@ -21,6 +21,8 @@
 #define MINFREEDISKSPACE    (512) // MB
 #define DISKCHECKINTERVAL   100 // seconds
 
+#define PATPMT_DISTANCE (1*1024*1024)
+
 class cFileWriter : public cThread {
 private:
   cRemux *remux;
@@ -28,6 +30,7 @@ private:
   cIndexFile *index;
   uchar pictureType;
   int fileSize;
+  int diffSize;
   cUnbufferedFile *recordFile;
   time_t lastDiskSpaceCheck;
   bool RunningLowOnDiskSpace(void);
@@ -47,6 +50,7 @@ cFileWriter::cFileWriter(const char *FileName, cRemux *Remux)
   index = NULL;
   pictureType = NO_PICTURE;
   fileSize = 0;
+  diffSize = 0;
   lastDiskSpaceCheck = time(NULL);
   fileName = new cFileName(FileName, true);
   recordFile = fileName->Open();
@@ -98,6 +102,7 @@ void cFileWriter::Action(void)
   while (Running()) {
         int Count;
         uchar *p = remux->Get(Count, &pictureType, 1);
+
         while(skipped < 10 && (remux->SFmode() == SF_UNKNOWN || remux->TSmode() == rAuto)){ // TB: give remuxer a chance to detect the stream type
            skipped++;
            Count = 0;
@@ -110,8 +115,8 @@ void cFileWriter::Action(void)
               break;
            if (NextFile()) {
 #if 1
-              // Add PAT+PMT at every filestart
-              if (!fileSize && remux->TSmode()==SF_H264) {
+              // Add PAT+PMT at every filestart and every MB
+              if ((!fileSize || diffSize > PATPMT_DISTANCE) && remux->TSmode()==SF_H264) {
 		      uchar patpmt[2*188];
 		      int plen;
 		      plen=remux->GetPATPMT(patpmt, 2*188);
@@ -122,6 +127,7 @@ void cFileWriter::Action(void)
 			      }
 			      fileSize+=plen;
 		      }
+		      diffSize=0;
 	      }
 #endif
               if (index && pictureType != NO_PICTURE)
@@ -131,6 +137,7 @@ void cFileWriter::Action(void)
                  break;
                  }
               fileSize += Count;
+              diffSize += Count;
               remux->Del(Count);
               }
            else
