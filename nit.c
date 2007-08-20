@@ -172,15 +172,15 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                            }
                         found = true;
                         }
-                     }
-                 if (!found && Setup.UpdateChannels >= 5) {
-                    for (int n = 0; n < NumFrequencies; n++) {
-                        cChannel *Channel = new cChannel;
-                        Channel->SetId(ts.getOriginalNetworkId(), ts.getTransportStreamId(), 0, 0);
-                        if (Channel->SetSatTransponderData(Source, Frequencies[n], Polarization, SymbolRate, CodeRate, Modulation, Rolloff))
-                           EITScanner.AddTransponder(Channel);
-                        else
-                           delete Channel;
+                    if (!found && Setup.UpdateChannels >= 5) {
+                       for (int n = 0; n < NumFrequencies; n++) {
+                           cChannel *Channel = new cChannel;
+                           Channel->SetId(ts.getOriginalNetworkId(), ts.getTransportStreamId(), 0, 0);
+                           if (Channel->SetSatTransponderData(Source, Frequencies[n], Polarization, SymbolRate, CodeRate, Modulation, Rolloff))
+                              EITScanner.AddTransponder(Channel);
+                           else
+                              delete Channel;
+		           }
                         }
                     }
                  }
