@@ -221,7 +221,8 @@ cMenuEditChrItem::~cMenuEditChrItem()
 void cMenuEditChrItem::Set(void)
 {
   char buf[2];
-  snprintf(buf, sizeof(buf), "%c", *value);
+  buf[0] = *value;
+  buf[1] = '\0';
   SetValue(buf);
 }
 
@@ -412,9 +413,7 @@ eOSState cMenuEditStrItem::ProcessKey(eKeys Key)
                  break;
     case kBlue|k_Repeat:
     case kBlue:  // consume the key only if in edit-mode
-                 if (InEditMode())
-                    ;
-                 else
+                 if (!InEditMode())
                     return osUnknown;
                  break;
     case kLeft|k_Repeat:
