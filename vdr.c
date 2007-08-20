@@ -744,10 +744,13 @@ int main(int argc, char *argv[])
 #endif
         // Attach launched player control:
         cControl::Attach();
+
+        time_t Now = time(NULL);
+
         // Make sure we have a visible programme in case device usage has changed:
         if (!EITScanner.Active() && cDevice::PrimaryDevice()->HasDecoder() && !cDevice::PrimaryDevice()->HasProgramme()) {
            static time_t lastTime = 0;
-           if (time(NULL) - lastTime > MINCHANNELWAIT) {
+           if (Now - lastTime > MINCHANNELWAIT) {
               cChannel *Channel = Channels.GetByNumber(cDevice::CurrentChannel());
               if (Channel && (Channel->Vpid() || Channel->Apid(0))) {
                  if (!scanning_on_receiving_device  // avoid scanning on current transponder
@@ -757,7 +760,7 @@ int main(int argc, char *argv[])
                      && !cDevice::SwitchChannel(-1)) // ...or the next lower available one
                     ;
                  }
-              lastTime = time(NULL); // don't do this too often
+              lastTime = Now; // don't do this too often
               LastTimerChannel = -1;
               }
            }
@@ -779,8 +782,8 @@ int main(int argc, char *argv[])
            if (modified == CHANNELSMOD_USER || Timers.Modified(TimerState))
               ChannelSaveTimeout = 1; // triggers an immediate save
            else if (modified && !ChannelSaveTimeout)
-              ChannelSaveTimeout = time(NULL) + CHANNELSAVEDELTA;
-           bool timeout = ChannelSaveTimeout == 1 || ChannelSaveTimeout && time(NULL) > ChannelSaveTimeout && !cRecordControls::Active();
+              ChannelSaveTimeout = Now + CHANNELSAVEDELTA;
+           bool timeout = ChannelSaveTimeout == 1 || ChannelSaveTimeout && Now > ChannelSaveTimeout && !cRecordControls::Active();
            if ((modified || timeout) && Channels.Lock(false, 100)) {
               if (timeout) {
                  Channels.Save();
@@ -811,12 +814,12 @@ int main(int argc, char *argv[])
               Menu = new cDisplayChannel(cDevice::CurrentChannel(), LastChannel >= 0 && !channelinfo_requested);
               }
            LastChannel = cDevice::CurrentChannel();
-           LastChannelChanged = time(NULL);
+           LastChannelChanged = Now;
            }
-        if (time(NULL) - LastChannelChanged >= Setup.ZapTimeout && LastChannel != PreviousChannel[PreviousChannelIndex])
+        if (Now - LastChannelChanged >= Setup.ZapTimeout && LastChannel != PreviousChannel[PreviousChannelIndex])
            PreviousChannel[PreviousChannelIndex ^= 1] = LastChannel;
         // Timers and Recordings:
-        if (TimerWakeup && Shutdown && time(NULL) - vdrStartTime > SHUTDOWNWAIT) {
+        if (TimerWakeup && Shutdown && Now - vdrStartTime > SHUTDOWNWAIT) {
            if (LastActivity == 0) {
                LastActivity = 1;
                AutoShutdown = true;
@@ -828,7 +831,6 @@ int main(int argc, char *argv[])
            // Assign events to timers:
            Timers.SetEvents();
            // Must do all following calls with the exact same time!
-           time_t Now = time(NULL);
            // Process ongoing recordings:
            cRecordControls::Process(Now);
            // Start new recordings:
@@ -928,7 +930,7 @@ int main(int argc, char *argv[])
                         }
                      }
                   }
-              LastTimerCheck = time(NULL);
+              LastTimerCheck = Now;
               }
            // Delete expired timers:
            Timers.DeleteExpired();
@@ -947,14 +949,14 @@ int main(int argc, char *argv[])
            if (Menu)
               LastCamMenu = 0;
            else if (!LastCamMenu)
-              LastCamMenu = time(NULL);
+              LastCamMenu = Now;
            }
         // Queued messages:
         if (!Skins.IsOpen())
            Skins.ProcessQueuedMessages();
         // User Input:
         cOsdObject *Interact = Menu ? Menu : cControl::Control(true);
-        eKeys key = Interface->GetKey((!Interact || !Interact->NeedsFastResponse()) && time(NULL) - LastCamMenu > LASTCAMMENUTIMEOUT);
+        eKeys key = Interface->GetKey((!Interact || !Interact->NeedsFastResponse()) && Now - LastCamMenu > LASTCAMMENUTIMEOUT);
         Interact = Menu ? Menu : cControl::Control();
         //Start by Klaus
         if (key == kMenu && cDevice::PrimaryDevice()->Replaying() && cDevice::PrimaryDevice()->PlayerCanHandleMenuCalls())
@@ -968,7 +970,7 @@ int main(int argc, char *argv[])
         if (NORMALKEY(key) != kNone) {
            cStatus::MsgUserAction(key, Interact);          // PIN PATCH
            EITScanner.Activity();
-           LastActivity = time(NULL);
+           LastActivity = Now;
            }
         // Keys that must work independent of any interactive mode:
         switch (key) {
@@ -1220,7 +1222,6 @@ int main(int argc, char *argv[])
                   break;
                if (cRecordControls::Active()) {
                   // Stop all running timers
-                  time_t Now = time(NULL);
                   cTimer *timer = Timers.GetNextActiveTimer();
                   time_t Next = timer ? timer->StartTime() : 0;
                   while (timer && Next - Now < 0) {
@@ -1244,7 +1245,7 @@ int main(int argc, char *argv[])
 	       else {
                   cTimer *timer = Timers.GetNextActiveTimer();
                   time_t Next  = timer ? timer->StartTime() : 0;
-                  time_t Delta = timer ? Next - time(NULL) : 0;
+                  time_t Delta = timer ? Next - Now : 0;
                   if (Next && Delta <= Setup.MinEventTimeout * 60 && !AutoShutdown) {
                      char *buf;
                      asprintf(&buf, tr("Recording in %ld minutes, shut down anyway?"), Delta / 60);
@@ -1271,14 +1272,14 @@ int main(int argc, char *argv[])
                     continue;
                     }
                  }
-             else if (time(NULL) - LastActivity > MENUTIMEOUT)
+             else if (Now - LastActivity > MENUTIMEOUT)
              {
                 state = osEnd;
                 }
            }
          // TODO make the CAM menu stay open in case of automatic updates and have it return osContinue; then the following two lines can be removed again
            else if (state == osEnd && LastActivity > 1)
-              LastActivity = time(NULL);
+              LastActivity = Now;
 
            switch (state) {
              case osPause:  if (cLiveBufferManager::GetLiveBufferControl()) {
@@ -1464,7 +1465,6 @@ int main(int argc, char *argv[])
               }
            }
          if (!Interact && ((!cRecordControls::Active() && !cCutter::Active() && (!Interface->HasSVDRPConnection() || UserShutdown)) || ForceShutdown)) {
-	   time_t Now = time(NULL);
            if (Now - LastActivity > ACTIVITYTIMEOUT) {
               // Shutdown:
               if (Shutdown && (Setup.MinUserInactivity || LastActivity == 1) && Now - LastActivity > Setup.MinUserInactivity * 60) {
@@ -1505,14 +1505,14 @@ int main(int argc, char *argv[])
                        int Channel = timer ? timer->Channel()->Number() : 0;
                        const char *File = timer ? timer->File() : "";
                        if (timer)
-                          Delta = Next - time(NULL); // compensates for Confirm() timeout
+                          Delta = Next - Now; // compensates for Confirm() timeout
                        char *cmd;
                        asprintf(&cmd, "%s %ld %ld %d \"%s\" %d", Shutdown, Next, Delta, Channel, *strescape(File, "\"$"), UserShutdown);
                        isyslog("executing '%s'", cmd);
                        SystemExec(cmd);
                        free(cmd);
                        Interrupted=1; // GA
-                       LastActivity = time(NULL) - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later
+                       LastActivity = Now - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later
                        }
                     else {
                       LastActivity = Now;
