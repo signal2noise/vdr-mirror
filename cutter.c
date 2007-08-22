@@ -17,7 +17,11 @@
 // --- cCuttingThread --------------------------------------------------------
 
 #ifndef CUTTER_MAX_BANDWIDTH
+#ifdef RBLITE
 #  define CUTTER_MAX_BANDWIDTH MEGABYTE(3) // 10 MB/s
+#else
+#  define CUTTER_MAX_BANDWIDTH MEGABYTE(20) // 10 MB/s
+#endif
 #endif
 #ifndef CUTTER_REL_BANDWIDTH
 #  define CUTTER_REL_BANDWIDTH 75 // %

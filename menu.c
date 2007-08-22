@@ -77,7 +77,7 @@ void cMenuEditCaItem::Set(void)
     sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) : tr("No CI at"), tr("upper slot"));
   else if (*value == 1)
     sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) : tr("No CI at"), tr("lower slot"));
-  
+
   if (*value <= 3)
      SetValue(s);
   else if (*value >= CA_ENCRYPTED_MIN)
@@ -165,9 +165,9 @@ eOSState cMenuEditSrcItem::ProcessKey(eKeys Key)
 }
 
 // --- cMenuEditSrcEItem ------------------------------------------------------
-#define DBG ""  
+#define DBG ""
 
-#if defined DEBUG_DISEQC 
+#if defined DEBUG_DISEQC
 #   define DBG " DEBUG [diseqc]:  -- "
 #   define DLOG(x...) dsyslog(x)
 #   define DPRINT(x...) fprintf(stderr,x)
@@ -469,7 +469,7 @@ void cMenuEditChannel::Setup(void)
     Add(new cMenuEditCaItem(  "CI-Slot",           &data.caids[0], false));//XXX
     Add(new cMenuEditIntItem( tr("Sid"),          &data.sid, 1, 0xFFFF));
     ST("C T")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValues, "QPSK"));
-    ST(" S ")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValuesS, "4"));    
+    ST(" S ")  Add(new cMenuEditMapItem( tr("Modulation"),   &data.modulation,   ModulationValuesS, "4"));
     ST("  T")  Add(new cMenuEditMapItem( tr("Bandwidth"),    &data.bandwidth,    BandwidthValues));
     ST("  T")  Add(new cMenuEditMapItem( tr("Transmission"), &data.transmission, TransmissionValues));
     ST("  T")  Add(new cMenuEditMapItem( tr("Guard"),        &data.guard,        GuardValues));
@@ -1747,7 +1747,7 @@ eOSState cMenuText::ProcessKey(eKeys Key)
 cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
 :cOsdMenu(Title)
 {
-  
+
   //printf (" Open Help  Title %s section %s \n", Title, Section?Section->Section():"NO Object");
   text = NULL;
   helpPage = NULL;
@@ -1762,7 +1762,7 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
 
   if (helpPage)
     SetText(helpPage->Text());
-    
+
 }
 
 cMenuHelp::~cMenuHelp()
@@ -1777,7 +1777,7 @@ void cMenuHelp::SetText(const char *Text)
 }
 void cMenuHelp::SetNextHelp()
 {
- 
+
   SetStatus(NULL);
   cHelpPage *h =  static_cast<cHelpPage *>(helpPage->cListObject::Next());
   if (h) // aviod malloc/free!
@@ -1792,8 +1792,8 @@ void cMenuHelp::SetNextHelp()
     free(buffer);
     Display();
   }
-  else 
-  {   
+  else
+  {
      SetStatus(tr("Already first help item"));
   }
 }
@@ -1814,8 +1814,8 @@ void cMenuHelp::SetPrevHelp()
     free(buffer);
     Display();
   }
-  else 
-  {   
+  else
+  {
      SetStatus(tr("Already last help item"));
   }
 }
@@ -1833,8 +1833,8 @@ eOSState cMenuHelp::ProcessKey(eKeys Key)
   switch (Key) {
     case kUp|k_Repeat:
     case kUp:
-                  
-                  SetNextHelp(); 
+
+                  SetNextHelp();
                   break;
     case kDown|k_Repeat:
     case kDown:
@@ -1891,15 +1891,15 @@ cMenuEditTimer::cMenuEditTimer(cTimer *Timer, bool New)
      Add(new cMenuEditIntItem( tr("Lifetime"),     &data.lifetime, 0, MAXLIFETIME));
      //Add(new cMenuEditBoolItem(tr("Child protection"), &data.fskProtection));  // PIN PATCH
      // PIN PATCH
-     if (cOsd::pinValid) 
+     if (cOsd::pinValid)
         Add(new cMenuEditBoolItem(tr("Child protection"),&data.fskProtection));
-     else { 
+     else {
         char* buf = 0;
-        asprintf(&buf, "%s\t%s", tr("Child protection"), data.fskProtection ? tr("yes") : tr("no")); 
+        asprintf(&buf, "%s\t%s", tr("Child protection"), data.fskProtection ? tr("yes") : tr("no"));
         Add(new cOsdItem(buf));
         free(buf);
         }
-     
+
      Add(new cMenuEditStrItem( tr("File"),          data.file, sizeof(data.file), tr(FileNameChars)));
      SetFirstDayItem();
      }
@@ -2118,7 +2118,7 @@ eOSState cMenuTimers::Edit(void)
      return osContinue;
   isyslog("editing timer %s", *CurrentTimer()->ToDescr());
 
-  /* RC: prepared for epgsearchs timeredit. currently has the prob that timers are only 
+  /* RC: prepared for epgsearchs timeredit. currently has the prob that timers are only
          updated when menu ist closed
   cPlugin *p = cPluginManager::GetPlugin("epgsearch");
   if (p) {
@@ -2163,7 +2163,7 @@ eOSState cMenuTimers::New(void)
       p->Service("Epgsearch-exttimeredit-v1.0", &serviceData);
       if (serviceData.pTimerMenu)
           return AddSubMenu(serviceData.pTimerMenu);
-      else 
+      else
           Skins.Message(mtError, tr("This version of EPGSearch does not support this service!"));
   }
   */
@@ -2322,7 +2322,7 @@ void cMenuActiveEvent::SetHelpButtons(void)
   Timers.GetMatch(event, &timerMatch);
   if (event)
      SetHelp(timerMatch == tmFull ? tr("Button$Timer") : tr("Button$Record"), NULL, NULL, NULL);
-  else 
+  else
      SetHelp(NULL);
 
 }
@@ -2354,7 +2354,7 @@ eOSState cMenuActiveEvent::Record(void)
         if (HasSubMenu())
            CloseSubMenu();
         }
-     
+
   return osContinue;
 }
 
@@ -3892,7 +3892,7 @@ cMenuSetupDVB::cMenuSetupDVB(void)
   updateChannelsTexts[4] = tr("add new channels");
   updateChannelsTexts[5] = tr("add new transponders");
   SetSection(tr("DVB"));
-*/  
+*/
   SetSection(tr("Audio"));
   Setup();
 }
@@ -3914,9 +3914,10 @@ void cMenuSetupDVB::Setup(void)
 */
   Add(new cMenuEditBoolItem(tr("Setup.DVB$Use Dolby Digital"),     &data.UseDolbyDigital));
   if (data.UseDolbyDigital) {
-     Add(new cMenuEditIntItem(tr(" Delay ac3 (10ms)"),     &data.ReplayDelay, 0, 80));
+     Add(new cMenuEditIntItem(tr(" Delay ac3 (10ms)"),               &data.ReplayDelay, 0, 80));
+     Add(new cMenuEditBoolItem(tr(" Prefer ac3 over HDMI"),          &data.Ac3OverHdmi));
   }
-  Add(new cMenuEditIntItem(tr("Delay Stereo (10ms)"),                &data.MP2Delay, 0, 80));
+  Add(new cMenuEditIntItem(tr("Delay Stereo (10ms)"),              &data.MP2Delay, 0, 80));
   SetCurrent(Get(current));
   Display();
 }
@@ -3999,13 +4000,13 @@ private:
      } /* keep this */ ;
   //tLnbType lnbTypesAtTuner[MAXTUNERS+1][MAXLNBS]; //XXX
   tLnbType lnbTypesAtTuner[MAXTUNERS+1][64];
-  int lnbNumberAtTuner[MAXTUNERS+1]; 
+  int lnbNumberAtTuner[MAXTUNERS+1];
   //int lnbNumber[MAXTUNERS+1];  // number of diffrent LNBs/sources
 
-  
+
   int tuner;
   int DiSEqC[MAXTUNERS+1];
-  int Diseqc[MAXTUNERS+1]; // DiSEqFlags 
+  int Diseqc[MAXTUNERS+1]; // DiSEqFlags
   int RotorLNBTuner[MAXTUNERS+1];
   int diffSetups;
   cOsdMenu *smenu;
@@ -4031,8 +4032,8 @@ public:
 cMenuSetupLNB::cMenuSetupLNB(void)
 {
   SetSection(tr("Dish settings"));
-  //DLOG( " LNB DEBUG  cMenuSetupLNB Constr  data.DiSEqC: %d  ", data.DiSEqC ); 
-   
+  //DLOG( " LNB DEBUG  cMenuSetupLNB Constr  data.DiSEqC: %d  ", data.DiSEqC );
+
   SetCols(19);
   extended = false;
   circular = 0;
@@ -4076,10 +4077,10 @@ void cMenuSetupLNB::Setup(void)
   char LnbC = 'A';
 
   bool hasRotor = false;
-  for (int i = diffSetups; i < diffSetups*MAXTUNERS + 1; i++) { // ??? 
-     if (i!=tuner && ((DiSEqC[i] & ROTORMASK) == GOTOX || 
-                 (DiSEqC[i] & ROTORMASK) == DISEQC12) && 
-                 (!i || cDevice::GetDevice(i-1) && 
+  for (int i = diffSetups; i < diffSetups*MAXTUNERS + 1; i++) { // ???
+     if (i!=tuner && ((DiSEqC[i] & ROTORMASK) == GOTOX ||
+                 (DiSEqC[i] & ROTORMASK) == DISEQC12) &&
+                 (!i || cDevice::GetDevice(i-1) &&
                   cDevice::GetDevice(i-1)->ProvidesSource(cSource::stSat)))
      {
         hasRotor = true;
@@ -4095,11 +4096,11 @@ void cMenuSetupLNB::Setup(void)
 
   Add(new cMenuEditStraItem(tr("DiSEqC Type"),     &Diseqc[tuner], hasRotor ? 8 : 7, useDiSEqcTexts));
 
-  
+
   //if (!(Diseqc[tuner] == DISICON4  || extended) || Diseqc[tuner] >= 4)
   // Add(new cMenuEditStraItem(tr("LNB Type"), &lnbTypesAtTuner[tuner][0].lnbType, 7, lofTexts));
 
-  DLOG (DBG " switch Diseqc[%X] @ tuner: %d ", Diseqc[tuner], tuner); 
+  DLOG (DBG " switch Diseqc[%X] @ tuner: %d ", Diseqc[tuner], tuner);
   switch (Diseqc[tuner]) {
      case NONE:
             lnbNumberAtTuner[tuner] = 1;
@@ -4182,7 +4183,7 @@ int cMenuSetupLNB::IntCmp(const void *a, const void *b)
 void cMenuSetupLNB::Init()
 {
 
-  // if settings changed we have to send diseqc commands by switching channel 
+  // if settings changed we have to send diseqc commands by switching channel
   currentChannel = cDevice::CurrentChannel();
   if (currentChannel > Channels.Count())
      currentChannel = 1;
@@ -4196,8 +4197,8 @@ void cMenuSetupLNB::Init()
      DLOG (DBG " for indiff Tuner setup set  DiSEqC[0] to %d ", data.DiSEqC);
      DiSEqC[0]= data.DiSEqC;
   }
-  DLOG( " LNB DEBUG  cMenuSetupLNB Constr  DiSEqC[%d]: %d  ", tuner, DiSEqC[tuner]); 
-  
+  DLOG( " LNB DEBUG  cMenuSetupLNB Constr  DiSEqC[%d]: %d  ", tuner, DiSEqC[tuner]);
+
   for (int t=0; t<=MAXTUNERS; t++) {
      if (DiSEqC[t] & SWITCHMASK)
         Diseqc[t]=DiSEqC[t] & SWITCHMASK;
@@ -4216,9 +4217,9 @@ void cMenuSetupLNB::Init()
   }
 
   DLOG (DBG " Restet LNB Types & LnbNubers  ");
-  
+
   for (int t=0;t<MAXTUNERS+1;t++) {
-     lnbNumberAtTuner[t] = 0; 
+     lnbNumberAtTuner[t] = 0;
      waitMs[t] = Diseqcs.WaitMs(t);
      repeat[t] = Diseqcs.RepeatCmd(t);
      for (int lnb=0;lnb<64;lnb++) {  // MAXLNBs
@@ -4234,7 +4235,7 @@ void cMenuSetupLNB::Init()
      int t = d->Tuner();
      DLOG (DBG " %d.) T: %d;Source: %d ",++i , t, d->Source());
      if (index == 0) {
-        lnbNumberAtTuner[t] = 1; 
+        lnbNumberAtTuner[t] = 1;
         lnbTypesAtTuner[t][index].source = d->Source();
         lnbTypesAtTuner[t][index].lnbType = d->LnbType();
         index++;
@@ -4249,7 +4250,7 @@ void cMenuSetupLNB::Init()
           DLOG (DBG " Count Lnb %d @ Tuner %d add Source %d  ", lnbNumberAtTuner[t], t, d->Source());
           }
         }
-     }   /// Tested OK  for indifferent Settings 
+     }   /// Tested OK  for indifferent Settings
   for (int k=0; k<=MAXTUNERS; k++)
     for (int i=0; i<lnbNumberAtTuner[k]; i++) {
        if (lnbTypesAtTuner[k][i].source == cSource::stSat)
@@ -4273,20 +4274,20 @@ void cMenuSetupLNB::DumpDiseqcs(bool all)
   dsyslog(DBG  " Dump Diseqc () D.Count() %d D.LnbCount() %d ALL %c", Diseqcs.Count(), Diseqcs.LnbCount(), all?'y':'n');
   //Loading already configured LnbTypes to LnbStruct
   int limit = 0;
-  
+
   for (int t = 0;t<MAXTUNERS+1;t++)
   {
-     if (all) 
-       limit = 20;  // vor save 
-     else 
+     if (all)
+       limit = 20;  // vor save
+     else
        limit = lnbNumberAtTuner[t];
       // Count Lnb 0 @ T: 1 S: 4
-      
+
       DLOG(DBG " Count Lnb %d @ T: %d ",  lnbNumberAtTuner[t], t);
       for (int lnb = 0;lnb<limit;lnb++) {
          DLOG(DBG " LNB %d points at  %d   ",lnb, lnbTypesAtTuner[t][lnb].source );
       }
-  }   
+  }
 }
 
 void cMenuSetupLNB::AddDefault()
@@ -4294,13 +4295,13 @@ void cMenuSetupLNB::AddDefault()
    DLOG (DBG " AddDefault() ");
 
   tLnbType initTypes[] = {
-   /// TODO we need to know right LNB types for each satelite 
+   /// TODO we need to know right LNB types for each satelite
      { 35008, 0, 0 },
      { 34946, 0, 0 },
      { 35031, 0, 0 },
      { 35076, 0, 0 },
      { 35051, 0, 0 },
-     { 35098, 0, 0 }, 
+     { 35098, 0, 0 },
      { 35121, 0, 0 },
      { 35129, 0, 0 },
      { 32838, 0, 0 },
@@ -4315,13 +4316,13 @@ void cMenuSetupLNB::AddDefault()
   // fill up with default values to avoid string "0"  in EditSrcItem
   for (int t=0; t<MAXTUNERS+1; t++) {
      int cnt = lnbNumberAtTuner[t];
-     DLOG (DBG " Procceding  through tuner %d LNBs: %d ",t, cnt); 
+     DLOG (DBG " Procceding  through tuner %d LNBs: %d ",t, cnt);
      for (int i=0;i<16;i++) {  // runs initTypes // XXX MAXLNBS
         for(int lnb=0;lnb<cnt;lnb++) { // loop though  actuall lnbs
-           //DLOG (DBG " check %d. InitSource %d vs. lnb %d s:%d   ", i, initTypes[i].source, lnb, lnbTypesAtTuner[t][lnb].source); 
+           //DLOG (DBG " check %d. InitSource %d vs. lnb %d s:%d   ", i, initTypes[i].source, lnb, lnbTypesAtTuner[t][lnb].source);
            if (lnbTypesAtTuner[t][lnb].source == initTypes[i].source) {
-             initTypes[i].flag = 1; 
-             DLOG (DBG " check %d. mark  s:%d found @ lnb %d", i, initTypes[i].source, lnb); 
+             initTypes[i].flag = 1;
+             DLOG (DBG " check %d. mark  s:%d found @ lnb %d", i, initTypes[i].source, lnb);
              break; //next lnb
              }
            }
@@ -4334,7 +4335,7 @@ void cMenuSetupLNB::AddDefault()
              DLOG(DBG " %d.) %d  marked as found   ",x, initTypes[x].source);
         }
 #endif
-        int lnb = lnbNumberAtTuner[t]; 
+        int lnb = lnbNumberAtTuner[t];
         for (int i=0;i<16;i++) { // loop though  actuall lnbs ///XXX MAXLNBS
             if (initTypes[i].flag == 0 || lnbNumberAtTuner[t] == 0) {
                lnbTypesAtTuner[t][lnb].source = initTypes[i].source;
@@ -4348,7 +4349,7 @@ void cMenuSetupLNB::AddDefault()
 
 bool cMenuSetupLNB::IsUnique(int Tuner, int Source)
 {
-  // actual, we do not call this function 
+  // actual, we do not call this function
   DLOG (DBG "IsUnique Source %d @ T: %d ",Source, Tuner);
   if(Source)  {
      for (int i=0;i<0;i++) {
@@ -4360,7 +4361,7 @@ bool cMenuSetupLNB::IsUnique(int Tuner, int Source)
 
   int tmp[MAXLNBS] = { 0 };
 
-  for (int i=0;i<MAXLNBS;i++) // ?? +1 
+  for (int i=0;i<MAXLNBS;i++) // ?? +1
      tmp[0]=lnbTypesAtTuner[Tuner][i].source;
 
   qsort(tmp, MAXLNBS ,sizeof(int), IntCmp);
@@ -4550,7 +4551,7 @@ void cMenuSetupLNB::LoadActuall()
   DLOG (" LoadActuall()  ");
 
   /// FIXME
-  for (cDiseqc *diseqc = Diseqcs.First(); diseqc; diseqc = Diseqcs.Next(diseqc)) { 
+  for (cDiseqc *diseqc = Diseqcs.First(); diseqc; diseqc = Diseqcs.Next(diseqc)) {
      DLOG (DBG " Source: %d ", diseqc->Source());
      bool found=false;
 
@@ -4604,14 +4605,14 @@ void cMenuSetupLNB::LoadActuall()
 #if 1
       dsyslog ("load actuall ");
      for (int t=1; t<=MAXTUNERS; t++) {
-        for (int lnb=0;lnb<16;lnb++) { // MAXXXLNBS 
+        for (int lnb=0;lnb<16;lnb++) { // MAXXXLNBS
           dsyslog ("found  %d LNBs @Tuner %d", lnbNumberAtTuner[t],t);
           dsyslog ("lnbTypesAtTuner[%d].source %d", lnb, lnbTypesAtTuner[t][lnb].source);
           }
        }
 #endif
 
-} */ 
+} */
 
 // --- cMenuSetupCICAM -------------------------------------------------------
 
@@ -4660,7 +4661,7 @@ cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int 
     else
       CamName = tr("--OFF--");
   }
-  
+
   switch(slot){
     case 0:
             snprintf(buffer, sizeof(buffer), "%s:\t%s", tr("lower slot"), CamName);
@@ -4674,7 +4675,7 @@ cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int 
     default:
 	    break;
   }
-  
+
   SetText(buffer);
 }
 
@@ -4963,7 +4964,7 @@ public:
   };
 
 cMenuSetupLiveBuffer::cMenuSetupLiveBuffer(void)
-{ 
+{
   SetSection(tr("Permanent Timeshift"));
   Setup();
 }
@@ -5163,7 +5164,7 @@ cMenuMain::cMenuMain(eOSState State)
 {
   // Load Menu Configuration
   HelpMenus.Load();
- 
+
   char *menuXML = NULL;
   asprintf(&menuXML, "%s/setup/vdr-menu.xml", cPlugin::ConfigDirectory());
   subMenu.LoadXml(menuXML);

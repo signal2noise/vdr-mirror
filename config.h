@@ -245,6 +245,7 @@ public:
   int VideoFormat;
   int UpdateChannels;
   int UseDolbyDigital;
+  int Ac3OverHdmi;
   int LiveDelay;   //RC: for bitstreamout
   int ReplayDelay; //RC: for bitstreamout
   int PCMDelay;    //RC: for bitstreamout

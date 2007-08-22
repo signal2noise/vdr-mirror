@@ -18,7 +18,7 @@ LSIDIR   = ./libsi
 TXMLDIR  = ./tinyxml
 MANDIR   = /usr/local/man
 BINDIR   = /usr/local/bin
-SBINDIR  = /usr/local/sbin
+SBINDIR  = /usr/sbin
 LIBS     = -ljpeg -lpthread -ldl -lcap
 INCLUDES = 
 
@@ -232,7 +232,7 @@ install-vdr: install-bin
 
 install-bin: vdr
 	@mkdir -p $(SBINDIR)
-	install -sp vdr $(SBINDIR)
+	install -p vdr $(SBINDIR)
 
 # Configuration files:
 
@@ -255,7 +255,7 @@ plugins-install: install-plugins
 
 install-plugins: plugins
 	@mkdir -p $(PLUGINLIBDIR)
-	install -sp $(PLUGINDIR)/lib/lib*-*.so.$(APIVERSION) $(PLUGINLIBDIR)
+	install -p $(PLUGINDIR)/lib/lib*-*.so.$(APIVERSION) $(PLUGINLIBDIR)
 
 # Source documentation:
 

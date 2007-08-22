@@ -256,6 +256,7 @@ cSetup::cSetup(void)
   VideoFormat = 0;
   UpdateChannels = 3;
   UseDolbyDigital = 0;
+  Ac3OverHdmi = 0;
   UseDolbyInRecordings = 1;
   LiveDelay = 20;
   ReplayDelay = 25;
@@ -438,6 +439,7 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "VideoFormat"))         VideoFormat        = atoi(Value);
   else if (!strcasecmp(Name, "UpdateChannels"))      UpdateChannels     = atoi(Value);
   else if (!strcasecmp(Name, "UseDolbyDigital"))     UseDolbyDigital    = atoi(Value);
+  else if (!strcasecmp(Name, "Ac3OverHdmi"))         Ac3OverHdmi        = atoi(Value);
   else if (!strcasecmp(Name, "UseDolbyInRecordings")) UseDolbyInRecordings = atoi(Value);
   else if (!strcasecmp(Name, "LiveDelay"))           LiveDelay          = atoi(Value);
   else if (!strcasecmp(Name, "ReplayDelay"))         ReplayDelay        = atoi(Value);
@@ -529,6 +531,7 @@ bool cSetup::Save(void)
   Store("VideoFormat",        VideoFormat);
   Store("UpdateChannels",     UpdateChannels);
   Store("UseDolbyDigital",    UseDolbyDigital);
+  Store("Ac3OverHdmi",        Ac3OverHdmi);
   Store("UseDolbyInRecordings", UseDolbyInRecordings);
   Store("LiveDelay",          LiveDelay);
   Store("ReplayDelay",        ReplayDelay);
