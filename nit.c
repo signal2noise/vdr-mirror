@@ -128,21 +128,29 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                  static char Polarizations[] = { 'h', 'v', 'l', 'r' };
                  char Polarization = Polarizations[sd->getPolarization()];
                  static int CodeRates[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, 
-					    FEC_5_6, FEC_7_8, FEC_8_9, FEC_3_5, 
-					    FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, 
-					    FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
+                       FEC_5_6, FEC_7_8, FEC_8_9, FEC_3_5, 
+                       FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, 
+                       FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
 
-                 static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,      // DVB-S
-					      QPSK, QPSK_S2, PSK8, QPSK};  // DVB-S2
+                  static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,      // DVB-S
+                                               QPSK, QPSK_S2, PSK8, QPSK };  // DVB-S2
 
-		 static int Rolloffs[] = { FE_ROLLOFF_35, FE_ROLLOFF_25, FE_ROLLOFF_20, FE_ROLLOFF_35};
+                 static int Rolloffs[] = { FE_ROLLOFF_35, FE_ROLLOFF_25, FE_ROLLOFF_20, FE_ROLLOFF_35};
 
                  int CodeRate = CodeRates[sd->getFecInner()];
-                 int SymbolRate = BCD2INT(sd->getSymbolRate()) / 10;
-		 int rawModulation = sd->getModulation();
-		 int rolloff = (rawModulation>>3)&3;
-		 int Rolloff = Rolloffs[rolloff];
-                 int Modulation = Modulations[rawModulation&7];
+                 int SymbolRate = BCD2INT(sd->getSymbolRate())/10;
+
+                 int Rolloff = Rolloffs[sd->getRollOff()];
+                 int Modulation = Modulations[sd->getModulationType()];
+
+#if 0
+           if (sd->getModulationSystem() == 1)
+              printf ("\033[0;45m HD  f %d mod_si_type: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
+                   Modulation, Rolloff, CodeRate, SymbolRate);
+           else 
+              printf ("\033[0;45m HD  f %d mod_si_type: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
+                   Modulation, Rolloff, CodeRate, SymbolRate);
+#endif
 
                  if (ThisNIT >= 0) {
                     for (int n = 0; n < NumFrequencies; n++) {
@@ -180,8 +188,8 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                               EITScanner.AddTransponder(Channel);
                            else
                               delete Channel;
-		           }
-                        }
+                           }
+                       }
                     }
                  }
                  break;
@@ -257,7 +265,7 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                     for (int n = 0; n < NumFrequencies; n++) {
                         if (ISTRANSPONDER(Frequencies[n] / 1000000, Transponder())) {
                            nits[ThisNIT].hasTransponder = true;
-                           //printf("has transponder %d\n", Transponder());
+                           printf("has transponder %d\n", Transponder());
                            break;
                            }
                         }

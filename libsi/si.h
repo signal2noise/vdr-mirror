@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   $Id: si.h 1.15 2006/05/27 13:07:20 kls Exp $
+ *   $Id: si.h 1.17 2007/04/22 13:32:09 kls Exp $
  *                                                                         *
  ***************************************************************************/
 
@@ -108,7 +108,7 @@ enum DescriptorTag {
                FrequencyListDescriptorTag = 0x62,
                PartialTransportStreamDescriptorTag = 0x63,
                DataBroadcastDescriptorTag = 0x64,
-               CaSystemDescriptorTag = 0x65,
+               ScramblingDescriptorTag = 0x65,
                DataBroadcastIdDescriptorTag = 0x66,
                TransportStreamDescriptorTag = 0x67,
                DSNGDescriptorTag = 0x68,
@@ -122,6 +122,19 @@ enum DescriptorTag {
                AdaptationFieldDataDescriptorTag = 0x70,
                ServiceIdentifierDescriptorTag = 0x71,
                ServiceAvailabilityDescriptorTag = 0x72,
+  // defined by ETSI (EN 300 468) v 1.7.1
+               DefaultAuthorityDescriptorTag = 0x73,
+               RelatedContentDescriptorTag = 0x74,
+               TVAIdDescriptorTag = 0x75,
+               ContentIdentifierDescriptorTag = 0x76,
+               TimeSliceFecIdentifierDescriptorTag = 0x77,
+               ECMRepetitionRateDescriptorTag = 0x78,
+               S2SatelliteDeliverySystemDescriptorTag = 0x79,
+               EnhancedAC3DescriptorTag = 0x7A,
+               DTSDescriptorTag = 0x7B,
+               AACDescriptorTag = 0x7C,
+               ExtensionDescriptorTag = 0x7F,
+
  // Defined by ETSI TS 102 812 (MHP)
                // They once again start with 0x00 (see page 234, MHP specification)
                MHP_ApplicationDescriptorTag = 0x00,
@@ -472,6 +485,11 @@ protected:
    void decodeText(char *buffer, int size);
    void decodeText(char *buffer, char *shortVersion, int sizeBuffer, int sizeShortVersion);
 };
+
+// Call this function to set the system character table. CharacterTable is a string
+// like "iso8859-15" or "utf-8" (case insensitive).
+// Returns true if the character table was recognized.
+bool SetSystemCharacterTable(const char *CharacterTable);
 
 } //end of namespace
 

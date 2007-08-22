@@ -88,7 +88,7 @@ const tChannelParameterMap ModulationValues[] = {
 
 const tChannelParameterMap ModulationValuesS[] = {
   {   4, QPSK },
-  {   42, QPSK_S2 },
+  {  42, QPSK_S2 }, // S2
   {   8, PSK8},
   {  16, QAM_16 },
   {  32, QAM_32 },
@@ -636,17 +636,23 @@ cString cChannel::ParametersToString(void) const
   ST("CST")  q += PrintParameter(q, 'I', MapToUser(inversion, InversionValues));
   ST("C T")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValues));
   ST(" S ")  q += PrintParameter(q, 'C', MapToUser(coderateH, CoderateValuesS));
-  if (rolloff != FE_ROLLOFF_35)
+  //if (rolloff != FE_ROLLOFF_35) // markus 
+  if (modulation != QPSK && modulation != QAM_AUTO) 
+  {
       ST(" S ")  q += PrintParameter(q, 'E', MapToUser(rolloff, RolloffValues));
+  }
   ST("  T")  q += PrintParameter(q, 'D', MapToUser(coderateL, CoderateValues));
   ST("C T")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValues));
-  if (modulation != QPSK && modulation != QAM_AUTO)
+  if (modulation != QPSK && modulation != QAM_AUTO) 
+  {
       ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
-  // ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
+  }
+   // ST(" S ")  q += PrintParameter(q, 'M', MapToUser(modulation, ModulationValuesS));
   ST("  T")  q += PrintParameter(q, 'B', MapToUser(bandwidth, BandwidthValues));
   ST("  T")  q += PrintParameter(q, 'T', MapToUser(transmission, TransmissionValues));
   ST("  T")  q += PrintParameter(q, 'G', MapToUser(guard, GuardValues));
   ST("  T")  q += PrintParameter(q, 'Y', MapToUser(hierarchy, HierarchyValues));
+
   return buffer;
 }
 
@@ -673,7 +679,7 @@ bool cChannel::StringToParameters(const char *s)
           case 'B': s = ParseParameter(s, bandwidth, BandwidthValues); break;
           case 'C': s = ParseParameter(s, coderateH, CoderateValuesS); break;
           case 'D': s = ParseParameter(s, coderateL, CoderateValues); break;
-	  case 'E': s = ParseParameter(s, rolloff, RolloffValues); break;
+          case 'E': s = ParseParameter(s, rolloff, RolloffValues); break;
           case 'G': s = ParseParameter(s, guard, GuardValues); break;
           case 'H': polarization = *s++; break;
           case 'I': s = ParseParameter(s, inversion, InversionValues); break;
@@ -740,6 +746,7 @@ cString cChannel::ToText(void) const
 
 bool cChannel::Parse(const char *s)
 {
+  
   bool ok = true;
   if (*s == ':') {
      groupSep = true;
