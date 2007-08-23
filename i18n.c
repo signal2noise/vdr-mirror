@@ -4270,6 +4270,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  { " Prefer ac3 over HDMI", //pls note the leading blank
+    " Bevorzuge AC3 über HDMI",
+    "",
+    "",//TODO
+    "",
+    "",//TODO
+    "",
+    "",//TODO
+    "",
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",
+    "",
+    "",//TODO
+    "",//TODO
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
   { " Delay in Replay Mode (10ms)",
     " Verzögerung bei Wiedergabe (10ms)",
     "",
