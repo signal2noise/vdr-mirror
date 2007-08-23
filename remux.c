@@ -184,6 +184,7 @@ int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &Pic
 					case SC_PICTURE: PictureType = (p[3] >> 3) & 0x07;
 						StreamFormat = SF_MPEG2;
 						return Length;
+					case 6: // TB: needed for ARD FestivalHD
 					case 9: // Access Unit Delimiter AUD in h.264
 						StreamFormat = SF_H264;
 						if (p[2]==0x10)
@@ -244,6 +245,7 @@ int cRemux::ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, 
 			case SC_PICTURE: PictureType = (p[3] >> 3) & 0x07;
 				StreamFormat = SF_MPEG2;
 				return 0;
+			case 6: // TB: needed for ARD FestivalHD
 			case 9: // Access Unit Delimiter AUD in h.264
 				StreamFormat = SF_H264;
 				if (p[2]==0x10)
