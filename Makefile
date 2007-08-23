@@ -84,6 +84,10 @@ ifdef RBLITE
 DEFINES += -DRBLITE
 endif
 
+ifdef ALWAYS_TS
+DEFINES += -DALWAYS_TS
+endif
+
 LIRC_DEVICE ?= /dev/lircd
 RCU_DEVICE  ?= /dev/ttyS1
 

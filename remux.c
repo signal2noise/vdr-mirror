@@ -1195,13 +1195,18 @@ cRemux::cRemux(int VPid, const int *APids, const int *DPids,
 	sfmode=SF_UNKNOWN;
 	tsmode_valid=0;
 
+#ifdef ALWAYS_TS
+	tsmode=rTS;
+	rmode=rTS;
+#else
 	if (rmode==rPES) {
 		tsmode=rPES;
 	}
 	if (rmode==rTS) {
 		tsmode=rTS;
 	}
-	
+#endif
+
 	vpid=0;
 	for(int n=0;n<8;n++) {
 		apids[n]=0;
