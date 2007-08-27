@@ -1665,11 +1665,15 @@ int cCiHandler::CloseAllSessions(int Slot)
 
 int cCiHandler::NumCams(void)
 {
+#ifdef RBLITE
   int result = 0;
   for (int i = 0; i < MAX_CI_SLOT; i++)
       if (moduleReady[i])
          result++;
   return result;
+#else
+  return 0;
+#endif
 }
 
 bool cCiHandler::Ready(void)
@@ -1929,9 +1933,11 @@ bool cCiHandler::CanDecrypt(int ProgramNumber)
 
 void cCiHandler::StartDecrypting(void)
 {
+#ifdef RBLITE 
   cMutexLock MutexLock(&mutex);
   newCaSupport = true;
   SendCaPmt();
+#endif 
 }
 
 bool cCiHandler::Reset(int Slot)
