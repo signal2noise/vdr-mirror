@@ -3550,7 +3550,7 @@ cMenuSetupOSD::cMenuSetupOSD(void)
 
   numSkins = Skins.Count();
   skinIndex = originalSkinIndex = Skins.Current()->Index();
-  //skinDescriptions = new const char*[numSkins];
+  skinDescriptions = new const char*[numSkins];
   themes.Load(Skins.Current()->Name());
   themeIndex = Skins.Current()->Theme() ? themes.GetThemeIndex(Skins.Current()->Theme()->Description()) : 0;
   Set();
@@ -3559,16 +3559,17 @@ cMenuSetupOSD::cMenuSetupOSD(void)
 cMenuSetupOSD::~cMenuSetupOSD()
 {
   cFont::SetCode(I18nCharSets()[Setup.OSDLanguage]);
-  //delete[] skinDescriptions;
+  delete[] skinDescriptions;
 }
 
 
 void cMenuSetupOSD::Set(void)
 {
   int current = Current();
-  /*
+  
   for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
-  skinDescriptions[Skin->Index()] = Skin->Description();
+       skinDescriptions[Skin->Index()] = Skin->Description();
+  /*
   useSmallFontTexts[0] = tr("never");
   useSmallFontTexts[1] = tr("skin dependent");
   useSmallFontTexts[2] = tr("always");
@@ -3584,6 +3585,9 @@ void cMenuSetupOSD::Set(void)
     //for (int i = 1; i < numLanguages; i++) {
     //Add(new cMenuEditStraItem(tr(" Setup.EPG$Preferred language"),     &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
     // }
+#ifndef RBLITE
+  Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),                   &skinIndex, numSkins, skinDescriptions));
+#endif
  if (themes.NumThemes())
     Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),                  &themeIndex, themes.NumThemes(), themes.Descriptions()));
  Add(new cMenuEditIntItem( tr("Setup.OSD$Left"),                   &data.OSDLeft, 0, MAXOSDWIDTH));
@@ -3607,9 +3611,10 @@ void cMenuSetupOSD::Set(void)
 
 eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
 {
-
   if (Key == kOk) {
-     /*
+#ifdef RBLITE
+     Skins.SetCurrent("Reel");
+#else
      if (skinIndex != originalSkinIndex) {
         cSkin *Skin = Skins.Get(skinIndex);
         if (Skin) {
@@ -3617,18 +3622,17 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
            Skins.SetCurrent(Skin->Name());
            }
         }
-    */
-    //dsyslog (" cMenuSetupOSD --------- kOK NumThemes  %d Theme %s  ", themes.NumThemes(), Skins.Current()->Theme()?"YES":"NO");
-         if (themes.NumThemes() && Skins.Current()->Theme()) {
+#endif
+     dsyslog (" cMenuSetupOSD --------- kOK NumThemes  %d Theme %s  ", themes.NumThemes(), Skins.Current()->Theme()?"YES":"NO");
+     if (themes.NumThemes() && Skins.Current()->Theme()) {
           data.UseSmallFont=2;
-          Skins.SetCurrent("Reel");
           Skins.Current()->Theme()->Load(themes.FileName(themeIndex));
-          //dsyslog (" cMenuSetupOSD save SkinTheme %s   ", themes.Name(themeIndex));
+          dsyslog (" cMenuSetupOSD save SkinTheme %s   ", themes.Name(themeIndex));
           strn0cpy(data.OSDTheme, themes.Name(themeIndex), sizeof(data.OSDTheme));
         }
      data.OSDWidth &= ~0x07; // OSD width must be a multiple of 8
   }
-  eOSState state = cMenuSetupBase::ProcessKey(Key);
+  //eOSState state = cMenuSetupBase::ProcessKey(Key);
 
   //if (Key == kRed) Dump();
 /*
@@ -3659,6 +3663,21 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
      Setup.OSDLanguage = OriginalOSDLanguage;
      }
 */
+  int oldSkinIndex = skinIndex;
+  eOSState state = cMenuSetupBase::ProcessKey(Key);
+
+  if (skinIndex != oldSkinIndex) {
+     cSkin *Skin = Skins.Get(skinIndex);
+     if (Skin) {
+        char *d = themes.NumThemes() ? strdup(themes.Descriptions()[themeIndex]) : NULL;
+        themes.Load(Skin->Name());
+        if (skinIndex != oldSkinIndex)
+           themeIndex = d ? themes.GetThemeIndex(d) : 0;
+        free(d);
+        }
+
+     Set();
+     }
   return state;
 }
 
