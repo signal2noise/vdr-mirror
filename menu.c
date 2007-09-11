@@ -1744,7 +1744,7 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
   helpPage = NULL;
   section = Section;
   char buffer[128];
-  snprintf(buffer,128"%s - %s",tr("Help"), Title);
+  snprintf(buffer,128, "%s - %s",tr("Help"), Title);
   SetTitle(buffer);
   free(buffer);
 
@@ -1758,12 +1758,12 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
 
 cMenuHelp::~cMenuHelp()
 {
-  if (test) free(text);
+  if (text) free(text);
 }
 
 void cMenuHelp::SetText(const char *Text)
 {
-  if (test) free(text);
+  if (text) free(text);
   text = Text ? strdup(Text) : NULL;
 }
 void cMenuHelp::SetNextHelp()
@@ -1776,9 +1776,8 @@ void cMenuHelp::SetNextHelp()
     helpPage = h;
     const char *myTitle = helpPage->Title();
     SetText(helpPage->Text());
-
     char buffer[128];
-    snprintf(buffer,128"%s - %s",tr("Help"), myTitle);
+    snprintf(buffer,128,"%s - %s",tr("Help"), myTitle);
     SetTitle(buffer);
     Display();
   }
@@ -1799,7 +1798,7 @@ void cMenuHelp::SetPrevHelp()
     SetText(helpPage->Text());
 
     char buffer[1024];
-    snprintf(buffer,"%s - %s",tr("Help"), myTitle);
+    snprintf(buffer,1024, "%s - %s",tr("Help"), myTitle);
     SetTitle(buffer);
     Display();
   }
