@@ -7618,7 +7618,7 @@ const tI18nPhrase Phrases[] = {
     "Ja",
     "da",
     "si",
-    "ja",
+    "Ja",
     "sim",
     "oui",
     "ja",
