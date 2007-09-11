@@ -294,7 +294,7 @@ cSetup::cSetup(void)
   InitialChannel = 0;
   InitialVolume = -1;
   LiveBuffer = 0;
-  LiveBufferSize = 100;
+  LiveBufferSize = 60;
   CAMEnabled=7;
   UseBouquetList = 1;
 }

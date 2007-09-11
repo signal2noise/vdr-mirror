@@ -1888,7 +1888,7 @@ cMenuEditTimer::cMenuEditTimer(cTimer *Timer, bool New)
      Add(new cMenuEditTimeItem(tr("Stop"),         &data.stop));
      Add(new cMenuEditBitItem( tr("VPS"),          &data.flags, tfVps));
      Add(new cMenuEditStraItem(tr("Priority"),     &tmpprio, 3, PriorityTexts));
-     Add(new cMenuEditIntItem( tr("Lifetime"),     &data.lifetime, 0, MAXLIFETIME));
+     Add(new cMenuEditIntItem( tr("Lifetime"),     &data.lifetime, 0, MAXLIFETIME, NULL, tr("unlimited")));
      //Add(new cMenuEditBoolItem(tr("Child protection"), &data.fskProtection));  // PIN PATCH
      // PIN PATCH
      if (cOsd::pinValid)
@@ -4995,7 +4995,7 @@ void cMenuSetupLiveBuffer::Setup(void)
  Clear();
   Add(new cMenuEditBoolItem(tr("Permanent Timeshift"),                                &data.LiveBuffer));
   if (data.LiveBuffer) {
-     Add(new cMenuEditIntItem(tr("Setup.LiveBuffer$Buffer (min)"),          &data.LiveBufferSize, 1, 100));
+     Add(new cMenuEditIntItem(tr("Setup.LiveBuffer$Buffer (min)"),          &data.LiveBufferSize, 1, 60));
         }
   SetCurrent(Get(current));
   Display();
