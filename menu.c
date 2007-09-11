@@ -1044,7 +1044,6 @@ public:
 cMenuBouquetsList::cMenuBouquetsList(cChannel* channel)
 :cOsdMenu("Bouquets", CHNUMWIDTH)
 {
-  printf ( " ----------------- cMenuBouquetsList  ping ---------------- \n" );
   bouquetMarked = -1;
   Setup(channel);
 }
@@ -1136,7 +1135,6 @@ eOSState cMenuBouquetsList::NewBouquet()
 void cMenuBouquetsList::Mark(void)
 {
 
-  printf ( " ------ Mark Up/Dn for new location - OK to move  %d   \n", Current());
   if (Count() && bouquetMarked < 0) {
      bouquetMarked = Current();
      SetStatus(tr("Up/Dn for new location - OK to move"));
@@ -1145,7 +1143,6 @@ void cMenuBouquetsList::Mark(void)
 
 void cMenuBouquetsList::Move(int From, int To)
 {
-  printf ( " cMenuBouquetsList Move from %d  To %d \n", From, To);
   int CurrentChannelNr = cDevice::CurrentChannel();
   cChannel *CurrentChannel = Channels.GetByNumber(CurrentChannelNr);
   cChannel *FromChannel = GetBouquet(From);
@@ -1221,7 +1218,6 @@ eOSState cMenuBouquetsList::ProcessKey(eKeys Key)
               case kOk:    if (bouquetMarked >= 0)
                            {
                              SetStatus(NULL);
-                             printf (" ------------- bouquetMarked %d Current() %d \n", bouquetMarked, Current());
                               if (bouquetMarked != Current() )
                                  Move(bouquetMarked , Current());
                               bouquetMarked = -1;
@@ -1357,7 +1353,6 @@ cChannel *cMenuBouquets::GetChannel(int Index)
 
 void cMenuBouquets::Mark()
 {
-     printf ( "     -       Mark ---- Up/Dn for new location - OK to move \n");
 
   if (Count() && channelMarked < 0) {
      channelMarked = GetChannel(Current())->Index();
@@ -1462,8 +1457,6 @@ eOSState cMenuBouquets::ListBouquets(void)
 
 void cMenuBouquets::Move(int From, int To)
 {
-  printf ("  ----------------- cMenuBouquets From %d To %d \n", From, To);
-
   int CurrentChannelNr = cDevice::CurrentChannel();
   cChannel *CurrentChannel = Channels.GetByNumber(CurrentChannelNr);
   cChannel *FromChannel = (cChannel*) Channels.Get(From);
@@ -1642,7 +1635,6 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              int current;
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
                              SetStatus(NULL);
-                             //printf ( " ---------  channelMarked  %d != current %d \n", channelMarked,current);
                              if (channelMarked != current)
                              {
                                 if(current < channelMarked && Channels.Get(current)->GroupSep()) current++;
@@ -1748,12 +1740,11 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
 :cOsdMenu(Title)
 {
 
-  //printf (" Open Help  Title %s section %s \n", Title, Section?Section->Section():"NO Object");
   text = NULL;
   helpPage = NULL;
   section = Section;
-  char *buffer;
-  asprintf(&buffer,"%s - %s",tr("Help"), Title);
+  char buffer[128];
+  snprintf(buffer,128"%s - %s",tr("Help"), Title);
   SetTitle(buffer);
   free(buffer);
 
@@ -1767,12 +1758,12 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
 
 cMenuHelp::~cMenuHelp()
 {
-  free(text);
+  if (test) free(text);
 }
 
 void cMenuHelp::SetText(const char *Text)
 {
-  free(text);
+  if (test) free(text);
   text = Text ? strdup(Text) : NULL;
 }
 void cMenuHelp::SetNextHelp()
@@ -1786,10 +1777,9 @@ void cMenuHelp::SetNextHelp()
     const char *myTitle = helpPage->Title();
     SetText(helpPage->Text());
 
-    char *buffer;
-    asprintf(&buffer,"%s - %s",tr("Help"), myTitle);
+    char buffer[128];
+    snprintf(buffer,128"%s - %s",tr("Help"), myTitle);
     SetTitle(buffer);
-    free(buffer);
     Display();
   }
   else
@@ -1802,16 +1792,15 @@ void cMenuHelp::SetPrevHelp()
 {
   SetStatus(NULL);
   cHelpPage *h = static_cast<cHelpPage *>(helpPage->cListObject::Prev());
-  if (h) // aviod malloc/free!
+  if (h) 
   {
     helpPage = h;
     const char *myTitle = helpPage->Title();
     SetText(helpPage->Text());
 
-    char *buffer;
-    asprintf(&buffer,"%s - %s",tr("Help"), myTitle);
+    char buffer[1024];
+    snprintf(buffer,"%s - %s",tr("Help"), myTitle);
     SetTitle(buffer);
-    free(buffer);
     Display();
   }
   else
@@ -1894,10 +1883,9 @@ cMenuEditTimer::cMenuEditTimer(cTimer *Timer, bool New)
      if (cOsd::pinValid)
         Add(new cMenuEditBoolItem(tr("Child protection"),&data.fskProtection));
      else {
-        char* buf = 0;
-        asprintf(&buf, "%s\t%s", tr("Child protection"), data.fskProtection ? tr("yes") : tr("no"));
+        char buf[64];
+        snprintf(buf,64, "%s\t%s", tr("Child protection"), data.fskProtection ? tr("yes") : tr("no"));
         Add(new cOsdItem(buf));
-        free(buf);
         }
 
      Add(new cMenuEditStrItem( tr("File"),          data.file, sizeof(data.file), tr(FileNameChars)));
