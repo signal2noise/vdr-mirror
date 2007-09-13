@@ -216,7 +216,7 @@ cSetup::cSetup(void)
 {
   OSDLanguage = 0;
   strcpy(OSDSkin, "Reel");
-  strcpy(OSDTheme, "Blue");
+  strcpy(OSDTheme, "Black");
   PrimaryDVB = 3;
   ShowInfoOnChSwitch = 1;
   WantChListOnOk = 1;
@@ -293,7 +293,11 @@ cSetup::cSetup(void)
   CurrentDolby = 0;
   InitialChannel = 0;
   InitialVolume = -1;
+#ifdef RBLITE  
+  LiveBuffer = 1;
+#else
   LiveBuffer = 0;
+#endif  
   LiveBufferSize = 30;
   CAMEnabled=7;
   UseBouquetList = 1;
