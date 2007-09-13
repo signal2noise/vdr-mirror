@@ -3701,7 +3701,7 @@ void cMenuSetupLang::DrawMenu(void)
   Clear();
 
   Add(new cMenuEditStraItem(tr("Setup.EPG$Preferred language"),     &data.EPGLanguages[0], I18nNumLanguages, I18nLanguages()));
-  Add(new cMenuEditIntItem( tr("Setup.OSD$Optional languages"),     &optLanguages, 0, I18nNumLanguages-1));
+  Add(new cMenuEditIntItem( tr("Setup.OSD$Optional languages"),     &optLanguages, 0, I18nNumLanguages-1, tr("none"), NULL));
   for (int i = 1; i <= optLanguages; i++)
      Add(new cMenuEditStraItem(tr("Setup.OSD$ Optional language"),   &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
 

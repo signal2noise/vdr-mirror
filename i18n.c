@@ -3347,7 +3347,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Setup.OSD$Skin",
-    "Oberfläche",
+    "Menü Oberfläche",
     "Preobleka",
     "Stile interfaccia",
     "Skin",
@@ -4755,7 +4755,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "DiSEqC Type",
-    "DiSEqC Eingang",
+    "DiSEqC Steuerung",
     "",
     "Tipo di DiSEqC",
     "DiSEqC Type",

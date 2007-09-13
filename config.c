@@ -234,7 +234,7 @@ cSetup::cSetup(void)
   SetSystemTime = 1;
   TimeSource = 0;
   TimeTransponder = 0;
-  MarginStart = 2;
+  MarginStart = 5;
   MarginStop = 10;
   AudioLanguages[0] = -1;
   EPGLanguages[0] = -1;
@@ -280,7 +280,7 @@ cSetup::cSetup(void)
   ShowReplayMode = 1;
   ResumeID = 0;
   JumpPlay = 1;
-  PlayJump = 0;
+  PlayJump = 1;
   PauseLastMark = 0;
   ReloadMarks = 0;
   CurrentChannel = -1;
@@ -294,7 +294,7 @@ cSetup::cSetup(void)
   InitialChannel = 0;
   InitialVolume = -1;
   LiveBuffer = 0;
-  LiveBufferSize = 60;
+  LiveBufferSize = 30;
   CAMEnabled=7;
   UseBouquetList = 1;
 }
