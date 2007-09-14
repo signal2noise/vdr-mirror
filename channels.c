@@ -77,6 +77,9 @@ const tChannelParameterMap RolloffValues[] = {
 
 const tChannelParameterMap ModulationValues[] = {
   {   0, QPSK },
+  {   4, QPSK },
+  {  42, QPSK_S2 }, // S2
+  {   8, PSK8},
   {  16, QAM_16 },
   {  32, QAM_32 },
   {  64, QAM_64 },
