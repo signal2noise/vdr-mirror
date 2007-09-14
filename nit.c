@@ -133,23 +133,34 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                        FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
 
                   static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,      // DVB-S
-                                               QPSK, QPSK_S2, PSK8, QPSK };  // DVB-S2
+                                               QPSK, QPSK_S2, PSK8, QPSK };  
+
+                  static int ModulationsS2[] = { QPSK, QPSK_S2, PSK8, QPSK,
+                                                 QPSK, QPSK, QPSK, QPSK };      // DVB-S2
+
 
                  static int Rolloffs[] = { FE_ROLLOFF_35, FE_ROLLOFF_25, FE_ROLLOFF_20, FE_ROLLOFF_35};
 
                  int CodeRate = CodeRates[sd->getFecInner()];
                  int SymbolRate = BCD2INT(sd->getSymbolRate())/10;
 
+                 int Modulation = QPSK;
                  int Rolloff = Rolloffs[sd->getRollOff()];
-                 int Modulation = Modulations[sd->getModulationType()];
+
+                 if (sd->getModulationSystem() == 1) {
+                    Modulation = ModulationsS2[sd->getModulationType()];
+                   }
+                 else {
+                   Modulation = Modulations[sd->getModulationType()];
+                   }
 
 #if 0
            if (sd->getModulationSystem() == 1)
-              printf ("\033[0;45m HD  f %d mod_si_type: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
-                   Modulation, Rolloff, CodeRate, SymbolRate);
+              printf ("\033[0;45m HD  f MOD[%d]: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
+               sd->getModulationType(),   Modulation, Rolloff, CodeRate, SymbolRate);
            else 
-              printf ("\033[0;45m HD  f %d mod_si_type: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
-                   Modulation, Rolloff, CodeRate, SymbolRate);
+              printf ("\033[0;44m SD  f %d MOD[%d]: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
+                 sd->getModulationType(),   Modulation, Rolloff, CodeRate, SymbolRate);
 #endif
 
                  if (ThisNIT >= 0) {
