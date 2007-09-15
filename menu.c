@@ -4954,8 +4954,7 @@ void cMenuSetupMisc::Store(void)
   else if  ( tmpUpdateChannels == 1 )
 	 data.UpdateChannels = 3;
   else if  ( tmpUpdateChannels == 2 )
-	 //data.UpdateChannels = 5;
-	 data.UpdateChannels = 4;  // hotfix for dvb-s2 broken data
+	 data.UpdateChannels = 5;
   cMenuSetupBase::Store();
 }
 
