@@ -1746,7 +1746,6 @@ cMenuHelp::cMenuHelp(cHelpSection *Section, const char *Title)
   char buffer[128];
   snprintf(buffer,128, "%s - %s",tr("Help"), Title);
   SetTitle(buffer);
-  free(buffer);
 
   if (Section)
      helpPage = Section->GetHelpByTitle(Title);

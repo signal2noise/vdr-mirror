@@ -509,20 +509,22 @@ eOSState cOsdMenu::CloseSubMenu()
  
 eOSState cOsdMenu::DisplayHelpMenu(const char *Title)
 {
-  char title[60];
+  char title[128];
   // if we get Menu at first we assume Main Menu 
   if (strstr(Title,tr("Menu")) == Title)
   {
-     strncpy(&title[0],tr("Main Menu"),60);
+     strncpy(title,tr("Main Menu"),128);
   }
   else 
   {
      char *sep =  SEPARATORS;
      while (*sep != '\0')
      {
-        printf (" \t\t --- sep %c   \n", *sep);
+        //printf (" \t\t --- sep %c   \n", *sep);
         char *s = NULL;
-        strncpy(&title[0],Title,60);
+        strncpy(title,Title,128);
+        title[127] = '\0';
+	
         s = strchr(title,*sep);
         if (s) 
         {
