@@ -881,7 +881,7 @@ cRecordings::cRecordings(bool Deleted)
 
 cRecordings::~cRecordings()
 {
-  Cancel(3);
+  Cancel(100); // avoid crash at shutdown 
 }
 
 void cRecordings::Action(void)
