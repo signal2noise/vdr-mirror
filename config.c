@@ -293,10 +293,10 @@ cSetup::cSetup(void)
   CurrentDolby = 0;
   InitialChannel = 0;
   InitialVolume = -1;
-#ifdef RBLITE  
-  LiveBuffer = 1;
-#else
+#ifdef RBLITE
   LiveBuffer = 0;
+#else
+  LiveBuffer = 1;
 #endif  
   LiveBufferSize = 30;
   CAMEnabled=7;
