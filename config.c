@@ -282,7 +282,7 @@ cSetup::cSetup(void)
   JumpPlay = 1;
   PlayJump = 1;
   PauseLastMark = 0;
-  ReloadMarks = 0;
+  ReloadMarks = 1;
   CurrentChannel = -1;
   CurrentVolume = MAXVOLUME;
   //Start by Klaus
@@ -297,7 +297,7 @@ cSetup::cSetup(void)
   LiveBuffer = 0;
 #else
   LiveBuffer = 1;
-#endif  
+#endif
   LiveBufferSize = 30;
   CAMEnabled=7;
   UseBouquetList = 1;
@@ -455,7 +455,7 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "OSDTop"))              OSDTop             = atoi(Value);
   else if (!strcasecmp(Name, "OSDWidth"))          { OSDWidth           = atoi(Value);
           if (OSDWidth  < 100) OSDWidth  *= 12; OSDWidth &= ~0x07; } // OSD width must be a multiple of 8
-  else if (!strcasecmp(Name, "OSDHeight"))         { OSDHeight          = atoi(Value); 
+  else if (!strcasecmp(Name, "OSDHeight"))         { OSDHeight          = atoi(Value);
           if (OSDHeight < 100) OSDHeight *= 27; }
   else if (!strcasecmp(Name, "OSDRandom"))           OSDRandom          = atoi(Value);
   else if (!strcasecmp(Name, "OSDMessageTime"))      OSDMessageTime     = atoi(Value);
@@ -474,8 +474,8 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "ReloadMarks"))         ReloadMarks        = atoi(Value);
   else if (!strcasecmp(Name, "CurrentChannel"))      CurrentChannel     = atoi(Value);
   //Start by Klaus
-  else if (!strcasecmp(Name, "CurrentPipChannel"))   CurrentPipChannel     = atoi(Value); 
-  else if (!strcasecmp(Name, "PipIsActive"))         PipIsActive  = atoi(Value); 
+  else if (!strcasecmp(Name, "CurrentPipChannel"))   CurrentPipChannel     = atoi(Value);
+  else if (!strcasecmp(Name, "PipIsActive"))         PipIsActive  = atoi(Value);
   else if (!strcasecmp(Name, "PipIsRunning"))        PipIsRunning  = atoi(Value);
   //End by Klaus
   else if (!strcasecmp(Name, "CurrentVolume"))       CurrentVolume      = atoi(Value);
