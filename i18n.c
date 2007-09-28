@@ -179,7 +179,7 @@ const tI18nPhrase Phrases[] = {
     "Menu Principale",
     "Hoofd Menu",
     "",//TODO
-    "",//TODO fr 
+    "",//TODO fr
     "",//TODO
     "päävalikossa",
     "",//TODO
@@ -4226,8 +4226,8 @@ const tI18nPhrase Phrases[] = {
     "Video format",
     "Formát videa",
   },
-  { "Setup.DVB$Use Dolby Digital",
-    "Dolby Digital verwenden",
+  { "Setup.DVB$Use Dolby Digital/dts",
+    "Dolby Digital/dts verwenden",
     "Uporabljaj Dolby Digital",
     "Attivare uscita audio digitale", //TODO
     "Dolby Digital/dts gebruiken",
@@ -4248,143 +4248,11 @@ const tI18nPhrase Phrases[] = {
     "Anvend Dolby Digital",
     "Pou¾ívat zvuk v Dolby Digital",
   },
-  { " Delay in Live Mode (10ms)", //pls note the leading blank
-    " Verzögerung bei Livebild (10ms)",
+  { "Delay Stereo (x10ms)",
+    "Verzögerung Stereo (x10ms)",
     "",
-    " Ritardo in Modalita' Live (10ms)",//TODO
-    " Vertraging in Live Mode (10ms)",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { " Prefer ac3 over HDMI", //pls note the leading blank
-    " Bevorzuge AC3 über HDMI",
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { " Delay in Replay Mode (10ms)",
-    " Verzögerung bei Wiedergabe (10ms)",
-    "",
-    " Ritardo in Modalita' Riproduzione (10ms)",//TODO
-    " Vertraging in weergave mode (10ms)",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { " PCM Initial wait frames",
-    " PCM Initialisierungframes",
-    "",
-    " Fotogrammi d'attesa iniziale del PCM",//TODO
-    " PCM initial wacht frame's",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { "Delay Stereo (10ms)",
-    "Verzögerung Stereo (10ms)",
-    "",
-    "Ritardo Stereo (10ms)",//TODO
-    "Stereo vertraging (10ms)",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { " Delay in Live Mode (10ms)", //pls note the leading blank
-    " Verzögerung bei Livebild (10ms)",
-    "",
-    " Ritardo in Modalita' Live (10ms)",//TODO
-    " Vertraging in Live Mode (10ms)",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { " Delay in Replay Mode (10ms)",
-    " Verzögerung bei Wiedergabe (10ms)",
-    "",
-    " Ritardo in Modalita' Riproduzione (10ms)",//TODO
-    " Vertraging in weergave mode (10ms)",
+    "Ritardo Stereo (x10ms)",//TODO
+    "Stereo vertraging (x10ms)",
     "",//TODO
     "",
     "",//TODO
@@ -5283,29 +5151,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Delay (ms)",
-    "Verzögerung (ms)",
-    "",
-    "Ritardo (ms)",
-    "Vertraging (ms)",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
- { "Repeat",
+  { "Repeat",
     "Wiederholungen",
     "",
     "Ripetere",
@@ -8622,7 +8468,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "--OFF--",
+  { "--OFF--",
     "Ausgeschaltet",
     "",
     "",
@@ -8644,7 +8490,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Init",
+  { "Init",
     "Initialisiere",
     "",
     "",
@@ -8666,7 +8512,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Error",
+  { "Error",
     "Fehler",
     "",
     "",
@@ -8688,7 +8534,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Disabled",
+  { "Disabled",
     "Ausgeschaltet",
     "",
     "",
@@ -8710,7 +8556,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Add to Favourites?",
+  { "Add to Favourites?",
     "Zu Favoriten hinzufügen?",
     "",
     "",
@@ -8732,7 +8578,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Favourites",
+  { "Favourites",
     "Favoriten",
     "",
     "",
@@ -8754,7 +8600,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Delete Bouquet?",
+  { "Delete Bouquet?",
     "Bouquet löschen?",
     "",
     "",
@@ -8776,8 +8622,8 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { " Delay ac3 (10ms)",
-    " Verzögerung AC3 (10ms)",
+  { " Delay DD/dts (x10ms)",
+    " Verzögerung DD/dts (x10ms)",
     "",
     "",
     "",
@@ -8798,7 +8644,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Videorecorder",
+  { "Videorecorder",
     "Videorekorder",
     "",
     "",
@@ -8929,7 +8775,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  }, 
+  },
   { "Timer Service",
     "Timer Service",
     "",
@@ -8951,7 +8797,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  }, 
+  },
   { "Streaming",
     "Streaming",
     "",
