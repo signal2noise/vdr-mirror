@@ -254,7 +254,7 @@ cSetup::cSetup(void)
   RecordingDirs = 1;
   VideoDisplayFormat = 1;
   VideoFormat = 0;
-  UpdateChannels = 3;
+  UpdateChannels = 5;
   UseDolbyDigital = 0;
   Ac3OverHdmi = 0;
   UseDolbyInRecordings = 1;
