@@ -368,7 +368,7 @@ void cBitmap::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, tC
 	     if (!Overlay || Bitmap.bitmap[lineStart + ix] != 0)	   
                SetIndexFast(x + ix, y + iy, Bitmap.bitmap[lineStart + ix]);
            }
-	}    
+	} 
      }
      else {
         tIndexes Indexes;
@@ -376,12 +376,13 @@ void cBitmap::DrawBitmap(int x, int y, const cBitmap &Bitmap, tColor ColorFg, tC
         for (int iy = 0; iy < Bitmap.height; iy++) {
            const int lineStart = Bitmap.width * iy;
            for (int ix = 0; ix < Bitmap.width; ix++) {
-             SetIndex(x + ix, y + iy, Indexes[int(Bitmap.bitmap[lineStart + ix])]);
+             //SetIndex(x + ix, y + iy, Indexes[int(Bitmap.bitmap[lineStart + ix])]);
+             SetIndexFast(x + ix, y + iy, Indexes[int(Bitmap.bitmap[lineStart + ix])]);
            }
         }
      }
      UpdateDirty(x,y,x+Bitmap.Width()-1,y+Bitmap.height-1);
-   }     
+   }
 }
 
 void cBitmap::DrawBitmapHor(int x, int y, int w, const cBitmap &Bitmap)
