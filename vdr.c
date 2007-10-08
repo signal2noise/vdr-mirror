@@ -970,7 +970,10 @@ int main(int argc, char *argv[])
         if (NORMALKEY(key) != kNone) {
            cStatus::MsgUserAction(key, Interact);          // PIN PATCH
            EITScanner.Activity();
-           LastActivity = Now;
+           if(NORMALKEY(key) != k_Plugin) //ignore auto call of install plugin, dirty!
+           {
+               LastActivity = Now;
+           }
            }
         // Keys that must work independent of any interactive mode:
         switch (key) {
