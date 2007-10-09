@@ -998,11 +998,15 @@ void cDvbDevice::SetAudioTrackDevice(eTrackType Type)
      if (IS_AUDIO_TRACK(Type) || (IS_DOLBY_TRACK(Type) && SetAudioBypass(true))) {
         if (pidHandles[ptAudio].pid && pidHandles[ptAudio].pid != TrackId->id) {
            DetachAll(pidHandles[ptAudio].pid);
-           (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, false);
+           if(cDevice::GetDevice(0)->CiHandler()) {
+             (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, false);
+             }
            pidHandles[ptAudio].pid = TrackId->id;
            SetPid(&pidHandles[ptAudio], ptAudio, true);
-           (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, true);
-           (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
+           if(cDevice::GetDevice(0)->CiHandler()) {
+             (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, true);
+             (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
+             }
            }
         }
      else if (IS_DOLBY_TRACK(Type)) {

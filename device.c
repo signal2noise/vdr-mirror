@@ -431,7 +431,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
               DelPid(Pid, PidType);
               return false;
               }
-	   ((cDevice::GetDevice(0))->CiHandler())->SetPid(Pid, true, slotOnDev);
+            if (cDevice::GetDevice(0)->CiHandler()) {
+              cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
+            }
            }
         PRINTPIDS("a");
         return true;
@@ -459,7 +461,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
            DelPid(Pid, PidType);
            return false;
            }
-	((cDevice::GetDevice(0))->CiHandler())->SetPid(Pid, true, slotOnDev);
+           if (cDevice::GetDevice(0)->CiHandler()) {
+             cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
+           }
         }
      }
   return true;
@@ -487,7 +491,9 @@ void cDevice::DelPid(int Pid, ePidType PidType)
            if (pidHandles[n].used == 0) {
               pidHandles[n].handle = -1;
               pidHandles[n].pid = 0;
-              (cDevice::GetDevice(0))->CiHandler()->SetPid(Pid, false, slotOnDev);
+              if (cDevice::GetDevice(0)->CiHandler()) {
+                cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, false, slotOnDev);
+                }
               }
            }
         PRINTPIDS("E");
@@ -724,13 +730,15 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
      if (Channel->Ca()) {// > CACONFBASE) {
        int slotOnDev = GetSlotOnDev(this);
        cCiHandler *ciHandler0 = (cDevice::GetDevice(0))->CiHandler();
-       ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev);
-       ciHandler0->AddPid(Channel->Sid(), Channel->Vpid(), 2, slotOnDev);
-       for (const int *Apid = Channel->Apids(); *Apid; Apid++)
-         ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
-       for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
-         ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
-       ciHandler0->StartDecrypting();
+       if(ciHandler0) {
+         ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev);
+         ciHandler0->AddPid(Channel->Sid(), Channel->Vpid(), 2, slotOnDev);
+         for (const int *Apid = Channel->Apids(); *Apid; Apid++)
+           ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
+         for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
+           ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
+           ciHandler0->StartDecrypting();
+       }
      }
   }
 
@@ -1404,7 +1412,9 @@ bool cDevice::AttachReceiver(cReceiver *Receiver)
          Unlock();
          if (!Running())
             Start();
-         (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
+         if (cDevice::GetDevice(0)->CiHandler()) {
+           cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+         }
          return true;
          }
       }
@@ -1431,7 +1441,9 @@ void cDevice::Detach(cReceiver *Receiver)
       else if (receiver[i])
          receiversLeft = true;
       }
-  (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
+  if (cDevice::GetDevice(0)->CiHandler()) {
+    cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+  }
   if (!receiversLeft)
      Cancel(3);
 }
