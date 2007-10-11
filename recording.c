@@ -824,6 +824,34 @@ bool cRecording::WriteInfo(void)
   return true;
 }
 
+bool cRecording::Undelete(void)
+{
+    printf ("\033[0;41m %s \033[0m\n", __PRETTY_FUNCTION__);
+    bool result = true;
+    char *NewName = strdup(FileName());
+    char *ext = strrchr(NewName, '.');
+    if (ext && strcmp(ext, DELEXT) == 0) {
+        strncpy(ext, RECEXT, strlen(ext));
+          printf ("\033[0;44m new FileName [%s] ... \nold FileName [%s]  \033[0m\n", NewName, FileName());
+        if (access(NewName, F_OK) == 0) {
+            // the new name already exists, so let's remove that one first:
+            esyslog("undelete  recording '%s'", NewName);
+            //Rename(NewName);
+        }
+        else { // 
+            isyslog("undeleting recording '%s'", FileName());
+            if (access(FileName(), F_OK) == 0)
+                result = RenameVideoFile(FileName(), NewName);
+            else {
+                isyslog("recording '%s' vanished", FileName());
+                result = false; // well, we were going to delete it, anyway
+            }
+        }
+    }
+    free(NewName);
+    return result;
+}
+
 bool cRecording::Delete(void)
 {
   bool result = true;

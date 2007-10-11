@@ -75,6 +75,7 @@ private:
   static char *StripEpisodeName(char *s);
   char *SortName(void) const;
   int GetResume(void) const;
+  cRecording(const cRecording& obj);
 public:
   time_t start;
   int priority;
@@ -101,6 +102,10 @@ public:
        // Returns false in case of error
   bool Remove(void);
        // Actually removes the file from the disk
+       // Returns false in case of error
+  bool Undelete(void);
+       // Changes the file name so that it will be visible in the "Recordings" menu again and 
+       // not catched by cRemoveDeletedRecordingsThread.
        // Returns false in case of error
   };
 
