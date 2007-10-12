@@ -127,17 +127,16 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                  int Frequency = Frequencies[0] = BCD2INT(sd->getFrequency()) / 100;
                  static char Polarizations[] = { 'h', 'v', 'l', 'r' };
                  char Polarization = Polarizations[sd->getPolarization()];
-                 static int CodeRates[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, 
-                       FEC_5_6, FEC_7_8, FEC_8_9, FEC_3_5, 
-                       FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, 
-                       FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
 
-                  static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,      // DVB-S
+                 static int CodeRates[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5, FEC_5_6, FEC_6_7, FEC_7_8, FEC_8_9,  // DVB-S
+                         FEC_1_3, FEC_1_4, FEC_2_5,  FEC_3_5, FEC_9_10, FEC_AUTO };  // DVB-S2 
+                 
+
+                  static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,   // DVB-S
                                                QPSK, QPSK_S2, PSK8, QPSK };  
 
-                  static int ModulationsS2[] = { QPSK, QPSK_S2, PSK8, QPSK,
-                                                 QPSK, QPSK, QPSK, QPSK };      // DVB-S2
-
+                  static int ModulationsS2[] = { QPSK, QPSK_S2, PSK8, QPSK, // DVB-S2
+                                                 QPSK, QPSK, QPSK, QPSK, QPSK, QPSK_S2 }; 
 
                  static int Rolloffs[] = { FE_ROLLOFF_35, FE_ROLLOFF_25, FE_ROLLOFF_20, FE_ROLLOFF_35};
 
@@ -154,7 +153,7 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                    Modulation = Modulations[sd->getModulationType()];
                    }
 
-#if 0
+#if 1
            if (sd->getModulationSystem() == 1)
               printf ("\033[0;45m HD  f MOD[%d]: %d rolloff  %d  FEC %d sr %d  \033[0m\n", Frequency,
                sd->getModulationType(),   Modulation, Rolloff, CodeRate, SymbolRate);
