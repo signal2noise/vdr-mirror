@@ -67,7 +67,7 @@ public:
   };
 
 #define MAX_CI_SESSION  16 //XXX
-#define MAX_CI_SLOT     16
+#define MAX_CI_SLOT     4
 
 class cCiCaPidData : public cListObject {
 public:
@@ -85,12 +85,10 @@ public:
 class cCiCaProgramData : public cListObject {
 public:
   int programNumber;
-  bool modified;
   cList<cCiCaPidData> pidList;
   cCiCaProgramData(int ProgramNumber)
   {
     programNumber = ProgramNumber;
-    modified = true;
   }
   };
 
@@ -109,23 +107,21 @@ private:
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
-  int source;
-  int transponder;
-  cList<cCiCaProgramData> caProgramList;
+  int source[MAX_CI_SLOT];
+  int transponder[MAX_CI_SLOT];
+  cList<cCiCaProgramData> caProgramList[MAX_CI_SLOT];
   uint32_t ResourceIdToInt(const uint8_t *Data);
   bool Send(uint8_t Tag, uint16_t SessionId, uint32_t ResourceId = 0, int Status = -1);
-  const unsigned short *GetCaSystemIds(int Slot);
   cCiSession *GetSessionBySessionId(uint16_t SessionId);
   cCiSession *GetSessionByResourceId(uint32_t ResourceId, int Slot);
   cCiSession *CreateSession(uint32_t ResourceId);
   bool OpenSession(int Length, const uint8_t *Data);
   bool CloseSession(uint16_t SessionId);
-  int CloseAllSessions(int Slot);
   cCiHandler(int Fd, int NumSlots);
   void SendCaPmt(void);
 public:
   ~cCiHandler();
-  static cCiHandler *CreateCiHandler(int fd_ca);
+  static cCiHandler *CreateCiHandler(const char *FileName);
        ///< Creates a new cCiHandler for the given CA device.
   int NumSlots(void) { return numSlots; }
        ///< Returns the number of CAM slots provided by this CA device.
@@ -148,6 +144,7 @@ public:
   const char *GetCamName(int Slot);
        ///< Returns the name of the CAM in the given Slot, or NULL if there
        ///< is no CAM in that slot.
+  const unsigned short *GetCaSystemIds(int Slot);
   bool ProvidesCa(const unsigned short *CaSystemIds); //XXX Slot???
        ///< Returns true if any of the CAMs can provide one of the given
        ///< CaSystemIds. This doesn't necessarily mean that it will be
@@ -155,15 +152,15 @@ public:
        ///< usually advertise several CA system ids, while the actual
        ///< decryption is controlled by the smart card inserted into
        ///< the CAM.
-  void SetSource(int Source, int Transponder);
+  void SetSource(int Source, int Transponder, int Slot);
        ///< Sets the Source and Transponder of the device this cCiHandler is
        ///< currently tuned to. If Source or Transponder are different than
        ///< what was given in a previous call to SetSource(), any previously
        ///< added PIDs will be cleared.
-  void AddPid(int ProgramNumber, int Pid, int StreamType);
+  void AddPid(int ProgramNumber, int Pid, int StreamType, int Slot);
        ///< Adds the given PID information to the list of PIDs. A later call
        ///< to SetPid() will (de)activate one of these entries.
-  void SetPid(int Pid, bool Active);
+  void SetPid(int Pid, bool Active, int Slot);
        ///< Sets the given Pid (which has previously been added through a
        ///< call to AddPid()) to Active. A later call to StartDecrypting() will
        ///< send the full list of currently active CA_PMT entries to the CAM.
@@ -177,6 +174,8 @@ public:
        ///< Triggers sending all currently active CA_PMT entries to the CAM,
        ///< so that it will start decrypting.
   bool Reset(int Slot);
+  int CloseAllSessions(int Slot);
+  int GetCaFd(void);
   };
 
 #endif //__CI_H

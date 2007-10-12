@@ -560,9 +560,9 @@ time_t LastModifiedTime(const char *FileName)
 
 // --- cTimeMs ---------------------------------------------------------------
 
-cTimeMs::cTimeMs(void)
+cTimeMs::cTimeMs(int Ms)
 {
-  Set();
+  Set(Ms);
 }
 
 uint64_t cTimeMs::Now(void)

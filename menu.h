@@ -10,7 +10,7 @@
 #ifndef __MENU_H
 #define __MENU_H
 
-#include "ci.h"
+//#include "ci.h"
 #include "device.h"
 #include "epg.h"
 #include "osdbase.h"

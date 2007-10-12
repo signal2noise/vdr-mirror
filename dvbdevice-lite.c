@@ -456,11 +456,7 @@ cDvbDevice::cDvbDevice(int n)
           frontendType = FE_DVBS2;
         else
           frontendType = feinfo.type;
-        int fd_ca = DvbOpen(DEV_DVB_CA, n, O_RDWR);
-        if(fd_ca>=0) {
-          ciHandler = cCiHandler::CreateCiHandler(fd_ca);
-          if(!ciHandler) close(fd_ca);
-          }
+        ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
         dvbTuner = new cDvbTuner(fd_frontend, CardIndex(), frontendType, ciHandler);
         }
      else
@@ -544,20 +540,28 @@ bool cDvbDevice::Ready(void)
 int cDvbDevice::ProvidesCa(const cChannel *Channel) const
 {
   int NumCams = 0;
-  if (ciHandler) {
-     NumCams = ciHandler->NumCams();
-       if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
-        unsigned short ids[MAXCAIDS + 1];
+  unsigned short ids[MAXCAIDS + 1];
+
+     NumCams = (cDevice::GetDevice(0))->CiHandler()->NumCams();
+       if (Channel->Ca() ) {
         for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
             ids[i] = Channel->Ca(i);
-        if (ciHandler->ProvidesCa(ids))
-           return NumCams + 1;
-        }
-      }
-   int result = cDevice::ProvidesCa(Channel);
-   if (result > 0)
+
+    struct ReLink link;
+    cPlugin *p = cPluginManager::GetPlugin(RE_NAME);
+    if(p){
+      PrepareReLink(&link,this,OP_PROVIDES);
+      link.caids=ids;
+      link.channelNumber=Channel->Number();
+      if (DoReLinkOp(&link) > 0)
+      return NumCams + 1;
+    }
+  }
+  int result = cDevice::ProvidesCa(Channel);
+  if (result > 0)
      result += NumCams;
-    return result;
+  return result;
+
 }
 
 cSpuDecoder *cDvbDevice::GetSpuDecoder(void)
@@ -835,12 +839,8 @@ bool cDvbDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *Ne
            if (Channel->Vpid() && !HasPid(Channel->Vpid()) || Channel->Apid(0) && !HasPid(Channel->Apid(0))) {
 #ifdef DO_MULTIPLE_RECORDINGS
 #ifndef DO_MULTIPLE_CA_CHANNELS
-              if (Ca() >= CA_ENCRYPTED_MIN || Channel->Ca() >= CA_ENCRYPTED_MIN) {
-                 if(Channel->Ca()<CA_ENCRYPTED_MIN || CiAllowConcurrent())
-                   result = true;
-                 else
-                   needsDetachReceivers = Ca() != Channel->Ca();
-                 }
+              if (Ca() >= CA_ENCRYPTED_MIN || Channel->Ca() >= CA_ENCRYPTED_MIN)
+                 needsDetachReceivers = Ca() != Channel->Ca();
               else
 #endif
               if (!IsPrimaryDevice())
@@ -992,19 +992,20 @@ void cDvbDevice::SetTransferModeForDolbyDigital(int Mode)
 void cDvbDevice::SetAudioTrackDevice(eTrackType Type)
 {
   const tTrackId *TrackId = GetTrack(Type);
+  int slotOnDev = GetSlotOnDev(this);
   if (TrackId && TrackId->id) {
      SetAudioBypass(false);
      if (IS_AUDIO_TRACK(Type) || (IS_DOLBY_TRACK(Type) && SetAudioBypass(true))) {
         if (pidHandles[ptAudio].pid && pidHandles[ptAudio].pid != TrackId->id) {
            DetachAll(pidHandles[ptAudio].pid);
-           if(ciHandler) {
-             ciHandler->SetPid(pidHandles[ptAudio].pid, false);
+           if(cDevice::GetDevice(0)->CiHandler()) {
+             (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, false);
              }
            pidHandles[ptAudio].pid = TrackId->id;
            SetPid(&pidHandles[ptAudio], ptAudio, true);
-           if(ciHandler) {
-             ciHandler->SetPid(pidHandles[ptAudio].pid, true);
-             CiStartDecrypting();
+           if(cDevice::GetDevice(0)->CiHandler()) {
+             (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, true);
+             (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
              }
            }
         }
@@ -1261,7 +1262,7 @@ bool cDvbDevice::OpenDvr(void)
   CloseDvr();
   fd_dvr = DvbOpen(DEV_DVB_DVR, CardIndex(), O_RDONLY | O_NONBLOCK, true);
   if (fd_dvr >= 0) {
-     tsBuffer = new cTSBuffer(fd_dvr, MEGABYTE(2), CardIndex() + 1);
+//     tsBuffer = new cTSBuffer(fd_dvr, MEGABYTE(2), CardIndex() + 1);
        Poller=new cPoller(fd_dvr);
   }
   return fd_dvr >= 0;
@@ -1270,11 +1271,22 @@ bool cDvbDevice::OpenDvr(void)
 void cDvbDevice::CloseDvr(void)
 {
   if (fd_dvr >= 0) {
-     delete tsBuffer;
+//     delete tsBuffer;
+     delete Poller;
      tsBuffer = NULL;
      close(fd_dvr);
      fd_dvr = -1;
      }
+}
+
+int cDvbDevice::GetTSPackets(uchar *Data, int count)
+{
+       int l;
+       if (Poller->Poll(20)) {
+               l=read(fd_dvr,Data,TS_SIZE*count);
+               return l;
+       }
+       return 0;
 }
 
 bool cDvbDevice::GetTSPacket(uchar *&Data)

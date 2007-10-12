@@ -403,56 +403,9 @@ bool cDevice::HasPid(int Pid) const
   return false;
 }
 
-void cDevice::CiStartDecrypting(void)
-{
-  if (ciHandler)
-     ciHandler->StartDecrypting();
-}
-
-void cDevice::CiSetSource(int Source, int Transponder)
-{
-  cMutexLock MutexLock(&ciListMutex);
-  if (ciSource != Source || ciTransponder != Transponder)
-     ciProgramList.Clear();
-  ciSource = Source;
-  ciTransponder = Transponder;
-}
-
-void cDevice::CiAddPid(int ProgramNumber, int Pid, int StreamType)
-{
-  cMutexLock MutexLock(&ciListMutex);
-  cCiCaProgramData *ProgramData = NULL;
-  for (cCiCaProgramData *p = ciProgramList.First(); p; p = ciProgramList.Next(p)) {
-      if (p->programNumber == ProgramNumber) {
-         ProgramData = p;
-         for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
-             if (q->pid == Pid)
-                return;
-             }
-         }
-      }
-  if (!ProgramData)
-     ciProgramList.Add(ProgramData = new cCiCaProgramData(ProgramNumber));
-  ProgramData->pidList.Add(new cCiCaPidData(Pid, StreamType));
-  ProgramData->modified=true;
-}
-
-void cDevice::CiSetPid(int Pid, bool Active)
-{
-  cMutexLock MutexLock(&ciListMutex);
-  for (cCiCaProgramData *p = ciProgramList.First(); p; p = ciProgramList.Next(p)) {
-      for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
-          if (q->pid == Pid) {
-             q->active = Active;
-             p->modified = true;
-             return;
-             }
-         }
-      }
-}
-
 bool cDevice::AddPid(int Pid, ePidType PidType)
 {
+  int slotOnDev = GetSlotOnDev(this);
   if (Pid || PidType == ptPcr) {
      int n = -1;
      int a = -1;
@@ -478,10 +431,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
               DelPid(Pid, PidType);
               return false;
               }
-            if (ciHandler) {
-              ciHandler->SetPid(Pid, true);
+            if (cDevice::GetDevice(0)->CiHandler()) {
+              cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
             }
-            CiSetPid(Pid, true);
            }
         PRINTPIDS("a");
         return true;
@@ -509,10 +461,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
            DelPid(Pid, PidType);
            return false;
            }
-           if (ciHandler) {
-             ciHandler->SetPid(Pid, true);
+           if (cDevice::GetDevice(0)->CiHandler()) {
+             cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
            }
-           CiSetPid(Pid, true);
         }
      }
   return true;
@@ -520,6 +471,7 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
 
 void cDevice::DelPid(int Pid, ePidType PidType)
 {
+  int slotOnDev = GetSlotOnDev(this);
   if (Pid || PidType == ptPcr) {
      int n = -1;
      if (PidType == ptPcr)
@@ -539,10 +491,9 @@ void cDevice::DelPid(int Pid, ePidType PidType)
            if (pidHandles[n].used == 0) {
               pidHandles[n].handle = -1;
               pidHandles[n].pid = 0;
-              if (ciHandler) {
-                ciHandler->SetPid(Pid, false);
+              if (cDevice::GetDevice(0)->CiHandler()) {
+                cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, false, slotOnDev);
                 }
-              CiSetPid(Pid, false);
               }
            }
         PRINTPIDS("E");
@@ -726,7 +677,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
         }
      // Tell the ciHandler about the channel switch and add all PIDs of this
      // channel to it, for possible later decryption:
-
+/*
      if (ciHandler) {
         ciHandler->SetSource(Channel->Source(), Channel->Transponder());
 // Men at work - please stand clear! ;-)
@@ -744,16 +695,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            }
 #endif
         }
-
-     CiSetSource(Channel->Source(), Channel->Transponder());
-     if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
-        CiAddPid(Channel->Sid(), Channel->Vpid(), 2);
-        for (const int *Apid = Channel->Apids(); *Apid; Apid++)
-            CiAddPid(Channel->Sid(), *Apid, 4);
-        for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
-            CiAddPid(Channel->Sid(), *Dpid, 0);
-        }
-
+*/
      if (NeedsDetachReceivers)
         DetachAllReceivers();
      if (SetChannelDevice(Channel, LiveView)) {
@@ -763,7 +705,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            sectionHandler->SetStatus(true);
            }
         // Start decrypting any PIDs that might have been set in SetChannelDevice():
-        CiStartDecrypting();
+        //(cDevice::GetDevice(0))->CiHandler()->StartDecrypting();
         }
      else
         Result = scrFailed;
@@ -785,7 +727,20 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            EnsureAudioTrack(true);
         }
      cStatus::MsgChannelSwitch(this, Channel->Number()); // only report status if channel switch successfull
+     if (Channel->Ca()) {// > CACONFBASE) {
+       int slotOnDev = GetSlotOnDev(this);
+       cCiHandler *ciHandler0 = (cDevice::GetDevice(0))->CiHandler();
+       if(ciHandler0) {
+         ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev);
+         ciHandler0->AddPid(Channel->Sid(), Channel->Vpid(), 2, slotOnDev);
+         for (const int *Apid = Channel->Apids(); *Apid; Apid++)
+           ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
+         for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
+           ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
+           ciHandler0->StartDecrypting();
+       }
      }
+  }
 
   return Result;
 }
@@ -1338,7 +1293,7 @@ bool cDevice::Receiving(bool CheckAny) const
       }
   return false;
 }
-
+#if 0
 void cDevice::Action(void)
 {
   if (Running() && OpenDvr()) {
@@ -1363,7 +1318,49 @@ void cDevice::Action(void)
      CloseDvr();
      }
 }
-
+#else
+// GA Speedup
+#define TS_MAX_READ (1024)  // max 192K buffer
+void cDevice::Action(void)
+{
+	uchar buf[TS_MAX_READ*188];
+	if (Running() && OpenDvr()) {
+		SetPriority(-5); // This thread is important...
+		while (Running()) {                    
+			int l;
+			l=GetTSPackets(buf,TS_MAX_READ); // Read data from the DVR device
+			if (l>0) {  
+				Lock();
+				int burstlen=188;
+				
+				// Look for bursts of the same PID
+				for(int n=0;n<l;n+=burstlen) {
+					uchar *b=buf+n;
+					int m;
+					int Pid = (((uint16_t)b[1] & PID_MASK_HI) << 8) | b[2];
+					int nextPid=-1;
+					burstlen=188;   
+					for(m=n+188;m<l;m+=188) {
+                                               nextPid=(((uint16_t)buf[m+1] & PID_MASK_HI) << 8) | buf[m+2];
+                                               if (nextPid!=Pid)
+                                                       break;
+                                               burstlen+=188;
+					}
+					// Distribute the packets to all attached receivers:
+					
+					for (int i = 0; i < MAXRECEIVERS; i++) {
+						if (receiver[i] && receiver[i]->WantsPid(Pid))
+							receiver[i]->Receive(b, burstlen);
+					}
+					
+				}
+				Unlock();
+			}
+		}
+		CloseDvr();
+	}
+}
+#endif
 bool cDevice::OpenDvr(void)
 {
   return false;
@@ -1376,6 +1373,11 @@ void cDevice::CloseDvr(void)
 bool cDevice::GetTSPacket(uchar *&Data)
 {
   return false;
+}
+
+int cDevice::GetTSPackets(uchar *Data, int count)
+{
+  return 0;
 }
 
 bool cDevice::AttachReceiver(cReceiver *Receiver)
@@ -1410,7 +1412,9 @@ bool cDevice::AttachReceiver(cReceiver *Receiver)
          Unlock();
          if (!Running())
             Start();
-         CiStartDecrypting();
+         if (cDevice::GetDevice(0)->CiHandler()) {
+           cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+         }
          return true;
          }
       }
@@ -1437,7 +1441,9 @@ void cDevice::Detach(cReceiver *Receiver)
       else if (receiver[i])
          receiversLeft = true;
       }
-  CiStartDecrypting();    
+  if (cDevice::GetDevice(0)->CiHandler()) {
+    cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+  }
   if (!receiversLeft)
      Cancel(3);
 }

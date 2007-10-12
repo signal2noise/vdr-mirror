@@ -11,7 +11,11 @@
 #define __DEVICE_H
 
 #include "channels.h"
-#include "ci.h"
+#ifdef RBLITE
+  #include "ci-lite.h"
+#else
+  #include "ci.h"
+#endif
 #include "eit.h"
 #include "filter.h"
 #include "nit.h"
@@ -325,6 +329,16 @@ public:
 
 protected:
   cCiHandler *ciHandler;
+#ifndef RBLITE
+  int ciSource, ciTransponder;
+  cList<cCiCaProgramData> ciProgramList;
+  cMutex ciListMutex;
+  virtual void CiStartDecrypting(void);
+  virtual bool CiAllowConcurrent(void) const { return false; }
+  void CiSetSource(int Source, int Transponder);
+  void CiAddPid(int ProgramNumber, int Pid, int StreamType);
+  void CiSetPid(int Pid, bool Active);
+#endif
 public:
   cCiHandler *CiHandler(void) { return ciHandler; }
 
@@ -546,7 +560,9 @@ protected:
       ///< new data available, Data will be set to NULL. The function returns
       ///< false in case of a non recoverable error, otherwise it returns true,
       ///< even if Data is NULL.
+#ifdef RBLITE
    virtual int GetTSPackets(uchar *Data, int count);
+#endif
 public:
   int  Ca(void) const;
        ///< Returns the ca of the current receiving session(s).

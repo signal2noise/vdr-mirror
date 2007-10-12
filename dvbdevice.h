@@ -19,7 +19,7 @@
 #error VDR requires Linux DVB driver API version 3!
 #endif
 
-#define MAXDVBDEVICES  4
+#define MAXDVBDEVICES  8
 
 class cDvbTuner;
 
@@ -149,7 +149,9 @@ protected:
   virtual bool OpenDvr(void);
   virtual void CloseDvr(void);
   virtual bool GetTSPacket(uchar *&Data);
+#ifdef RBLITE
   virtual int GetTSPackets(uchar *Data, int count);
+#endif
   };
 
 #endif //__DVBDEVICE_H
