@@ -403,6 +403,7 @@ bool cDevice::HasPid(int Pid) const
   return false;
 }
 
+#ifndef RBLITE
 void cDevice::CiStartDecrypting(void)
 {
   if (ciHandler)
@@ -450,9 +451,13 @@ void cDevice::CiSetPid(int Pid, bool Active)
          }
       }
 }
+#endif
 
 bool cDevice::AddPid(int Pid, ePidType PidType)
 {
+#ifdef RBLITE
+  int slotOnDev = GetSlotOnDev(this);
+#endif
   if (Pid || PidType == ptPcr) {
      int n = -1;
      int a = -1;
@@ -478,10 +483,16 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
               DelPid(Pid, PidType);
               return false;
               }
+#ifdef RBLITE
+            if (cDevice::GetDevice(0)->CiHandler()) {
+              cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
+			}
+#else
             if (ciHandler) {
               ciHandler->SetPid(Pid, true);
             }
             CiSetPid(Pid, true);
+#endif
            }
         PRINTPIDS("a");
         return true;
@@ -509,10 +520,16 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
            DelPid(Pid, PidType);
            return false;
            }
+#ifdef RBLITE
+           if (cDevice::GetDevice(0)->CiHandler()) {
+             cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
+		   }
+#else
            if (ciHandler) {
              ciHandler->SetPid(Pid, true);
            }
            CiSetPid(Pid, true);
+#endif
         }
      }
   return true;
@@ -520,6 +537,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
 
 void cDevice::DelPid(int Pid, ePidType PidType)
 {
+#ifdef RBLITE
+  int slotOnDev = GetSlotOnDev(this);
+#endif
   if (Pid || PidType == ptPcr) {
      int n = -1;
      if (PidType == ptPcr)
@@ -539,10 +559,16 @@ void cDevice::DelPid(int Pid, ePidType PidType)
            if (pidHandles[n].used == 0) {
               pidHandles[n].handle = -1;
               pidHandles[n].pid = 0;
+#ifdef RBLITE
+              if (cDevice::GetDevice(0)->CiHandler()) {
+                cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, false, slotOnDev);
+              }
+#else
               if (ciHandler) {
                 ciHandler->SetPid(Pid, false);
                 }
               CiSetPid(Pid, false);
+#endif
               }
            }
         PRINTPIDS("E");
@@ -727,6 +753,8 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
      // Tell the ciHandler about the channel switch and add all PIDs of this
      // channel to it, for possible later decryption:
 
+#ifndef RBLITE
+
      if (ciHandler) {
         ciHandler->SetSource(Channel->Source(), Channel->Transponder());
 // Men at work - please stand clear! ;-)
@@ -754,6 +782,8 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
             CiAddPid(Channel->Sid(), *Dpid, 0);
         }
 
+#endif // RBLITE
+
      if (NeedsDetachReceivers)
         DetachAllReceivers();
      if (SetChannelDevice(Channel, LiveView)) {
@@ -763,7 +793,9 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            sectionHandler->SetStatus(true);
            }
         // Start decrypting any PIDs that might have been set in SetChannelDevice():
+#ifndef RBLITE
         CiStartDecrypting();
+#endif
         }
      else
         Result = scrFailed;
@@ -785,6 +817,21 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            EnsureAudioTrack(true);
         }
      cStatus::MsgChannelSwitch(this, Channel->Number()); // only report status if channel switch successfull
+#ifdef RBLITE
+     if (Channel->Ca()) {// > CACONFBASE) {
+       int slotOnDev = GetSlotOnDev(this);
+       cCiHandler *ciHandler0 = (cDevice::GetDevice(0))->CiHandler();
+       if(ciHandler0) {
+         ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev);
+         ciHandler0->AddPid(Channel->Sid(), Channel->Vpid(), 2, slotOnDev);
+         for (const int *Apid = Channel->Apids(); *Apid; Apid++)
+           ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
+         for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
+           ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
+           ciHandler0->StartDecrypting();
+       }
+	 }
+#endif
      }
 
   return Result;
@@ -1339,6 +1386,9 @@ bool cDevice::Receiving(bool CheckAny) const
   return false;
 }
 
+#ifdef RBLITE
+#if 0
+
 void cDevice::Action(void)
 {
   if (Running() && OpenDvr()) {
@@ -1363,6 +1413,50 @@ void cDevice::Action(void)
      CloseDvr();
      }
 }
+#else
+// GA Speedup
+#define TS_MAX_READ (1024)  // max 192K buffer
+void cDevice::Action(void)
+{
+       uchar buf[TS_MAX_READ*188];
+       if (Running() && OpenDvr()) {
+               SetPriority(-5); // This thread is important...
+               while (Running()) {                    
+                       int l;
+                       l=GetTSPackets(buf,TS_MAX_READ); // Read data from the DVR device
+                       if (l>0) {  
+                               Lock();
+                               int burstlen=188;
+                               
+                               // Look for bursts of the same PID
+                               for(int n=0;n<l;n+=burstlen) {
+                                       uchar *b=buf+n;
+                                       int m;
+                                       int Pid = (((uint16_t)b[1] & PID_MASK_HI) << 8) | b[2];
+                                       int nextPid=-1;
+                                       burstlen=188;   
+                                       for(m=n+188;m<l;m+=188) {
+                                               nextPid=(((uint16_t)buf[m+1] & PID_MASK_HI) << 8) | buf[m+2];
+                                               if (nextPid!=Pid)
+                                                       break;
+                                               burstlen+=188;
+                                       }
+                                       // Distribute the packets to all attached receivers:
+                                       
+                                       for (int i = 0; i < MAXRECEIVERS; i++) {
+                                               if (receiver[i] && receiver[i]->WantsPid(Pid))
+                                                       receiver[i]->Receive(b, burstlen);
+                                       }
+                                       
+                               }
+                               Unlock();
+                       }
+               }
+               CloseDvr();
+       }
+}
+#endif
+#endif
 
 bool cDevice::OpenDvr(void)
 {
@@ -1377,6 +1471,13 @@ bool cDevice::GetTSPacket(uchar *&Data)
 {
   return false;
 }
+
+#ifdef RBLITE
+int cDevice::GetTSPackets(uchar *Data, int count)
+{
+  return 0;
+}
+#endif
 
 bool cDevice::AttachReceiver(cReceiver *Receiver)
 {
@@ -1410,7 +1511,13 @@ bool cDevice::AttachReceiver(cReceiver *Receiver)
          Unlock();
          if (!Running())
             Start();
+#ifdef RBLITE
+         if (cDevice::GetDevice(0)->CiHandler()) {
+           cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+         }
+#else
          CiStartDecrypting();
+#endif
          return true;
          }
       }
@@ -1437,7 +1544,13 @@ void cDevice::Detach(cReceiver *Receiver)
       else if (receiver[i])
          receiversLeft = true;
       }
-  CiStartDecrypting();    
+#ifdef RBLITE
+  if (cDevice::GetDevice(0)->CiHandler()) {
+    cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
+  }
+#else
+  CiStartDecrypting();
+#endif
   if (!receiversLeft)
      Cancel(3);
 }
