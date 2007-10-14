@@ -40,7 +40,7 @@ SILIB    = $(LSIDIR)/libsi.a
 TXMLLIB  = $(TXMLDIR)/libtinyxml.a
 
 ifdef RBLITE
-OBJS = audio.o channels.o ci-lite.o config.o cutter.o device-lite.o diseqc.o dvbdevice-lite.o dvbosd.o
+OBJS = audio.o channels.o ci-lite.o config.o cutter.o device-lite.o diseqc.o dvbdevice.o dvbosd.o
 else
 OBJS = audio.o channels.o ci.o config.o cutter.o device.o diseqc.o dvbdevice.o dvbosd.o
 endif
