@@ -67,7 +67,11 @@ public:
   };
 
 #define MAX_CI_SESSION  16 //XXX
+#ifdef RBLITE
+#define MAX_CI_SLOT     4
+#else
 #define MAX_CI_SLOT     16
+#endif
 
 class cCiCaPidData : public cListObject {
 public:
@@ -85,12 +89,16 @@ public:
 class cCiCaProgramData : public cListObject {
 public:
   int programNumber;
+#ifndef RBLITE
   bool modified;
+#endif
   cList<cCiCaPidData> pidList;
   cCiCaProgramData(int ProgramNumber)
   {
     programNumber = ProgramNumber;
+#ifndef RBLITE
     modified = true;
+#endif
   }
   };
 
@@ -109,23 +117,37 @@ private:
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
+#ifdef RBLITE
+  int source[MAX_CI_SLOT];
+  int transponder[MAX_CI_SLOT];
+  cList<cCiCaProgramData> caProgramList[MAX_CI_SLOT];
+#else
   int source;
   int transponder;
   cList<cCiCaProgramData> caProgramList;
+#endif
   uint32_t ResourceIdToInt(const uint8_t *Data);
   bool Send(uint8_t Tag, uint16_t SessionId, uint32_t ResourceId = 0, int Status = -1);
+#ifndef RBLITE
   const unsigned short *GetCaSystemIds(int Slot);
+#endif
   cCiSession *GetSessionBySessionId(uint16_t SessionId);
   cCiSession *GetSessionByResourceId(uint32_t ResourceId, int Slot);
   cCiSession *CreateSession(uint32_t ResourceId);
   bool OpenSession(int Length, const uint8_t *Data);
   bool CloseSession(uint16_t SessionId);
+#ifndef RBLITE
   int CloseAllSessions(int Slot);
+#endif
   cCiHandler(int Fd, int NumSlots);
   void SendCaPmt(void);
 public:
   ~cCiHandler();
+#ifdef RBLITE
+  static cCiHandler *CreateCiHandler(const char *FileName);
+#else
   static cCiHandler *CreateCiHandler(int fd_ca);
+#endif
        ///< Creates a new cCiHandler for the given CA device.
   int NumSlots(void) { return numSlots; }
        ///< Returns the number of CAM slots provided by this CA device.
@@ -148,6 +170,9 @@ public:
   const char *GetCamName(int Slot);
        ///< Returns the name of the CAM in the given Slot, or NULL if there
        ///< is no CAM in that slot.
+#ifdef RBLITE
+  const unsigned short *GetCaSystemIds(int Slot);
+#endif
   bool ProvidesCa(const unsigned short *CaSystemIds); //XXX Slot???
        ///< Returns true if any of the CAMs can provide one of the given
        ///< CaSystemIds. This doesn't necessarily mean that it will be
@@ -155,15 +180,26 @@ public:
        ///< usually advertise several CA system ids, while the actual
        ///< decryption is controlled by the smart card inserted into
        ///< the CAM.
+#ifdef RBLITE
+  void SetSource(int Source, int Transponder, int Slot);
+#endif
   void SetSource(int Source, int Transponder);
        ///< Sets the Source and Transponder of the device this cCiHandler is
        ///< currently tuned to. If Source or Transponder are different than
        ///< what was given in a previous call to SetSource(), any previously
        ///< added PIDs will be cleared.
+#ifdef RBLITE
+  void AddPid(int ProgramNumber, int Pid, int StreamType, int Slot);
+#else
   void AddPid(int ProgramNumber, int Pid, int StreamType);
+#endif
        ///< Adds the given PID information to the list of PIDs. A later call
        ///< to SetPid() will (de)activate one of these entries.
+#ifdef RBLITE
+  void SetPid(int Pid, bool Active, int Slot);
+#else
   void SetPid(int Pid, bool Active);
+#endif
        ///< Sets the given Pid (which has previously been added through a
        ///< call to AddPid()) to Active. A later call to StartDecrypting() will
        ///< send the full list of currently active CA_PMT entries to the CAM.
@@ -177,6 +213,10 @@ public:
        ///< Triggers sending all currently active CA_PMT entries to the CAM,
        ///< so that it will start decrypting.
   bool Reset(int Slot);
+#ifdef RBLITE
+  int CloseAllSessions(int Slot);
+  int GetCaFd(void);
+#endif
   };
 
 #endif //__CI_H
