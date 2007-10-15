@@ -826,19 +826,36 @@ bool cRecording::WriteInfo(void)
 
 bool cRecording::Undelete(void)
 {
-    printf ("\033[0;41m %s \033[0m\n", __PRETTY_FUNCTION__);
+//    printf ("\033[0;41m %s \033[0m\n", __PRETTY_FUNCTION__);
     bool result = true;
     char *NewName = strdup(FileName());
     char *ext = strrchr(NewName, '.');
+    int i = 0;
+    
     if (ext && strcmp(ext, DELEXT) == 0) {
         strncpy(ext, RECEXT, strlen(ext));
-          printf ("\033[0;44m new FileName [%s] ... \nold FileName [%s]  \033[0m\n", NewName, FileName());
         if (access(NewName, F_OK) == 0) {
-            // the new name already exists, so let's remove that one first:
-            esyslog("undelete  recording '%s'", NewName);
-            //Rename(NewName);
+        // the new name already exists, so let's try to get another NewName first
+            strncpy(ext, "\0", 1);
+            for(i=1;i<=255;++i){
+                char *tmp = NULL;
+                asprintf(&tmp,"%s_%03d%s",NewName, i, RECEXT);
+                if (access(tmp, F_OK) != 0)
+                {
+                    // Bingo, we found a nonexists filename
+                    free(NewName);
+                    NewName = tmp;
+                    break;
+                }
+                free(tmp);
+            }
         }
-        else { // 
+        if (access(NewName, F_OK) == 0) {
+        // if the new name still already exists then give up and tell the user
+            Skins.Message(mtWarning, tr("Recording-file already exists!"),3);
+            isyslog("undeleting recording '%s' FAILED!", FileName());
+            result = false;
+        } else {
             isyslog("undeleting recording '%s'", FileName());
             if (access(FileName(), F_OK) == 0)
                 result = RenameVideoFile(FileName(), NewName);
@@ -847,6 +864,7 @@ bool cRecording::Undelete(void)
                 result = false; // well, we were going to delete it, anyway
             }
         }
+//        printf ("\033[0;44m new FileName [%s] ... \nold FileName [%s]  \033[0m\n", NewName, FileName());
     }
     free(NewName);
     return result;
