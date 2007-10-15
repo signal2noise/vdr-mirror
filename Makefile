@@ -24,6 +24,9 @@ INCLUDES =
 
 PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
+ifndef RBLITE
+EXCLUDE_PLUGINS = -e ipkg -e reelcam
+endif
 
 VIDEODIR = /video
 #DVBDIR   = ../kernel/linux-2.6.11.11/include
@@ -201,7 +204,7 @@ include-dir:
 # Plugins:
 
 plugins:
-	for i in `ls $(PLUGINDIR)/src | grep -v '[^a-z0-9]'`; do\
+	for i in `ls $(PLUGINDIR)/src | grep -ve '[^a-z0-9]' $(EXCLUDE_PLUGINS)`; do\
 		$(MAKE) -C "$(PLUGINDIR)/src/$$i" all || exit 1 ;\
 	done
 
