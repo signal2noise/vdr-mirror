@@ -1386,8 +1386,7 @@ bool cDevice::Receiving(bool CheckAny) const
   return false;
 }
 
-#ifdef RBLITE
-#if 0
+#ifndef RBLITE
 
 void cDevice::Action(void)
 {
@@ -1414,7 +1413,7 @@ void cDevice::Action(void)
      }
 }
 #else
-// GA Speedup
+// GA Speedup (RBLITE)
 #define TS_MAX_READ (1024)  // max 192K buffer
 void cDevice::Action(void)
 {
@@ -1455,7 +1454,6 @@ void cDevice::Action(void)
                CloseDvr();
        }
 }
-#endif
 #endif
 
 bool cDevice::OpenDvr(void)
