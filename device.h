@@ -11,11 +11,7 @@
 #define __DEVICE_H
 
 #include "channels.h"
-#ifdef RBLITE
-  #include "ci-lite.h"
-#else
-  #include "ci.h"
-#endif
+#include "ci.h"
 #include "eit.h"
 #include "filter.h"
 #include "nit.h"
