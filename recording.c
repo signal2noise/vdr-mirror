@@ -866,7 +866,10 @@ bool cRecording::Undelete(void)
         }
 //        printf ("\033[0;44m new FileName [%s] ... \nold FileName [%s]  \033[0m\n", NewName, FileName());
     }
-    free(NewName);
+    if (fileName) 
+        free(fileName);
+
+    fileName = NewName;
     return result;
 }
 
