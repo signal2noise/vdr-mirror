@@ -830,25 +830,25 @@ bool cRecording::Undelete(void)
     bool result = true;
     char *NewName = strdup(FileName());
     char *ext = strrchr(NewName, '.');
-    int i = 0;
     
     if (ext && strcmp(ext, DELEXT) == 0) {
         strncpy(ext, RECEXT, strlen(ext));
         if (access(NewName, F_OK) == 0) {
         // the new name already exists, so let's try to get another NewName first
-            strncpy(ext, "\0", 1);
-            for(i=1;i<=255;++i){
-                char *tmp = NULL;
-                asprintf(&tmp,"%s_%03d%s",NewName, i, RECEXT);
-                if (access(tmp, F_OK) != 0)
-                {
+            *ext = '\0'; // we cut off the file extension
+
+            char tmp[1024]; 
+//            strcpy(tmp,NewName);
+
+            for(int i=1;i<=255;++i) {
+                snprintf(tmp,1024, "%s_%03d%s",NewName, i, RECEXT);
+                if (access(tmp, F_OK) != 0) {
                     // Bingo, we found a nonexists filename
-                    free(NewName);
-                    NewName = tmp;
                     break;
                 }
-                free(tmp);
             }
+            free(NewName);
+            NewName = tmp;
         }
         if (access(NewName, F_OK) == 0) {
         // if the new name still already exists then give up and tell the user
@@ -864,7 +864,6 @@ bool cRecording::Undelete(void)
                 result = false; // well, we were going to delete it, anyway
             }
         }
-//        printf ("\033[0;44m new FileName [%s] ... \nold FileName [%s]  \033[0m\n", NewName, FileName());
     }
     if (fileName) 
         free(fileName);
