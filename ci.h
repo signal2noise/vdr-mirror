@@ -142,6 +142,7 @@ private:
   cCiHandler(int Fd, int NumSlots);
   void SendCaPmt(void);
 public:
+  cCiHandler();
   ~cCiHandler();
 #ifdef RBLITE
   static cCiHandler *CreateCiHandler(const char *FileName);

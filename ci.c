@@ -1502,6 +1502,31 @@ bool cCiEnquiry::Abort(void)
 }
 
 // -- cCiHandler -------------------------------------------------------------
+cCiHandler::cCiHandler()
+{
+  fd = 0;
+  numSlots = 0;
+  newCaSupport = false;
+  hasUserIO = false;
+  for (int i = 0; i < MAX_CI_SESSION; i++) {
+      sessions[i] = NULL;
+  }
+
+#ifdef RBLITE
+  for (int i = 0; i < MAX_CI_SLOT; i++) {
+      moduleReady[i] = false;
+      source[i] = transponder[i] = 0;
+  }
+  source = transponder = 0;
+#else 
+  for (int i = 0; i < MAX_CI_SLOT; i++) {
+      moduleReady[i] = false;
+  }
+#endif
+
+  tpl = NULL;
+  tc = NULL;
+}
 
 cCiHandler::cCiHandler(int Fd, int NumSlots)
 {
@@ -1511,23 +1536,29 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   hasUserIO = false;
   for (int i = 0; i < MAX_CI_SESSION; i++)
       sessions[i] = NULL;
-  for (int i = 0; i < MAX_CI_SLOT; i++){
-      moduleReady[i] = false;
+
 #ifdef RBLITE
+  for (int i = 0; i < MAX_CI_SLOT; i++) {
+      moduleReady[i] = false;
       source[i] = transponder[i] = 0;
-#endif
   }
+  source = transponder = 0;
+
+#else 
+
+  for (int i = 0; i < MAX_CI_SLOT; i++)
+      moduleReady[i] = false;
+#endif
+
   tpl = new cCiTransportLayer(Fd, numSlots);
   tc = NULL;
-#ifndef RBLITE
-  source = transponder = 0;
-#endif
 }
 
 cCiHandler::~cCiHandler()
 {
   for (int i = 0; i < MAX_CI_SESSION; i++)
       delete sessions[i];
+
   delete tpl;
   close(fd);
 }
@@ -1607,10 +1638,25 @@ cCiSession *cCiHandler::GetSessionBySessionId(uint16_t SessionId)
 
 cCiSession *cCiHandler::GetSessionByResourceId(uint32_t ResourceId, int Slot)
 {
+  // cCiSession *sessions[MAX_CI_SESSION]; // array of pointer of cCiSession
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
-         return sessions[i];
+      printf ("\033[0;41m %s \033[0m\n", "PING1");
+      printf ("\033[0;41m GetSessionByResourceId: sizeof sessions[%i] = %i \033[0m\n", i, sizeof(sessions[i]));
+      //printf ("\033[0;41m GetSessionByResourceId: %s \033[0m\n", (sessions[i])?"TRUE":"FALSE");
+      printf ("\033[0;41m %s \033[0m\n", "PING2");
+      //if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
+      const cCiTransportConnection *tc =NULL;
+      if (sessions[i] && sessions[i]->Tc()) {
+          printf ("\033[0;41m must be save   \033[0m\n");
+          tc = sessions[i]->Tc();
+          if (tc) {
+             int slot = tc->Slot(); 
+             printf ("\033[0;41m session ID %d has Slot %d  \033[0m\n", i, slot);
+          }
+
+         //return sessions[i];
       }
+  }
   return NULL;
 }
 

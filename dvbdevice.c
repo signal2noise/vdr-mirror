@@ -459,14 +459,17 @@ cDvbDevice::cDvbDevice(int n)
 #ifdef RBLITE
         ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
 #else
-        int fd_ca = DvbOpen(DEV_DVB_CA, n, O_RDWR);
-        if(fd_ca>=0) {
+        int fd_ca = DvbOpen(DEV_DVB_CA, n, O_RDWR); // BUG: DvbOpen always returns -1 because there is no such device
+        //printf ("\033[0;41m fd_ca = %i \033[0m\n", fd_ca);
+        if (fd_ca>=0) 
           ciHandler = cCiHandler::CreateCiHandler(fd_ca);
-          if(!ciHandler) close(fd_ca);
-          }
+        else 
+          ciHandler = new cCiHandler;
+
+        if(!ciHandler) close(fd_ca);
 #endif
         dvbTuner = new cDvbTuner(fd_frontend, CardIndex(), frontendType, ciHandler);
-        }
+     }
      else
         LOG_ERROR;
      }

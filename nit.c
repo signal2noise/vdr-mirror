@@ -135,8 +135,8 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                                         FEC_3_5, FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
 
                  // same as in channels.c   do not use for now 
-                 static int CodeRates2[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5, FEC_5_6, FEC_6_7, FEC_7_8, FEC_8_9,  // DVB-S
-                                            FEC_1_3, FEC_1_4, FEC_2_5,  FEC_3_5, FEC_9_10, FEC_AUTO };  // DVB-S2 
+                 //static int CodeRates2[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5, FEC_5_6, FEC_6_7, FEC_7_8, FEC_8_9,  // DVB-S
+                 //                           FEC_1_3, FEC_1_4, FEC_2_5,  FEC_3_5, FEC_9_10, FEC_AUTO };  // DVB-S2 
 
 
                   static int Modulations[] = { QPSK, QPSK, QPSK, QPSK,   // DVB-S
@@ -149,7 +149,7 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 
                  int CodeRate = CodeRates[sd->getFecInner()];
                  // only for S2 testing purposes 
-                 int CodeRate2 = CodeRates2[sd->getFecInner()];
+                 //int CodeRate2 = CodeRates2[sd->getFecInner()];
 
                  int SymbolRate = BCD2INT(sd->getSymbolRate())/10;
 
@@ -163,7 +163,7 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                    Modulation = Modulations[sd->getModulationType()];
                    }
 
-#if 1
+#if 0
            if (sd->getModulationSystem() == 1)
               printf ("\033[0;45m HD  f %d  sr:%d  MOD[%d]: %2d  FEC[%2d]: %2d (old: %2d) \033[0m\n", Frequency,
                 SymbolRate, sd->getModulationType(),   Modulation, CodeRates[sd->getFecInner()], CodeRate, CodeRate2 );
