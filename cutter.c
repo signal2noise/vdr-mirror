@@ -38,6 +38,8 @@ private:
   cFileName *fromFileName, *toFileName;
   cIndexFile *fromIndex, *toIndex;
   cMarks fromMarks, toMarks;
+  uchar *PATPMT;
+  void CheckTS(cUnbufferedFile *replayFile);
 protected:
   virtual void Action(void);
 public:
@@ -68,10 +70,32 @@ cCuttingThread::cCuttingThread(const char *FromFileName, const char *ToFileName)
 cCuttingThread::~cCuttingThread()
 {
   Cancel(3);
+  if( PATPMT != NULL )
+     free(PATPMT);
   delete fromFileName;
   delete toFileName;
   delete fromIndex;
   delete toIndex;
+}
+
+void cCuttingThread::CheckTS(cUnbufferedFile *replayFile)
+{
+   uchar * pp = NULL;
+   pp = MALLOC(uchar, 2*TS_SIZE);
+   if ( pp != NULL) {
+      if ( replayFile->Read( pp, 2*TS_SIZE ) == 2*TS_SIZE ) {
+         if ( (*pp == 0x47 && *(pp+1) == 0x40) && (*(pp+TS_SIZE) == 0x47 && *(pp+TS_SIZE+1) == 0x40)) {
+            printf("cCuttingThread::CheckTS(): TS recognized\n");
+            PATPMT = pp;
+         } else {
+            printf("cCuttingThread::CheckTS(): PES recognized\n");
+            PATPMT = NULL;
+            free(pp);
+         }
+      }
+      if (PATPMT == NULL)
+         replayFile->Seek(0,SEEK_SET);
+   }
 }
 
 void cCuttingThread::Action(void)
@@ -93,6 +117,7 @@ void cCuttingThread::Action(void)
      toFile = toFileName->Open();
      if (!fromFile || !toFile)
         return;
+     CheckTS(fromFile);
      fromFile->SetReadAhead(MEGABYTE(20));
      int Index = Mark->position;
      Mark = fromMarks.Next(Mark);
@@ -142,16 +167,30 @@ void cCuttingThread::Action(void)
 
            // Write one frame:
 
-           if (PictureType == I_FRAME) { // every file shall start with an I_FRAME
+           if (PictureType == I_FRAME || PATPMT != NULL) { // every file shall start with an I_FRAME
               if (LastMark) // edited version shall end before next I-frame
                  break;
-              if (FileSize > MEGABYTE(Setup.MaxVideoFileSize)) {
+              if (FileSize == 0) {
+                 if (PATPMT != NULL) {
+                    if (toFile->Write(PATPMT, 2*TS_SIZE) < 0) // Add PATPMT to start of every file
+                       break;
+                    else
+                       FileSize+=TS_SIZE*2;
+                    }   
+                 }
+              else if (FileSize > MEGABYTE(Setup.MaxVideoFileSize)) {
                  toFile = toFileName->NextFile();
                  if (!toFile) {
                     error = "toFile 1";
                     break;
                     }
                  FileSize = 0;
+                 if (PATPMT != NULL) {
+                    if (toFile->Write(PATPMT, 2*TS_SIZE) < 0) // Add PATPMT to start of every file
+                       break;
+                    else
+                       FileSize+=TS_SIZE*2;
+                    }
                  }
               LastIFrame = 0;
 
