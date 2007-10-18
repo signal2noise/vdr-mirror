@@ -1640,20 +1640,13 @@ cCiSession *cCiHandler::GetSessionByResourceId(uint32_t ResourceId, int Slot)
 {
   // cCiSession *sessions[MAX_CI_SESSION]; // array of pointer of cCiSession
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      printf ("\033[0;41m %s \033[0m\n", "PING1");
-      printf ("\033[0;41m GetSessionByResourceId: sizeof sessions[%i] = %i \033[0m\n", i, sizeof(sessions[i]));
-      //printf ("\033[0;41m GetSessionByResourceId: %s \033[0m\n", (sessions[i])?"TRUE":"FALSE");
-      printf ("\033[0;41m %s \033[0m\n", "PING2");
       //if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
       const cCiTransportConnection *tc =NULL;
       if (sessions[i] && sessions[i]->Tc()) {
-          printf ("\033[0;41m must be save   \033[0m\n");
           tc = sessions[i]->Tc();
           if (tc) {
              int slot = tc->Slot(); 
-             printf ("\033[0;41m session ID %d has Slot %d  \033[0m\n", i, slot);
           }
-
          //return sessions[i];
       }
   }
