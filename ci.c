@@ -1517,11 +1517,11 @@ cCiHandler::cCiHandler()
       moduleReady[i] = false;
       source[i] = transponder[i] = 0;
   }
-  source = transponder = 0;
 #else 
   for (int i = 0; i < MAX_CI_SLOT; i++) {
       moduleReady[i] = false;
   }
+  source = transponder = 0;
 #endif
 
   tpl = NULL;
@@ -1542,12 +1542,13 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
       moduleReady[i] = false;
       source[i] = transponder[i] = 0;
   }
-  source = transponder = 0;
 
 #else 
 
   for (int i = 0; i < MAX_CI_SLOT; i++)
       moduleReady[i] = false;
+
+  source = transponder = 0;
 #endif
 
   tpl = new cCiTransportLayer(Fd, numSlots);
