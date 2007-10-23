@@ -45,6 +45,7 @@ private:
   const cEvent *event;
   cEvent *ownEvent;
   char *aux;
+  bool isHD;
   cRecordingInfo(const cChannel *Channel = NULL, const cEvent *Event = NULL);
   void SetData(const char *Title, const char *ShortText, const char *Description);
   void SetAux(const char *Aux);
@@ -53,11 +54,13 @@ public:
   tChannelID ChannelID(void) const { return channelID; }
   void SetTitle(const char *Title);
   void SetShortText(const char *ShortText);
+  void SetIsHD(bool isHD);
   const char *Title(void) const { return event->Title(); }
   const char *ShortText(void) const { return event->ShortText(); }
   const char *Description(void) const { return event->Description(); }
   const cComponents *Components(void) const { return event->Components(); }
   const char *Aux(void) const { return aux; }
+  bool IsHD(void) { return isHD; }
   bool Read(FILE *f);
   bool Write(FILE *f, const char *Prefix = "") const;
   };
@@ -96,6 +99,7 @@ public:
   void ResetResume(void) const;
   bool IsNew(void) const { return GetResume() == -1; }
   bool IsEdited(void) const;
+  bool IsHD(void); // TB
   bool WriteInfo(void);
   bool Delete(void);
        // Changes the file name so that it will no longer be visible in the "Recordings" menu

@@ -266,6 +266,7 @@ cRecordingInfo::cRecordingInfo(const cChannel *Channel, const cEvent *Event)
   ownEvent = Event ? NULL : new cEvent(0);
   event = ownEvent ? ownEvent : Event;
   aux = NULL;
+  isHD = false;
   if (Channel) {
      // Since the EPG data's component records can carry only a single
      // language code, let's see whether the channel's PID data has
@@ -327,6 +328,11 @@ void cRecordingInfo::SetTitle(const char *Title)
   ((cEvent *)event)->SetTitle(Title);
 }
 
+void cRecordingInfo::SetIsHD(bool IsHD)
+{
+   isHD = IsHD;
+}
+
 void cRecordingInfo::SetAux(const char *Aux)
 {
   free(aux);
@@ -370,6 +376,8 @@ bool cRecordingInfo::Read(FILE *f)
              case '@': free(aux);
                        aux = strdup(t);
                        break;
+             case 'H': isHD = true;
+                       break;
              case '#': break; // comments are ignored
              default: if (!ownEvent->Parse(s)) {
                          esyslog("ERROR: EPG data problem in line %d", line);
@@ -390,6 +398,8 @@ bool cRecordingInfo::Write(FILE *f, const char *Prefix) const
   event->Dump(f, Prefix, true);
   if (aux)
      fprintf(f, "%s@ %s\n", Prefix, aux);
+  if (isHD)
+     fprintf(f, "%sH\n", Prefix);
   return true;
 }
 
@@ -807,6 +817,11 @@ bool cRecording::IsEdited(void) const
   const char *s = strrchr(name, '~');
   s = !s ? name : s + 1;
   return *s == '%';
+}
+
+bool cRecording::IsHD(void)
+{
+  return info->IsHD();
 }
 
 bool cRecording::WriteInfo(void)
