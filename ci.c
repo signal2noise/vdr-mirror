@@ -1641,15 +1641,8 @@ cCiSession *cCiHandler::GetSessionByResourceId(uint32_t ResourceId, int Slot)
 {
   // cCiSession *sessions[MAX_CI_SESSION]; // array of pointer of cCiSession
   for (int i = 0; i < MAX_CI_SESSION; i++) {
-      //if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
-      const cCiTransportConnection *tc =NULL;
-      if (sessions[i] && sessions[i]->Tc()) {
-          tc = sessions[i]->Tc();
-          if (tc) {
-             int slot = tc->Slot(); 
-          }
-         //return sessions[i];
-      }
+	if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
+	    return sessions[i];
   }
   return NULL;
 }
