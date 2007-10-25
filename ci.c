@@ -1884,9 +1884,13 @@ cCiEnquiry *cCiHandler::GetEnquiry(void)
 
 const char *cCiHandler::GetCamName(int Slot)
 {
+#ifdef RBLITE
   cMutexLock MutexLock(&mutex);
   cCiApplicationInformation *ai = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
   return ai ? ai->GetMenuString() : NULL;
+#else
+  return NULL;
+#endif
 }
 
 const unsigned short *cCiHandler::GetCaSystemIds(int Slot)
