@@ -162,7 +162,7 @@ static void Eject()
 {
   const char *cmd1 = MOUNTSH " eject";
   Skins.Message(mtInfo, tr("eject DVD"));
-  system(cmd1);
+  SystemExec(cmd1);
 }
 
 
@@ -1214,7 +1214,7 @@ int main(int argc, char *argv[])
                //  -- Shutdown at mp3 playback by moviemax
                if (cControl::Control()) {
                    cControl::Control()->Shutdown();
-                   Skins.Message(mtInfo, tr(" Activated standby "));
+                   //Skins.Message(mtInfo, tr(" Activated standby "));
                    UserShutdown = true;
                    break;
                }
