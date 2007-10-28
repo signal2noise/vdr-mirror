@@ -165,6 +165,28 @@ static void Eject()
   SystemExec(cmd1);
 }
 
+static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown = false )
+{
+	///< executes external shutdown command given with -s
+	
+	cTimer *timer = Timers.GetNextActiveTimer();
+	time_t Now   = time(NULL);
+	time_t Next  = timer ? timer->StartTime() : 0;
+	time_t Delta = timer ? Next - Now : 0;
+	
+	int Channel = timer ? timer->Channel()->Number() : 0;
+	const char *File = timer ? timer->File() : "";
+	
+	if (timer)
+		Delta = Next - Now; // compensates for Confirm() timeout
+	char *cmd;
+	asprintf(&cmd, "%s %ld %ld %d \"%s\" %d", ShutdownCmd, Next, Delta, Channel,
+	                                          *strescape(File, "\"$"), UserShutdown);
+	isyslog("executing '%s'", cmd);
+	SystemExec(cmd);
+	free(cmd);
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -1211,14 +1233,14 @@ int main(int argc, char *argv[])
                   if (!Interface->Confirm(tr("Recording - shut down anyway?")))
                      break;
                }
-               //  -- Shutdown at mp3 playback by moviemax
+               //  -- Shutdown at active playback by moviemax
                if (cControl::Control()) {
                    cControl::Control()->Shutdown();
                    //Skins.Message(mtInfo, tr(" Activated standby "));
                    UserShutdown = true;
                    break;
                }
-               //  -- Shutdown at mp3 playback by moviemax end
+               //  -- Shutdown at active playback by moviemax end
 
                UserShutdown = true;
                if (cPluginManager::Active(tr("shut down anyway?")))
@@ -1505,6 +1527,8 @@ int main(int argc, char *argv[])
                        signal(SIGALRM, SIG_IGN);
                     if (Interface->Confirm(tr("Activating standby"), UserShutdown ? 2 : SHUTDOWNWAIT, true)) {
                        cControl::Shutdown();
+                       /* RC: moved downwards to be executed on every shutdown, not just
+                              user shutdown. See PrepareShutdownExternal().
                        int Channel = timer ? timer->Channel()->Number() : 0;
                        const char *File = timer ? timer->File() : "";
                        if (timer)
@@ -1514,6 +1538,7 @@ int main(int argc, char *argv[])
                        isyslog("executing '%s'", cmd);
                        SystemExec(cmd);
                        free(cmd);
+                       */
                        Interrupted=1; // GA
                        LastActivity = Now - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later
                        }
@@ -1539,8 +1564,10 @@ int main(int argc, char *argv[])
         // Main thread hooks of plugins:
         PluginManager.MainThreadHook();
         }
-  if (Interrupted)
-     isyslog("caught signal %d", Interrupted);
+  if (Interrupted) {
+	isyslog("caught signal %d", Interrupted);
+	PrepareShutdownExternal( Shutdown, UserShutdown );
+  }
 
 Exit:
 
