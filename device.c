@@ -299,6 +299,7 @@ cDevice *cDevice::GetDevice(const cChannel *Channel, int Priority, bool *NeedsDe
          uint imp = 0;
          imp <<= 1; imp |= !device[i]->Receiving(true) || ndr;                     // use receiving devices if we don't need to detach existing receivers
          imp <<= 1; imp |= device[i]->Receiving();                                 // avoid devices that are receiving
+         imp <<= 1; imp |= device[i]->ProvidesS2();                                // make S2 less preferable
          //imp <<= 1; imp |= device[i] == cTransferControl::ReceiverDevice();        // avoid the Transfer Mode receiver device
          imp <<= 1; imp |= device[i] == ActualDevice();                            // avoid the actual device (in case of Transfer Mode)
          imp <<= 1; imp |= device[i]->IsPrimaryDevice();                           // avoid the primary device
@@ -1391,6 +1392,7 @@ bool cDevice::Receiving(bool CheckAny) const
 void cDevice::Action(void)
 {
   if (Running() && OpenDvr()) {
+     SetPriority(-5); // This thread is important...
      while (Running()) {
            // Read data from the DVR device:
            uchar *b = NULL;
