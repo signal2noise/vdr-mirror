@@ -51,6 +51,7 @@ protected:
 public:
   cRecorder(const char *FileName, int Ca, int Priority, int VPid, const int *APids, const int *DPids, const int *SPids, cLiveBuffer *LiveBuffer = NULL);
   virtual ~cRecorder();
+  cRemux* GetRemux(void) {return remux;}
   };
 
 #endif //__RECORDER_H

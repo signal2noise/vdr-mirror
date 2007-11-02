@@ -100,6 +100,7 @@ public:
   bool IsNew(void) const { return GetResume() == -1; }
   bool IsEdited(void) const;
   bool IsHD(void); // TB
+  void SetIsHD(bool Hd); //TB
   bool WriteInfo(void);
   bool Delete(void);
        // Changes the file name so that it will no longer be visible in the "Recordings" menu

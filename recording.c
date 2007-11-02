@@ -824,6 +824,11 @@ bool cRecording::IsHD(void)
   return info->IsHD();
 }
 
+void cRecording::SetIsHD(bool Hd)
+{
+  if(info) info->SetIsHD(Hd);
+}
+
 bool cRecording::WriteInfo(void)
 {
   char *InfoFileName = NULL;
