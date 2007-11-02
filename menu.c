@@ -6134,6 +6134,9 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
         if(recorder->GetRemux()->SFmode()==SF_H264){
           Recording.SetIsHD(true);
         } 
+        if(recorder->GetRemux()->TSmode()==rTS){
+          Recording.SetIsTS(true);
+        }
         Recording.WriteInfo();
         cStatus::MsgRecording(device, Recording.Name(), Recording.FileName(), true, ch->Number());
         if (!Timer || Timer->HasFlags(tfInstant) && !cReplayControl::LastReplayed()) // an instant recording, maybe from cRecordControls::PauseLiveVideo()

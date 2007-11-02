@@ -267,6 +267,7 @@ cRecordingInfo::cRecordingInfo(const cChannel *Channel, const cEvent *Event)
   event = ownEvent ? ownEvent : Event;
   aux = NULL;
   isHD = false;
+  isTS = false;
   if (Channel) {
      // Since the EPG data's component records can carry only a single
      // language code, let's see whether the channel's PID data has
@@ -333,6 +334,11 @@ void cRecordingInfo::SetIsHD(bool IsHD)
    isHD = IsHD;
 }
 
+void cRecordingInfo::SetIsTS(bool IsTS)
+{
+   isTS = IsTS;
+}
+
 void cRecordingInfo::SetAux(const char *Aux)
 {
   free(aux);
@@ -378,6 +384,8 @@ bool cRecordingInfo::Read(FILE *f)
                        break;
              case 'H': isHD = true;
                        break;
+             case 'Z': isTS = true;
+                       break;
              case '#': break; // comments are ignored
              default: if (!ownEvent->Parse(s)) {
                          esyslog("ERROR: EPG data problem in line %d", line);
@@ -400,6 +408,8 @@ bool cRecordingInfo::Write(FILE *f, const char *Prefix) const
      fprintf(f, "%s@ %s\n", Prefix, aux);
   if (isHD)
      fprintf(f, "%sH\n", Prefix);
+  if (isTS)
+     fprintf(f, "%sZ\n", Prefix);
   return true;
 }
 
@@ -826,7 +836,16 @@ bool cRecording::IsHD(void)
 
 void cRecording::SetIsHD(bool Hd)
 {
-  if(info) info->SetIsHD(Hd);
+  if (info) info->SetIsHD(Hd);
+}
+
+bool cRecording::IsTS(void)
+{
+  return info->IsTS();
+}
+
+void cRecording::SetIsTS(bool Ts){
+  if (info) info->SetIsTS(Ts);
 }
 
 bool cRecording::WriteInfo(void)
