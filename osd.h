@@ -202,6 +202,13 @@ public:
        ///< (x2, y2) corners with the given Color. If the rectangle covers the entire
        ///< bitmap area, the color palette will be reset, so that new colors can be
        ///< used for drawing.
+  void DrawRectangle(int x1, int y1, int x2, int y2, tColor Color, int alphaGradH, int alphaGradV, int alphaGradStepH, int alphaGradStepV); //TB
+       ///< Draws a filled rectangle defined by the upper left (x1, y1) and lower right
+       ///< (x2, y2) corners with the given Color. If the rectangle covers the entire
+       ///< bitmap area, the color palette will be reset, so that new colors can be
+       ///< used for drawing.
+       ///< //TB: The Alpha-Value is incremented all alphaGradStepH pixels by the value AlphaGradH in every line,
+       ///< and all alphaGradStepV pixels by the value alphaGradV in every row.
   void DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Quadrants = 0);
        ///< Draws a filled ellipse defined by the upper left (x1, y1) and lower right
        ///< (x2, y2) corners with the given Color. Quadrants controls which parts of
@@ -329,6 +336,11 @@ public:
   virtual void DrawRectangle(int x1, int y1, int x2, int y2, tColor Color);
        ///< Draws a filled rectangle defined by the upper left (x1, y1) and lower right
        ///< (x2, y2) corners with the given Color.
+  virtual void DrawRectangle(int x1, int y1, int x2, int y2, tColor Color, int alphaGradH, int alphaGradV, int alphaGradStepH, int alphaGradStepV); //TB
+       ///< Draws a filled rectangle defined by the upper left (x1, y1) and lower right
+       ///< (x2, y2) corners with the given Color.
+       ///< //TB: The Alpha-Value is incremented all alphaGradStepH pixels by the value AlphaGradH in every line,
+       ///< and all alphaGradStepV pixels by the value alphaGradV in every row.
   virtual void DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Quadrants = 0);
        ///< Draws a filled ellipse defined by the upper left (x1, y1) and lower right
        ///< (x2, y2) corners with the given Color. Quadrants controls which parts of

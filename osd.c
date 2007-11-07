@@ -532,6 +532,36 @@ void cBitmap::DrawRectangle(int x1, int y1, int x2, int y2, tColor Color)
     }
 }
 
+void cBitmap::DrawRectangle(int x1, int y1, int x2, int y2, tColor Color, int alphaGradH, int alphaGradV, int alphaGradStepH, int alphaGradStepV)
+{
+    if (bitmap && Intersects(x1, y1, x2, y2)) {
+        if (Covers(x1, y1, x2, y2))
+            Reset();
+        x1 -= x0;
+        y1 -= y0;
+        x2 -= x0;
+        y2 -= y0;
+        x1 = max(x1, 0);
+        y1 = max(y1, 0);
+        x2 = min(x2, width - 1);
+        y2 = min(y2, height - 1);
+        tIndex c = Index(Color);
+        if (dirtyX1 > x1)  dirtyX1 = x1;
+        if (dirtyY1 > y1)  dirtyY1 = y1;
+        if (dirtyX2 < x2)  dirtyX2 = x2;
+        if (dirtyY2 < y2)  dirtyY2 = y2;
+        
+        for (int y = y1; y <= y2; y++)
+        {
+            for (int x = x1; x <= x2; x++)
+                SetIndex(x, y, c);
+        }
+    }
+}
+
+
+
+
 void cBitmap::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Quadrants)
 {
   if (!Intersects(x1, y1, x2, y2))
@@ -790,6 +820,12 @@ void cOsd::DrawRectangle(int x1, int y1, int x2, int y2, tColor Color)
 {
   for (int i = 0; i < numBitmaps; i++)
       bitmaps[i]->DrawRectangle(x1, y1, x2, y2, Color);
+}
+
+void cOsd::DrawRectangle(int x1, int y1, int x2, int y2, tColor Color, int alphaGradH, int alphaGradV, int alphaGradStepH, int alphaGradStepV)
+{
+  for (int i = 0; i < numBitmaps; i++)
+      bitmaps[i]->DrawRectangle(x1, y1, x2, y2, Color, alphaGradH, alphaGradV, alphaGradStepH, alphaGradStepV);
 }
 
 void cOsd::DrawEllipse(int x1, int y1, int x2, int y2, tColor Color, int Quadrants)
