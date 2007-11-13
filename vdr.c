@@ -148,7 +148,11 @@ static void SignalHandlerCrash(int signum)
   size_t size;
   char **strings;
   size_t i;
-  FILE *f=fopen("/var/log/vdr.crashlog","a");
+  FILE *f;
+  
+  signal(signum,SIG_DFL); // Allow core dump    
+  
+  f=fopen("/var/log/vdr.crashlog","a");
   if (f) {
     size = backtrace (array, 15);
     strings = backtrace_symbols (array, size);                                
@@ -159,7 +163,6 @@ static void SignalHandlerCrash(int signum)
 
       fclose(f);
      }
-  signal(signum,SIG_DFL); // Allow core dump    
 }
 #endif
 static void SignalHandler(int signum)
