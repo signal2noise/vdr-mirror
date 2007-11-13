@@ -35,6 +35,9 @@
 #include <sys/prctl.h>
 #include <termios.h>
 #include <unistd.h>
+#ifndef RBLITE
+#include <execinfo.h>
+#endif
 #include "audio.h"
 #include "channels.h"
 #include "config.h"
@@ -138,7 +141,27 @@ static bool SetKeepCaps(bool On)
      }
   return true;
 }
+#ifndef RBLITE
+static void SignalHandlerCrash(int signum)
+{
+  void *array[15];
+  size_t size;
+  char **strings;
+  size_t i;
+  FILE *f=fopen("/var/log/vdr.crashlog","a");
+  if (f) {
+    size = backtrace (array, 15);
+    strings = backtrace_symbols (array, size);                                
+    fprintf(f,"### Crash signal %i ###\n",signum);
+    for (i = 0; i < size; i++)
+      fprintf (f, "Backtrace %i: %s\n", i, strings[i]);                        
+      free (strings);
 
+      fclose(f);
+     }
+  signal(signum,SIG_DFL); // Allow core dump    
+}
+#endif
 static void SignalHandler(int signum)
 {
   if (signum != SIGPIPE) {
@@ -416,7 +439,10 @@ int main(int argc, char *argv[])
            return 2;
         }
      }
-
+#ifndef RBLITE
+  signal(SIGSEGV, SignalHandlerCrash);
+  signal(SIGBUS, SignalHandlerCrash);
+#endif
   // Help and version info:
 
   if (DisplayHelp || DisplayVersion) {
