@@ -798,7 +798,24 @@ void cDvbPlayer::Goto(int Index, bool Still)
               b[r++] = 0x01;
               b[r++] = 0xB7;
               }
-           DeviceStillPicture(b, r);
+
+              int tsstartcode = 0x00000047;
+              if(r >= 4 && (*((int*)b) & 0x000000FF) == tsstartcode) //TS-Packet
+              {
+                  //printf("--------------cDvbPlayer::Goto: TS-------------\n");
+		  if(PATPMT)
+		  { 
+                     PlayTS(NULL, 0, false, PATPMT);
+                     for(uint i = 0; i < 10; ++i)
+                     {
+                       PlayTS(b, Length, false);
+                     }
+                  }
+              }
+              else
+              {
+                 DeviceStillPicture(b, r);
+              }
            }
         playMode = pmStill;
         }
