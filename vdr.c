@@ -149,16 +149,20 @@ static void SignalHandlerCrash(int signum)
   char **strings;
   size_t i;
   FILE *f;
+  char dtstr[16];
+  time_t t=time(NULL);
+  struct tm *tm=localtime(&t);
   
   signal(signum,SIG_DFL); // Allow core dump    
   
   f=fopen("/var/log/vdr.crashlog","a");
   if (f) {
+    strftime(dtstr, sizeof(dtstr), "%b %e %T", tm);
     size = backtrace (array, 15);
     strings = backtrace_symbols (array, size);                                
-    fprintf(f,"### Crash signal %i ###\n",signum);
+    fprintf(f,"%s ### Crash signal %i ###\n",dtstr, signum);
     for (i = 0; i < size; i++)
-      fprintf (f, "Backtrace %i: %s\n", i, strings[i]);                        
+      fprintf (f, "%s Backtrace %i: %s\n", dtstr, i, strings[i]);                        
       free (strings);
 
       fclose(f);
