@@ -24,8 +24,11 @@ INCLUDES =
 
 PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
-ifndef RBLITE
-EXCLUDE_PLUGINS = -e ipkg -e reelcam
+
+ifdef RBLITE
+  EXCLUDE_PLUGINS = -e xxvautotimer
+else
+  EXCLUDE_PLUGINS = -e ipkg -e reelcam
 endif
 
 VIDEODIR = /video
