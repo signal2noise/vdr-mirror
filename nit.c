@@ -129,8 +129,8 @@ void cNitFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
                  char Polarization = Polarizations[sd->getPolarization()];
 
                  // orig
-                  static int CodeRates[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5,  FEC_5_6, FEC_7_8, FEC_8_9, 
-                                        FEC_3_5, FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
+                  static int CodeRates[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_5_6, FEC_7_8, FEC_8_9, 
+                                        FEC_3_5, FEC_4_5, FEC_9_10, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_AUTO, FEC_NONE };
 
                  // same as in channels.c   do not use for now 
                  //static int CodeRates2[] = { FEC_NONE, FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5, FEC_5_6, FEC_6_7, FEC_7_8, FEC_8_9,  // DVB-S
