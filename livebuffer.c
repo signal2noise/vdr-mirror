@@ -251,7 +251,7 @@ ssize_t cUnbufferedFile64::Write(const void *Data, size_t Size)
 }
 
 cUnbufferedFile64 *cUnbufferedFile64::Create(const char *FileName, int Flags, mode_t Mode)
-{
+{ 
   cUnbufferedFile64 *File = new cUnbufferedFile64;
   if (File->Open(FileName, Flags, Mode) < 0) {
      delete File;
@@ -291,7 +291,7 @@ cLiveIndex::~cLiveIndex()
 }
 
 void cLiveIndex::Add(uchar pt, int pos)
-{
+{ 
   RwLock->Lock(true);
   DCount=0;
   DPos = pos;
@@ -766,7 +766,7 @@ void cLiveCutterThread::Action(void)
 
 cLiveBuffer::cLiveBuffer(const char *FileName, cRemux *Remux)
 :cThread("livebuffer")
-{
+{  
   index = new cLiveIndex();
   remux = Remux;
   filestring = strdup(FileName);
@@ -839,7 +839,7 @@ void cLiveBuffer::Action(void)
 {
   while (Running()) {
     int Count;
-    Lock();
+    Lock(); 
     uchar *p = remux->Get(Count, &pictureType, 1);
     if (p) {
       Store(p,Count);
@@ -853,7 +853,7 @@ void cLiveBuffer::Action(void)
 }
 
 void cLiveBuffer::SetNewRemux(cRemux *Remux, bool Clear)
-{
+{ 
   if (Clear) {
     index->Switched();
     }
@@ -872,7 +872,7 @@ void cLiveBuffer::SetNewRemux(cRemux *Remux, bool Clear)
 }
 
 int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
-{
+{ 
   if (!Buffer) {
     fileReader->Clear();
     return -1;
@@ -909,7 +909,7 @@ int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
 }
 
 void cLiveBuffer::CreateIndexFile(const char *FileName, int64_t PTS, int EndFrame)
-{
+{  
   if (liveCutter) {
      if (liveCutter->Active()) {
         startFrame = -1;
@@ -962,8 +962,8 @@ cLiveReceiver::cLiveReceiver(const cChannel *Channel)
 {
   channel = Channel;
 //  ringBuffer = new cRingBufferLinear(RECORDERBUFSIZE, TS_SIZE * 2, true, "Recorder");
-//  ringBuffer->SetTimeouts(0, 20);
-  remux = new cRemux(Channel->Vpid(), Channel->Apids(), Setup.UseDolbyDigital ? Channel->Dpids() : NULL, Channel->Spids());
+//  ringBuffer->SetTimeouts(0, 20); 
+  remux = new cRemux(Channel->Vpid(), Channel->Apids(), Channel->Dpids(), Channel->Spids()); //always use dpids (Klaus)
   remux->SetTimeouts(0, 50);
 }
 
@@ -989,7 +989,8 @@ void cLiveReceiver::Receive(uchar *Data, int Length)
 {
 //  int p = ringBuffer->Put(Data, Length);
 //  if (p != Length && Running())
-//     ringBuffer->ReportOverflow(Length - p);
+//     ringBuffer->ReportOverflow(Length - p); 
+    //printf("-----------------cLiveReceiver::Receive, vor remux->Put-------------------\n");
     remux->Put(Data, Length);
 }
 
@@ -1086,6 +1087,7 @@ cLivePlayer::cLivePlayer(cLiveBuffer *LiveBuffer)
   trickSpeed = NORMAL_SPEED;
   Off = 0;
   backTrace = new cLiveBackTrace;
+  isTS = 0;
 }
 
 cLivePlayer::~cLivePlayer()
@@ -1142,8 +1144,20 @@ void cLivePlayer::Activate(bool On)
      Cancel(-1);
 }
 
+void cLivePlayer::CheckTS(const uchar *data)
+{ 
+   if(data && *data == 0x47)
+   {
+      isTS = 1;
+   }
+   else
+   {
+      isTS = 0;
+   }
+}
+
 void cLivePlayer::Action(void)
-{
+{  
   int PollTimeouts = 0;
   uchar *b = NULL;
   uchar **pb = &b;
@@ -1174,7 +1188,14 @@ void cLivePlayer::Action(void)
 
    if (PollTimeouts >= 6) {
      DeviceClear();
-     PlayPes(NULL, 0);
+     if (isTS)
+     {
+       PlayTS(NULL, 0);
+     }
+     else
+     {
+       PlayPes(NULL, 0);
+     }
      }
 
    LOCK_THREAD;
@@ -1232,20 +1253,38 @@ void cLivePlayer::Action(void)
       p = NULL;
       pc = 0;
       }
-    if (playFrame) {
+    if (playFrame) { 
       if (!p) {
          p = playFrame->Data();
          pc = playFrame->Count();
          if (p) {
             if (firstPacket) {
-               PlayPes(NULL, 0);
+               CheckTS(p);
+               if (isTS)
+               {
+                   liveBuffer->GetRemux()->GetPATPMT(PATPMT, 2*TS_SIZE);  
+	           PlayTS(NULL, 0, false, PATPMT);
+               }
+               else
+               {
+                   PlayPes(NULL, 0);
+               }
                cRemux::SetBrokenLink(p, pc);
                firstPacket = false;
                }
              }
           }
-       if (p) {
-          int w = PlayPes(p, pc, playMode != pmPlay);
+       if (p) { 
+          int w =0;
+          CheckTS(p);
+          if(isTS)
+          {
+             w = PlayTS(p, pc, false, NULL);
+          }
+          else
+          { 
+            w = PlayPes(p, pc, playMode != pmPlay);
+          }
           if (w > 0) {
              p += w;
              pc -= w;
@@ -1720,7 +1759,7 @@ cLiveBuffer *cLiveBufferManager::InLiveBuffer(cTimer *timer, int *StartFrame, in
   if (timer && !timer->HasFlags(tfhasLiveBuf) && liveReceiver && liveReceiver->GetChannel() == timer->Channel()) {
     int now = liveBuffer->LastIndex();
     int first = liveBuffer->FirstIndex() + 50;
-    if (now-first < 250)  // Erst wenn LiveBuffer größer 10s
+    if (now-first < 250)  // Erst wenn LiveBuffer grï¿½ï¿½er 10s
        return NULL;
     if (timer->StartTime() < time(NULL) && now-first > (time(NULL)-timer->StopTime())*FRAMESPERSEC) {
        if (StartFrame) {

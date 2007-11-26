@@ -169,7 +169,8 @@ private:
   int startFrame;
   cLiveCutterThread *liveCutter;
   void Write(bool Wait);
-  void Store(uchar *Data, int Count);
+  void Store(uchar *Data, int Count);  
+
 protected:
   virtual void Action(void);
 public:
@@ -183,9 +184,9 @@ public:
   int FirstIndex(void) { return index->First(); }
   void CreateIndexFile(const char *FileName, int64_t PTS, int EndFrame = 0);
   void SetStartFrame(int StartFrame) { startFrame = StartFrame; }
-  bool LiveCutterActive(void) { return liveCutter && liveCutter->Active(); }
+  bool LiveCutterActive(void) { return liveCutter && liveCutter->Active(); }  
+  cRemux *GetRemux();
 };
-
 
 class cLiveBackTrace;
 
@@ -203,6 +204,9 @@ private:
   int readIndex, writeIndex;
   cFrame *readFrame;
   cFrame *playFrame;
+  uchar PATPMT[2*TS_SIZE];
+  bool isTS;
+  void CheckTS(const uchar *data);
   int Off;
   bool firstPacket;
   void TrickSpeed(int Increment);
@@ -281,5 +285,11 @@ public:
   static bool AllowsChannelSwitch(void);
   static cTimer *Timer(int n);
 };
+
+//----------inline----------------------------
+inline cRemux *cLiveBuffer::GetRemux()
+{
+  return remux;
+}
 
 #endif //__LIVEBUFFER_H
