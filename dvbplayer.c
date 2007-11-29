@@ -253,6 +253,7 @@ cDvbPlayer::cDvbPlayer(const char *FileName)
   readIndex = writeIndex = -1;
   readFrame = NULL;
   playFrame = NULL;
+  PATPMT = NULL;
   isyslog("replay %s", FileName);
   fileName = new cFileName(FileName, false);
   replayFile = fileName->Open();
