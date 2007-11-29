@@ -3498,15 +3498,57 @@ protected:
   virtual void Store(void);
 public:
   cMenuSetupBase(void);
-  };
+  int tmpScrollBarWidth;      // hw ScrollBarWidth
+};
 
 cMenuSetupBase::cMenuSetupBase(void)
 {
   data = Setup;
+  switch (data.OSDScrollBarWidth) {              // hw move setup to tmpsrcollbarwidth
+    case 5:  {tmpScrollBarWidth = 0;
+      break;
+    }
+    case 7:   {tmpScrollBarWidth = 1;
+              break;
+    }
+    case 9:   {tmpScrollBarWidth = 2;
+              break;
+    }
+    case 11:  {tmpScrollBarWidth = 3;
+              break;
+    }
+    case 13:  {tmpScrollBarWidth = 4;
+              break;
+    }
+    case 15:  {tmpScrollBarWidth = 5;
+              break;
+    }
+    default : tmpScrollBarWidth = 3;
+  }
 }
 
 void cMenuSetupBase::Store(void)
 {
+  switch (tmpScrollBarWidth) {              // hw move tmpsrcollbarwidth to setup
+    case 0:  {data.OSDScrollBarWidth = 5;
+              break;
+    }
+    case 1:  {data.OSDScrollBarWidth = 7;
+              break;
+    }
+    case 2:  {data.OSDScrollBarWidth = 9;
+              break;
+    }
+    case 3:  {data.OSDScrollBarWidth = 11;
+              break;
+    }
+    case 4:  {data.OSDScrollBarWidth = 13;
+              break;
+    }
+    case 5:  {data.OSDScrollBarWidth = 15;
+              break;
+    }
+  }
   Setup = data;
   Setup.Save();
 }
@@ -3517,6 +3559,7 @@ class cMenuSetupOSD : public cMenuSetupBase {
 private:
   const char *useSmallFontTexts[3];
   const char *channelViewModeTexts[3];
+  const char *ScrollBarWidthTexts[6];
 
   int numSkins;
   int originalSkinIndex;
@@ -3525,6 +3568,8 @@ private:
   cThemes themes;
   int themeIndex;
   virtual void Set(void);
+  void ExpertMenu(void);            // ExpertMenu for OSD
+  void DrawExpertMenu(void);        // Draw ExpertMenu
 public:
   cMenuSetupOSD(void);
   virtual ~cMenuSetupOSD();
@@ -3548,75 +3593,68 @@ cMenuSetupOSD::~cMenuSetupOSD()
   delete[] skinDescriptions;
 }
 
-
 void cMenuSetupOSD::Set(void)
 {
   int current = Current();
   
   for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
        skinDescriptions[Skin->Index()] = Skin->Description();
-  /*
-  useSmallFontTexts[0] = tr("never");
-  useSmallFontTexts[1] = tr("skin dependent");
-  useSmallFontTexts[2] = tr("always");
-  */
+
   channelViewModeTexts[0] = tr("channellist");
   channelViewModeTexts[1] = tr("current bouquet");
   channelViewModeTexts[2] = tr("bouquet list");
 
- Clear();
- SetSection(tr("OSD"));
-    //Add(new cMenuEditStraItem(tr("Setup.OSD$Language"),               &data.OSDLanguage, I18nNumLanguages, I18nLanguages()));
-    //Add(new cMenuEditIntItem( tr("Setup.EPG$Preferred languages"),    &numLanguages, 1, I18nNumLanguages));
-    //for (int i = 1; i < numLanguages; i++) {
-    //Add(new cMenuEditStraItem(tr(" Setup.EPG$Preferred language"),     &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
-    // }
+  Clear();
+  SetSection(tr("OSD"));
+  
 #ifndef RBLITE
-  Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),                   &skinIndex, numSkins, skinDescriptions));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),               &skinIndex, numSkins, skinDescriptions));
 #endif
- if (themes.NumThemes())
-    Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),                  &themeIndex, themes.NumThemes(), themes.Descriptions()));
- Add(new cMenuEditIntItem( tr("Setup.OSD$Left"),                   &data.OSDLeft, 0, MAXOSDWIDTH));
- Add(new cMenuEditIntItem( tr("Setup.OSD$Top"),                    &data.OSDTop, 0, MAXOSDHEIGHT));
- Add(new cMenuEditIntItem( tr("Setup.OSD$Width"),                  &data.OSDWidth, MINOSDWIDTH, MAXOSDWIDTH));
- Add(new cMenuEditIntItem( tr("Setup.OSD$Height"),                 &data.OSDHeight, MINOSDHEIGHT, MAXOSDHEIGHT));
- Add(new cMenuEditBoolItem(tr("Setup.OSD$Random"),                 &data.OSDRandom));
-  Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll pages"),           &data.MenuScrollPage));
- Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll wraps"),           &data.MenuScrollWrap));
- Add(new cMenuEditIntItem( tr("Setup.OSD$Channel info time (s)"),  &data.ChannelInfoTime, 1, 60));
- //Add(new cMenuEditBoolItem(tr("Setup.OSD$Timeout requested channel info"), &data.TimeoutRequChInfo));
- //Add(new cMenuEditBoolItem(tr("Setup.OSD$Menu button closes"),     &data.MenuButtonCloses));
- Add(new cMenuEditBoolItem(tr("Setup.OSD$Ok shows"),               &data.WantChListOnOk, tr("channelinfo"), tr("channellist")));
- Add(new cMenuEditStraItem(tr("Setup.OSD$Channellist starts with"), &data.UseBouquetList, 3, channelViewModeTexts));
- Add(new cMenuEditBoolItem(tr("Setup.OSD$Remain Time"),              &data.OSDRemainTime));
- //Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),         &data.UseSmallFont, 3, useSmallFontTexts));
- SetCurrent(Get(current));
- Display();
- }
+    if (themes.NumThemes())
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),            &themeIndex, themes.NumThemes(), themes.Descriptions()));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Random"),                   &data.OSDRandom));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll pages"),             &data.MenuScrollPage));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll wraps"),             &data.MenuScrollWrap));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Channellist starts with"),  &data.UseBouquetList, 3, channelViewModeTexts));
 
+  //Add(new cMenuEditStraItem(tr("Setup.OSD$Language"),               &data.OSDLanguage, I18nNumLanguages, I18nLanguages()));
+  //Add(new cMenuEditIntItem( tr("Setup.EPG$Preferred languages"),    &numLanguages, 1, I18nNumLanguages));
+  //for (int i = 1; i < numLanguages; i++) {
+  //Add(new cMenuEditStraItem(tr(" Setup.EPG$Preferred language"),     &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
+  // }
+  //Add(new cMenuEditBoolItem(tr("Setup.OSD$Timeout requested channel info"), &data.TimeoutRequChInfo));
+  //Add(new cMenuEditBoolItem(tr("Setup.OSD$Menu button closes"),     &data.MenuButtonCloses));
+  //Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),         &data.UseSmallFont, 3, useSmallFontTexts));
+
+  SetHelp(tr("Expertmenu"));  // hw
+  SetCurrent(Get(current));
+  Display();
+}
 
 eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
 {
+  if (Key == kRed) {
+      ExpertMenu();
+  }
   if (Key == kOk) {
 #ifdef RBLITE
-     Skins.SetCurrent("Reel");
+    Skins.SetCurrent("Reel");
 #else
-     if (skinIndex != originalSkinIndex) {
-        cSkin *Skin = Skins.Get(skinIndex);
-        if (Skin) {
-           strn0cpy(data.OSDSkin, Skin->Name(), sizeof(data.OSDSkin));
-           Skins.SetCurrent(Skin->Name());
-           }
-        }
+    if (skinIndex != originalSkinIndex) {
+      cSkin *Skin = Skins.Get(skinIndex);
+      if (Skin) {
+        strn0cpy(data.OSDSkin, Skin->Name(), sizeof(data.OSDSkin));
+        Skins.SetCurrent(Skin->Name());
+      }
+    }
 #endif
-     dsyslog (" cMenuSetupOSD --------- kOK NumThemes  %d Theme %s  ", themes.NumThemes(), Skins.Current()->Theme()?"YES":"NO");
-     if (themes.NumThemes() && Skins.Current()->Theme()) {
-          data.UseSmallFont=2;
-          Skins.Current()->Theme()->Load(themes.FileName(themeIndex));
-          dsyslog (" cMenuSetupOSD save SkinTheme %s   ", themes.Name(themeIndex));
-          strn0cpy(data.OSDTheme, themes.Name(themeIndex), sizeof(data.OSDTheme));
-        }
-     data.OSDWidth &= ~0x07; // OSD width must be a multiple of 8
+    if (themes.NumThemes() && Skins.Current()->Theme()) {
+      // hw data.UseSmallFont=2;
+      Skins.SetCurrent("Reel");
+      Skins.Current()->Theme()->Load(themes.FileName(themeIndex));
+      strn0cpy(data.OSDTheme, themes.Name(themeIndex), sizeof(data.OSDTheme));
+    }
+    data.OSDWidth &= ~0x07; // OSD width must be a multiple of 8
   }
   //eOSState state = cMenuSetupBase::ProcessKey(Key);
 
@@ -3653,18 +3691,57 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
   eOSState state = cMenuSetupBase::ProcessKey(Key);
 
   if (skinIndex != oldSkinIndex) {
-     cSkin *Skin = Skins.Get(skinIndex);
-     if (Skin) {
-        char *d = themes.NumThemes() ? strdup(themes.Descriptions()[themeIndex]) : NULL;
-        themes.Load(Skin->Name());
-        if (skinIndex != oldSkinIndex)
-           themeIndex = d ? themes.GetThemeIndex(d) : 0;
+    cSkin *Skin = Skins.Get(skinIndex);
+    if (Skin) {
+      char *d = themes.NumThemes() ? strdup(themes.Descriptions()[themeIndex]) : NULL;
+      themes.Load(Skin->Name());
+      if (skinIndex != oldSkinIndex)
+        themeIndex = d ? themes.GetThemeIndex(d) : 0;
         free(d);
-        }
-
-     Set();
-     }
+    }
+    Set();
+  }
   return state;
+}
+// --- OSD ExpertMenu Init ---------------------------------------------------------
+
+void cMenuSetupOSD::ExpertMenu(void)
+{
+    SetHelp(NULL);                                      // clear HelpKey
+    Clear();                                            // Clear OSD
+    SetSection(tr("OSD - Expertmenu"));                 // Title OSD
+    DrawExpertMenu();                                   // Draw New OSD
+}
+
+// --- OSD ExpertMenu Draw ---------------------------------------------------------
+
+void cMenuSetupOSD::DrawExpertMenu(void)
+{
+    useSmallFontTexts[0] = tr("never");
+    useSmallFontTexts[1] = tr("skin dependent");
+    useSmallFontTexts[2] = tr("always");
+
+    ScrollBarWidthTexts[0] = "5";
+    ScrollBarWidthTexts[1] = "7";
+    ScrollBarWidthTexts[2] = "9";
+    ScrollBarWidthTexts[3] = "11";
+    ScrollBarWidthTexts[4] = "13";
+    ScrollBarWidthTexts[5] = "15";
+    
+    int current = Current();
+    Add(new cMenuEditIntItem(tr("Setup.OSD$Left"),                &data.OSDLeft, 0, MAXOSDWIDTH));
+    Add(new cMenuEditIntItem(tr("Setup.OSD$Top"),                 &data.OSDTop, 0, MAXOSDHEIGHT));
+    Add(new cMenuEditIntItem(tr("Setup.OSD$Width"),               &data.OSDWidth, MINOSDWIDTH, MAXOSDWIDTH));
+    Add(new cMenuEditIntItem(tr("Setup.OSD$Height"),              &data.OSDHeight, MINOSDHEIGHT, MAXOSDHEIGHT));
+    Add(new cMenuEditIntItem( tr("Setup.OSD$Channel info time (s)"),    &data.ChannelInfoTime, 1, 60));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Ok shows"),                 &data.WantChListOnOk, tr("channelinfo"), tr("channellist")));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Remain Time"),              &data.OSDRemainTime));
+    Add(new cMenuEditBoolItem(tr("Setup.OSD$Use Symbol"),         &data.OSDUseSymbol));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$ScrollBar Width"),    &tmpScrollBarWidth, 6, ScrollBarWidthTexts));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),     &data.UseSmallFont, 3, useSmallFontTexts));
+
+    SetCurrent(Get(current));
+    Display();
 }
 
 // --- cMenuSetupLang ---------------------------------------------------------

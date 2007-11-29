@@ -257,6 +257,8 @@ public:
   int OSDRandom;
   int OSDMessageTime;
   int OSDRemainTime; //AR; bool for channelInfo 
+  int OSDUseSymbol; 
+  int OSDScrollBarWidth;
   int UseSmallFont;
   int MaxVideoFileSize;
   int SplitEditedFiles;

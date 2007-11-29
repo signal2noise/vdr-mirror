@@ -271,6 +271,8 @@ cSetup::cSetup(void)
   OSDRandom = 0;
   OSDMessageTime = 2;
   OSDRemainTime = 0;  // bool for channelInfo
+  OSDUseSymbol = 1;  // hw
+  OSDScrollBarWidth = 5;  // hw
   UseSmallFont = 2;
   MaxVideoFileSize = MAXVIDEOFILESIZE;
   SplitEditedFiles = 0;
@@ -460,6 +462,8 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "OSDRandom"))           OSDRandom          = atoi(Value);
   else if (!strcasecmp(Name, "OSDMessageTime"))      OSDMessageTime     = atoi(Value);
   else if (!strcasecmp(Name, "OSDRemainTime"))       OSDRemainTime      = atoi(Value);
+  else if (!strcasecmp(Name, "OSDUseSymbol"))        OSDUseSymbol       = atoi(Value);
+  else if (!strcasecmp(Name, "OSDScrollBarWidth"))   OSDScrollBarWidth  = atoi(Value);
   else if (!strcasecmp(Name, "UseSmallFont"))        UseSmallFont       = atoi(Value);
   else if (!strcasecmp(Name, "MaxVideoFileSize"))    MaxVideoFileSize   = atoi(Value);
   else if (!strcasecmp(Name, "SplitEditedFiles"))    SplitEditedFiles   = atoi(Value);
@@ -550,6 +554,8 @@ bool cSetup::Save(void)
   Store("OSDRandom",          OSDRandom);
   Store("OSDMessageTime",     OSDMessageTime);
   Store("OSDRemainTime",      OSDRemainTime);
+  Store("OSDUseSymbol",       OSDUseSymbol);
+  Store("OSDScrollBarWidth",  OSDScrollBarWidth);
   Store("UseSmallFont",       UseSmallFont);
   Store("MaxVideoFileSize",   MaxVideoFileSize);
   Store("SplitEditedFiles",   SplitEditedFiles);
