@@ -1572,7 +1572,7 @@ int main(int argc, char *argv[])
                        SystemExec(cmd);
                        free(cmd);
                        */
-                       Interrupted=1; // GA
+                       Interrupted = SIGTERM; // GA
                        LastActivity = Now - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later
                        }
                     else {
@@ -1597,13 +1597,13 @@ int main(int argc, char *argv[])
         // Main thread hooks of plugins:
         PluginManager.MainThreadHook();
         }
-  if (Interrupted) {
-	isyslog("caught signal %d", Interrupted);
+  if (Interrupted == SIGTERM) {
 	PrepareShutdownExternal( Shutdown, UserShutdown );
   }
 
 Exit:
 
+  isyslog("caught signal %d", Interrupted);
   cLiveBufferManager::Shutdown();
   PluginManager.StopPlugins();
   cRecordControls::Shutdown();
