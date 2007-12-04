@@ -213,21 +213,29 @@ void cRecorder::Action(void)
            if (!writer && liveBuffer) {
               int c;
               uchar pictureType;
-              uchar *p = remux->Get(c, &pictureType, 1);
-        if (p) {
-           if (pictureType == I_FRAME && p[0]==0x00 && p[1]==0x00 && p[2]==0x01 && (p[7] & 0x80) && p[3]>=0xC0 && p[3]<=0xEF) {
-                 int64_t pts  = (int64_t) (p[ 9] & 0x0E) << 29 ;
-                 pts |= (int64_t)  p[ 10]         << 22 ;
-                 pts |= (int64_t) (p[ 11] & 0xFE) << 14 ;
-                 pts |= (int64_t)  p[ 12]         <<  7 ;
-                 pts |= (int64_t) (p[ 13] & 0xFE) >>  1 ;
-                 liveBuffer->CreateIndexFile(fileName,pts);
-                 writer = new cFileWriter(fileName, remux);
-                 writer->Start();
-                 }
-              else
-                 remux->Del(c);              
-              }
+              uchar *p = remux->Get(c, &pictureType, 1);        
+        if (remux->TSmode() == rTS)
+        {
+             writer = new cFileWriter(fileName, remux);
+             writer->Start();
+        }
+        else
+        {
+            if (p) {
+               if (pictureType == I_FRAME && p[0]==0x00 && p[1]==0x00 && p[2]==0x01 && (p[7] & 0x80) && p[3]>=0xC0 && p[3]<=0xEF) {
+                     int64_t pts  = (int64_t) (p[ 9] & 0x0E) << 29 ;
+                     pts |= (int64_t)  p[ 10]         << 22 ;
+                     pts |= (int64_t) (p[ 11] & 0xFE) << 14 ;
+                     pts |= (int64_t)  p[ 12]         <<  7 ;
+                     pts |= (int64_t) (p[ 13] & 0xFE) >>  1 ;
+                     liveBuffer->CreateIndexFile(fileName,pts);
+                     writer = new cFileWriter(fileName, remux);
+                     writer->Start();
+                     }
+                  else
+                     remux->Del(c);              
+                  }
+        }
         continue;
         }
 #if 0
