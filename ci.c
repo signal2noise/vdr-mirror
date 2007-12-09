@@ -1822,6 +1822,7 @@ void cCiHandler::SendCaPmt(void)
                 if (CaPmt->Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
                        if (q->active) {
+			       printf("###### ADD PID %i %x\n",q->pid,q->pid);
                           CaPmt->AddPid(q->pid, q->streamType);
                           Active = true;
                           }
@@ -1884,7 +1885,7 @@ cCiEnquiry *cCiHandler::GetEnquiry(void)
 
 const char *cCiHandler::GetCamName(int Slot)
 {
-#ifdef RBLITE
+#if 1 //def RBLITE
   cMutexLock MutexLock(&mutex);
   cCiApplicationInformation *ai = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
   return ai ? ai->GetMenuString() : NULL;
@@ -1947,21 +1948,13 @@ void cCiHandler::SetSource(int Source, int Transponder)
 
 #ifdef RBLITE
 void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType, int Slot)
-#else
-void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType)
-#endif
 {
-#ifdef RBLITE
   if(Slot < 0 || Slot > 2 )
     return;
-#endif
   cMutexLock MutexLock(&mutex);
   cCiCaProgramData *ProgramData = NULL;
-#ifdef RBLITE
+
   for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
-#else
-  for (cCiCaProgramData *p = caProgramList.First(); p; p = caProgramList.Next(p)) {
-#endif
       if (p->programNumber == ProgramNumber) {
          ProgramData = p;
          for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
@@ -1971,13 +1964,28 @@ void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType)
          }
       }
   if (!ProgramData)
-#ifdef RBLITE
      caProgramList[Slot].Add(ProgramData = new cCiCaProgramData(ProgramNumber));
-#else
-     caProgramList.Add(ProgramData = new cCiCaProgramData(ProgramNumber));
-#endif
   ProgramData->pidList.Add(new cCiCaPidData(Pid, StreamType));
 }
+#else
+void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType)
+{
+  cMutexLock MutexLock(&mutex);
+  cCiCaProgramData *ProgramData = NULL;
+  for (cCiCaProgramData *p = caProgramList.First(); p; p = caProgramList.Next(p)) {
+      if (p->programNumber == ProgramNumber) {
+         ProgramData = p;
+         for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
+             if (q->pid == Pid)
+                return;
+             }
+         }
+      }
+  if (!ProgramData)
+     caProgramList.Add(ProgramData = new cCiCaProgramData(ProgramNumber));
+  ProgramData->pidList.Add(new cCiCaPidData(Pid, StreamType));
+}
+#endif
 
 #ifdef RBLITE
 void cCiHandler::SetPid(int Pid, bool Active, int Slot)
@@ -2020,7 +2028,7 @@ bool cCiHandler::CanDecrypt(int ProgramNumber)
                 cCiCaPmt CaPmt(CPCI_QUERY, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));//XXX???
 #else
                 cCiCaPmt CaPmt(CPCI_QUERY, source, transponder, p->programNumber, GetCaSystemIds(Slot));//XXX???
-#endif
+#endif		
                 if (CaPmt.Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
 //XXX                       if (q->active)

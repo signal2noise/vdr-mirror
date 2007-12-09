@@ -547,24 +547,34 @@ bool cDvbDevice::Ready(void)
      }
   return true;
 }
-
+#ifndef RBLITE
 int cDvbDevice::ProvidesCa(const cChannel *Channel) const
 {
   int NumCams = 0;
-#ifdef RBLITE
+  if (ciHandler) {
+     NumCams = ciHandler->NumCams();
+     if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
+        unsigned short ids[MAXCAIDS + 1];
+        for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
+            ids[i] = Channel->Ca(i);
+        if (ciHandler->ProvidesCa(ids))
+           return NumCams + 1;
+        }
+     }
+  int result = cDevice::ProvidesCa(Channel);
+  if (result > 0) 
+     result += NumCams;   
+  return result;
+}
+#else
+int cDvbDevice::ProvidesCa(const cChannel *Channel) const
+{
+  int NumCams = 0;
   unsigned short ids[MAXCAIDS + 1];
   NumCams = (cDevice::GetDevice(0))->CiHandler()->NumCams();
   if (Channel->Ca() ) {
-#else
-  if (ciHandler) {
-     NumCams = ciHandler->NumCams();
-       if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
-        unsigned short ids[MAXCAIDS + 1];
-#endif
         for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
             ids[i] = Channel->Ca(i);
-#ifdef RBLITE
-
     struct ReLink link;
     cPlugin *p = cPluginManager::GetPlugin(RE_NAME);
     if(p){
@@ -577,17 +587,10 @@ int cDvbDevice::ProvidesCa(const cChannel *Channel) const
   }
   int result = cDevice::ProvidesCa(Channel);
   if (result > 0)
-#else
-        if (ciHandler->ProvidesCa(ids))
-           return NumCams + 1;
-        }
-      }
-   int result = cDevice::ProvidesCa(Channel);
-   if (result > 0)
-#endif
      result += NumCams;
     return result;
 }
+#endif
 
 cSpuDecoder *cDvbDevice::GetSpuDecoder(void)
 {

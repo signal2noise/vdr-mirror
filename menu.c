@@ -4713,10 +4713,14 @@ public:
 
 cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int Slot, int state, int enabled)
 {
+  int slot_tmp=Slot;
   ciHandler = CiHandler;
   slot = Slot;
   char buffer[64];
   const char *CamName = CiHandler->GetCamName(slot);
+#ifndef RBLITE
+  slot=Device;
+#endif
   if (!CamName) {
     if (state&(3<<(16+2*slot))){
       if((firstTimeChecked[slot] == 0) || ((time(NULL) - firstTimeChecked[slot]) < 10)){
@@ -4757,7 +4761,7 @@ cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int 
     default:
 	    break;
   }
-
+  slot=slot_tmp;
   SetText(buffer);
 }
 
@@ -4775,6 +4779,8 @@ public:
 #define IOCTL_REEL_CI_GET_STATE _IOR('d', 0x45, int)
 
 void cMenuSetupCICAM::Update(int cur) {
+#ifdef RBLITE
+  int numDevices=1;       
   SetCols(20);
   int fd,state=0;
   fd = open("/dev/reelfpga0", O_RDWR);
@@ -4782,8 +4788,12 @@ void cMenuSetupCICAM::Update(int cur) {
     state=ioctl(fd,IOCTL_REEL_CI_GET_STATE,0);
     close(fd);
   }
+#else
+  int numDevices=cDevice::NumDevices();
+  int state=(1<<16)|1;
+#endif
   SetSection(tr("Common Interface"));
-  for (int d = 0; d < 1 /*cDevice::NumDevices() */; d++) {
+  for (int d = 0; d < numDevices; d++) {
     cDevice *Device = cDevice::GetDevice(d);
     if (Device) {
       cCiHandler *CiHandler = Device->CiHandler();
@@ -4796,8 +4806,11 @@ void cMenuSetupCICAM::Update(int cur) {
   // GA: Best way without knowing object
   for(int i=0;i<=cur;i++)
     CursorDown();
-
+#ifdef RBLITE
   SetHelp(tr("Reset"), NULL, NULL, tr("On/Off"));
+#else
+  SetHelp(tr("Reset"), NULL, NULL, NULL);
+#endif
 }
 
 cMenuSetupCICAM::cMenuSetupCICAM(void)
@@ -4867,6 +4880,7 @@ eOSState cMenuSetupCICAM::ProcessKey(eKeys Key)
   if (state == osUnknown) {
      switch (Key) {
        case kRed:    return Reset();
+#ifdef RBLITE
        case kBlue:
 		     cur=Current();
 		     Switch();
@@ -4875,6 +4889,7 @@ eOSState cMenuSetupCICAM::ProcessKey(eKeys Key)
 		     Display();
 		     Store();
 		     return osContinue;
+#endif
        default: break;
        }
      }
