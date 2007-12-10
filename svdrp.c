@@ -91,7 +91,7 @@ bool cSocket::Open(void)
         LOG_ERROR;
         return false;
         }
-     oldflags |= O_NONBLOCK;
+     oldflags |= O_NONBLOCK|FD_CLOEXEC;
      if (fcntl(sock, F_SETFL, oldflags) < 0) {
         LOG_ERROR;
         return false;

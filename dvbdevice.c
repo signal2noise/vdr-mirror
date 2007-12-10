@@ -64,6 +64,7 @@ static int DvbOpen(const char *Name, int n, int Mode, bool ReportError = false)
   int fd = open(FileName, Mode);
   if (fd < 0 && ReportError)
      LOG_ERROR_STR(FileName);
+  fcntl(fd, F_SETFD, FD_CLOEXEC);
   return fd;
 }
 
