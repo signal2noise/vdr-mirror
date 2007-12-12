@@ -4705,10 +4705,12 @@ class cMenuSetupCICAMItem : public cOsdItem {
 private:
   cCiHandler *ciHandler;
   int slot;
+  int device;
 public:
   cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int Slot, int state, int enabled);
   cCiHandler *CiHandler(void) { return ciHandler; }
   int Slot(void) { return slot; }
+  int Device(void) { return device; }
   };
 
 cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int Slot, int state, int enabled)
@@ -4721,9 +4723,14 @@ cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int 
 #ifndef RBLITE
   slot=Device;
 #endif
+  device=Device;
   if (!CamName) {
     if (state&(3<<(16+2*slot))){
+#ifdef RBLITE
       if((firstTimeChecked[slot] == 0) || ((time(NULL) - firstTimeChecked[slot]) < 10)){
+#else
+      if((firstTimeChecked[slot] == 0) || ((time(NULL) - firstTimeChecked[slot]) < 25)){
+#endif
 	CamName = tr("Init");
 	if(!firstTimeChecked[slot])
 	  firstTimeChecked[slot] = time(NULL);
@@ -4790,7 +4797,7 @@ void cMenuSetupCICAM::Update(int cur) {
   }
 #else
   int numDevices=cDevice::NumDevices();
-  int state=(1<<16)|1;
+  int state=(5<<16)|3;
 #endif
   SetSection(tr("Common Interface"));
   for (int d = 0; d < numDevices; d++) {
@@ -4841,9 +4848,14 @@ eOSState cMenuSetupCICAM::Reset(void)
   if (item) {
      Skins.Message(mtWarning, tr("Resetting CAM..."));
      int slot = item->Slot();
+     int device = item->Device();
      if (item->CiHandler()->Reset(slot)) {
         Skins.Message(mtInfo, tr("CAM has been reset"));
+#ifdef RBLITE
         camFound[slot] = 0;
+#else
+	camFound[device] = 0;
+#endif
         return osContinue;
         }
      else
