@@ -26,7 +26,7 @@ PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
 
 ifdef RBLITE
-  EXCLUDE_PLUGINS = -e xxvautotimer -e netcv -e update -e dpkg -e ripit -e mediad
+  EXCLUDE_PLUGINS = -e xxvautotimer -e netcv -e update -e dpkg -e ripit -e mediad -e webbrowser
 else
   EXCLUDE_PLUGINS = -e ipkg -e reelcam
 endif
