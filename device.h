@@ -308,6 +308,7 @@ protected:
   void StartSectionHandler(void);
        ///< A derived device that provides section data must call
        ///< this function to actually set up the section handler.
+  void StopSectionHandler(void);
 public:
   virtual int OpenFilter(u_short Pid, u_char Tid, u_char Mask);
        ///< Opens a file handle for the given filter data.

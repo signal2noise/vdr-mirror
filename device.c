@@ -20,6 +20,8 @@
 #include "status.h"
 #include "transfer.h"
 
+//#define DETACH_UNUSED_DEVICES
+
 bool scanning_on_receiving_device = false;
 
 // --- cPesAssembler ---------------------------------------------------------
@@ -189,12 +191,8 @@ cDevice::~cDevice()
   for (int i = 0; i < MAXRECEIVERS; i++)
       Detach(receiver[i]);
   delete ciHandler;
-  delete nitFilter;
-  delete sdtFilter;
-  delete patFilter;
-  delete eitFilter;
-  delete sectionHandler;
   delete pesAssembler;
+  StopSectionHandler();
 }
 
 bool cDevice::WaitForAllDevicesReady(int Timeout)
@@ -289,6 +287,13 @@ cDevice *cDevice::GetDevice(const cChannel *Channel, int Priority, bool *NeedsDe
   uint Impact = 0xFFFFFFFF; // we're looking for a device with the least impact
   for (int i = 0; i < numDevices; i++) {
       bool ndr;
+#ifdef DETACH_UNUSED_DEVICES
+      if(!device[i]->Receiving()) {
+        isyslog("device %d (%p) not receiving", i, device[i]);
+        device[i]->StopSectionHandler();
+        device[i]->DetachAllReceivers();
+      }
+#endif
       if (device[i]->ProvidesChannel(Channel, Priority, &ndr)) { // this device is basicly able to do the job
          // Put together an integer number that reflects the "impact" using
          // this device would have on the overall system. Each condition is represented
@@ -585,11 +590,34 @@ bool cDevice::SetPid(cPidHandle *Handle, int Type, bool On)
 void cDevice::StartSectionHandler(void)
 {
   if (!sectionHandler) {
+     isyslog("StartSectionHandler %p\n",this);
      sectionHandler = new cSectionHandler(this);
      AttachFilter(eitFilter = new cEitFilter);
      AttachFilter(patFilter = new cPatFilter);
      AttachFilter(sdtFilter = new cSdtFilter(patFilter));
      AttachFilter(nitFilter = new cNitFilter);
+     }
+}
+
+void cDevice::StopSectionHandler(void)
+{
+  if (sectionHandler) {
+     isyslog("StopSectionHandler %p\n",this);
+     sectionHandler->SetStatus(false);
+     sectionHandler->Detach(eitFilter);
+     sectionHandler->Detach(patFilter);
+     sectionHandler->Detach(sdtFilter);
+     sectionHandler->Detach(nitFilter);
+     delete nitFilter;
+     nitFilter = NULL;
+     delete sdtFilter;
+     sdtFilter = NULL;
+     delete patFilter;
+     patFilter = NULL;
+     delete eitFilter;
+     eitFilter = NULL;
+     delete sectionHandler;
+     sectionHandler = NULL;
      }
 }
 
@@ -789,6 +817,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
         DetachAllReceivers();
      if (SetChannelDevice(Channel, LiveView)) {
         // Start section handling:
+        StartSectionHandler();
         if (sectionHandler) {
            sectionHandler->SetChannel(Channel);
            sectionHandler->SetStatus(true);
