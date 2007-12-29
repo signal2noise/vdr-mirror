@@ -328,9 +328,7 @@ int cCiTransportConnection::SendTPDU(uint8_t Tag, int Length, const uint8_t *Dat
 }
 
 #define CAM_READ_TIMEOUT  3500 // ms
-#ifdef RBLITE
 #define CAM_POLL_RETRIES  5
-#endif
 
 int cCiTransportConnection::RecvTPDU(void)
 {
@@ -338,7 +336,6 @@ int cCiTransportConnection::RecvTPDU(void)
   pfd[0].fd = fd;
   pfd[0].events = POLLIN;
   lastResponse = ERROR;
-#ifdef RBLITE
   int ret;
   
   // GA: Sometimes poll returns -1 (-EPERM) for absolutely no reason (kernel race???)
@@ -350,8 +347,7 @@ int cCiTransportConnection::RecvTPDU(void)
          usleep(1000);
   }
 
-#endif
-  if (poll(pfd, 1, CAM_READ_TIMEOUT) > 0 && (pfd[0].revents & POLLIN) && tpdu->Read(fd) == OK && tpdu->Tcid() == tcid) {
+  if (ret > 0 && (pfd[0].revents & POLLIN) && tpdu->Read(fd) == OK && tpdu->Tcid() == tcid) {
      switch (state) {
        case stIDLE:     break;
        case stCREATION: if (tpdu->Tag() == T_CTC_REPLY) {
