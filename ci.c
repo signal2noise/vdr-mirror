@@ -34,8 +34,8 @@ static int SysLogLevel = 3;
 */
 
 // Set these to 'true' for debug output:
-static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = false;
+static bool DumpTPDUDataTransfer = true;
+static bool DebugProtocol = true;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
 
@@ -432,9 +432,7 @@ int cCiTransportConnection::CreateConnection(void)
                   return OK;
                   }
                }
-#ifdef RBLITE
            Reset(); // GA
-#endif
            return ERROR;
            }
         }
