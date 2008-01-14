@@ -617,7 +617,7 @@ void cMenuChannelItem::Set(void)
 	      frac = (int)roundf( (float)(time(NULL) - event->StartTime()) / (float)(event->Duration()) * 8.0 );
 	      frac = min(8,max(0, frac));
 	      for(int i = 0; i < frac; i++)
-		 szProgress[i] = '|';
+		     szProgress[i] = '|';
 	      szProgress[frac]=0;
 	      sprintf(szProgressPart, "%c%-8s%c\t", '[', szProgress, ']');
 	   }
@@ -625,6 +625,8 @@ void cMenuChannelItem::Set(void)
      }
      if (sortMode == csmProvider)
         asprintf(&buffer, "%d\t%s - %s", channel->Number(), channel->Provider(), channel->Name());
+     else if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
+        asprintf(&buffer, "%d\t%-.17s\t%-.20s\t%s", channel->Number(), channel->Name(), event?event->Title():" ", szProgressPart);
      else
         asprintf(&buffer, "%d\t%-.17s\t%s    %-.20s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
      }
@@ -1259,7 +1261,10 @@ cMenuBouquets::cMenuBouquets(int view)
   number = 0;
   channelMarked = -1;
   startChannel = 0;
-  SetCols(5, 18, 6);
+  if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
+      SetCols(5, 18, 24);
+  else
+      SetCols(5, 18, 6);
   if (view == 1)
     AddSubMenu(new cMenuBouquetsList());
   else if (view == 2) {
