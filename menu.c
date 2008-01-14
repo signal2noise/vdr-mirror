@@ -668,7 +668,10 @@ cMenuChannels::cMenuChannels(void)
   number = 0;
   Setup();
   Channels.IncBeingEdited();
-  SetCols(5, 18, 6);
+  if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
+      SetCols(5, 18, 24);
+  else
+      SetCols(5, 18, 6);
 }
 
 cMenuChannels::~cMenuChannels()
