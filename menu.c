@@ -5418,8 +5418,8 @@ void cMenuMain::Set(int current)
         if(strcmp(item, "Timezone") == 0)
           Add(new cOsdItem(hk(tr("Timezone")),   osTimezone));
       else
-        if(strcmp(item, "Timeshift") == 0)
-          Add(new cOsdItem(hk(tr("Timeshift")),   osTimeshift));
+        if(strcmp(item, "Permanent Timeshift") == 0)
+          Add(new cOsdItem(hk(tr("Permanent Timeshift")),   osTimeshift));
     }
     index++;
   }
