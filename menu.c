@@ -5409,14 +5409,14 @@ void cMenuMain::Set(int current)
         if(strcmp(item, "Commands") == 0 && Commands.Count()>0)
           Add(new cOsdItem(hk(tr("Commands")),   osCommands));
       else
-        if(strcmp(item, "OSDSetup") == 0)
-          Add(new cOsdItem(hk(tr("OSD")),   osOSDSetup));
+        if(strcmp(item, "OSD Settings") == 0)
+          Add(new cOsdItem(hk(tr("OSD Settings")),   osOSDSetup));
       else
-        if(strcmp(item, "Language") == 0)
-          Add(new cOsdItem(hk(tr("Language")),   osLanguage));
+        if(strcmp(item, "Language Settings") == 0)
+          Add(new cOsdItem(hk(tr("Language Settings")),   osLanguage));
       else
-        if(strcmp(item, "Timezone") == 0)
-          Add(new cOsdItem(hk(tr("Timezone")),   osTimezone));
+        if(strcmp(item, "Timezone Settings") == 0)
+          Add(new cOsdItem(hk(tr("Timezone Settings")),   osTimezone));
       else
         if(strcmp(item, "Permanent Timeshift") == 0)
           Add(new cOsdItem(hk(tr("Permanent Timeshift")),   osTimeshift));
