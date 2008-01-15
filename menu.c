@@ -5312,6 +5312,24 @@ cMenuMain::cMenuMain(eOSState State)
     case osRecordings: AddSubMenu(new cMenuRecordings(NULL, 0, true)); break;
     case osSetup:      AddSubMenu(new cMenuSetup); break;
     case osCommands:   AddSubMenu(new cMenuCommands(tr("Commands"), &Commands)); break;
+    case osOSDSetup:   AddSubMenu(new cMenuSetupOSD); break;
+    case osLanguage:   AddSubMenu(new cMenuSetupLang); break;
+    case osTimezone:
+                       {
+                           cPlugin *SetupTimePlugin = cPluginManager::GetPlugin("setup");
+                           if (SetupTimePlugin)
+                           {
+                               struct {
+                                   cOsdMenu* menu;
+                               } data;
+
+                               SetupTimePlugin->Service("Setup Timezone", &data);
+
+                               AddSubMenu(data.menu);
+                           }
+                       }
+                       break;
+    case osTimeshift:  AddSubMenu(new cMenuSetupLiveBuffer); break;
     case osActiveEvent:AddSubMenu(new cMenuActiveEvent); break;
     default: break;
     }
@@ -5390,6 +5408,18 @@ void cMenuMain::Set(int current)
       else
         if(strcmp(item, "Commands") == 0 && Commands.Count()>0)
           Add(new cOsdItem(hk(tr("Commands")),   osCommands));
+      else
+        if(strcmp(item, "OSDSetup") == 0)
+          Add(new cOsdItem(hk(tr("OSD")),   osOSDSetup));
+      else
+        if(strcmp(item, "Language") == 0)
+          Add(new cOsdItem(hk(tr("Language")),   osLanguage));
+      else
+        if(strcmp(item, "Timezone") == 0)
+          Add(new cOsdItem(hk(tr("Timezone")),   osTimezone));
+      else
+        if(strcmp(item, "Timeshift") == 0)
+          Add(new cOsdItem(hk(tr("Timeshift")),   osTimeshift));
     }
     index++;
   }
@@ -5541,6 +5571,23 @@ eOSState cMenuMain::ProcessKey(eKeys Key)
     case osRecordings: return AddSubMenu(new cMenuRecordings);
     case osSetup:      return AddSubMenu(new cMenuSetup);
     case osCommands:   return AddSubMenu(new cMenuCommands(tr("Commands"), &Commands));
+    case osOSDSetup:   return AddSubMenu(new cMenuSetupOSD);
+    case osLanguage:   return AddSubMenu(new cMenuSetupLang);
+    case osTimezone:
+                       {
+                           cPlugin *SetupTimePlugin = cPluginManager::GetPlugin("setup");
+                           if (SetupTimePlugin)
+                           {
+                               struct {
+                                   cOsdMenu* menu;
+                               } data;
+
+                               SetupTimePlugin->Service("Setup Timezone", &data);
+
+                               return AddSubMenu(data.menu);
+                           }
+                       }
+    case osTimeshift:  return AddSubMenu(new cMenuSetupLiveBuffer);
     case osStopRecord: if (Interface->Confirm(tr("Stop recording?"))) {
                           cOsdItem *item = Get(Current());
                           if (item) {
