@@ -370,6 +370,50 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
+  { "Settings",
+    "Einstellungen",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+  },
+  { "Frontpanel",
+    "Gerätefront",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+  },
   { "Setup",
     "Einstellungen",
     "Nastavitve",
@@ -8579,7 +8623,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Init",
-    "Initialisiere",
+    "Suche CI-Modul",
     "",
     "",
     "",
@@ -8601,7 +8645,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Error",
-    "Fehler",
+    "Kein CI-Modul",
     "",
     "",
     "",
@@ -9239,7 +9283,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Timezone Settings",
-    "Zeiteinstellungen... (Zeitzone)",
+    "Zeitzone",
     "",
     "",
     "",
