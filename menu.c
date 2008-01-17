@@ -5259,15 +5259,22 @@ eOSState cMenuSetup::ProcessKey(eKeys Key)
 class cMenuPluginItem : public cOsdItem {
 private:
   int pluginIndex;
+  std::string Link_;
 public:
-  cMenuPluginItem(const char *Name, int Index);
+  cMenuPluginItem(const char *Name, int Index, std::string Link);
   int PluginIndex(void) { return pluginIndex; }
+  std::string Link() { return Link_; }
   };
 
-cMenuPluginItem::cMenuPluginItem(const char *Name, int Index)
+cMenuPluginItem::cMenuPluginItem(const char *Name, int Index, std::string Link)
 :cOsdItem(Name, osPlugin)
 {
+  Link_ = Link;
   pluginIndex = Index;
+  std::string strBuff;
+  strBuff.assign(Link, 0, std::string(Link).length() - std::string(Name).length());
+  strBuff.append(tr(Name));
+  SetText(strBuff.c_str());
 }
 
 // --- cMenuMain -------------------------------------------------------------
@@ -5373,7 +5380,7 @@ void cMenuMain::Set(int current)
       const char *item = node->GetPluginMainMenuEntry();
 
       if(item)
-        Add(new cMenuPluginItem(hk(item), node->GetPluginIndex()));
+        Add(new cMenuPluginItem(item, node->GetPluginIndex(), hk(item)));
     }
     else if(type==cSubMenuNode::MENU)
     {
@@ -5608,7 +5615,7 @@ eOSState cMenuMain::ProcessKey(eKeys Key)
                             if (p) {
                                if ( strcmp(p->Name(), "setup") == 0)
                                {
-                                   char *tmp = strrchr(item->Text(),' ');
+                                   char *tmp = strrchr(item->Link().c_str(),' ');
                                    p->Service("link", (void *)++tmp);
                                }
                                if (!cStatus::MsgPluginProtected(p)) {  // PIN PATCH
