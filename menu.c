@@ -625,7 +625,7 @@ void cMenuChannelItem::Set(void)
      }
      if (sortMode == csmProvider)
         asprintf(&buffer, "%d\t%s - %s", channel->Number(), channel->Provider(), channel->Name());
-     else if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
+     else if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
         asprintf(&buffer, "%d\t%-.17s\t%-.20s\t%s", channel->Number(), channel->Name(), event?event->Title():" ", szProgressPart);
      else
         asprintf(&buffer, "%d\t%-.17s\t%s    %-.20s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
@@ -668,8 +668,8 @@ cMenuChannels::cMenuChannels(void)
   number = 0;
   Setup();
   Channels.IncBeingEdited();
-  if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
-      SetCols(5, 18, 24);
+  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
+      SetCols(5, 18, 22);
   else
       SetCols(5, 18, 6);
 }
@@ -1264,8 +1264,8 @@ cMenuBouquets::cMenuBouquets(int view)
   number = 0;
   channelMarked = -1;
   startChannel = 0;
-  if (strcmp(Skins.Current()->Name(), "Reel2") == 0)
-      SetCols(5, 18, 24);
+  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
+      SetCols(5, 18, 22);
   else
       SetCols(5, 18, 6);
   if (view == 1)
