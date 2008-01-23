@@ -1023,9 +1023,27 @@ int main(int argc, char *argv[])
         }
         if(key == kStop)
         {
-            //stop filebrowser while replaying playlists
-            printf("\n\nc--PluginManager::CallAllServices: Filebrowser inactivate--\n\n");
-            cPluginManager::CallAllServices("Filebrowser inactivate", NULL);
+            //shutdown filebrowser while replaying playlists
+            struct 
+            {
+                int cmd;
+            }   FileBrowserControl=
+            {
+                1
+            };
+            cPluginManager::CallAllServices("Filebrowser control", &FileBrowserControl);
+        }
+        if(key == kBack)
+        {
+            //halt filebrowser while replaying playlists
+            struct 
+            {
+                int cmd;
+            }   FileBrowserControl=
+            {
+                2
+            };
+            cPluginManager::CallAllServices("Filebrowser control", &FileBrowserControl);
         }
         //End by Klaus
         if (NORMALKEY(key) != kNone) {
