@@ -1021,6 +1021,12 @@ int main(int argc, char *argv[])
                 key = k3;
             }
         }
+        if(key == kStop)
+        {
+            //stop filebrowser while replaying playlists
+            printf("\n\nc--PluginManager::CallAllServices: Filebrowser inactivate--\n\n");
+            cPluginManager::CallAllServices("Filebrowser inactivate", NULL);
+        }
         //End by Klaus
         if (NORMALKEY(key) != kNone) {
            cStatus::MsgUserAction(key, Interact);          // PIN PATCH
