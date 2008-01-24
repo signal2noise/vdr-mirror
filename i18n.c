@@ -239,7 +239,7 @@ const tI18nPhrase Phrases[] = {
     "Kanály",
   },
   { "Timers",
-    "Timer-Manager",
+    "Timer Manager",
     "Termini",
     "Timer",
     "Timers",
