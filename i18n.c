@@ -4359,7 +4359,7 @@ const tI18nPhrase Phrases[] = {
     "Formát videa",
   },
   { "Setup.DVB$Use Dolby Digital/dts",
-    "Dolby Digital/dts verwenden",
+    "Dolby Digital-dts",
     "Uporabljaj Dolby Digital",
     "Attivare uscita audio digitale", //TODO
     "Dolby Digital/dts gebruiken",
@@ -4380,11 +4380,11 @@ const tI18nPhrase Phrases[] = {
     "Anvend Dolby Digital",
     "Pou¾ívat zvuk v Dolby Digital",
   },
-  { "Delay Stereo (x10ms)",
-    "Verzögerung Stereo (x10ms)",
+  { "Delay Stereo",
+    "Verzögerung Stereo",
     "",
-    "Ritardo Stereo (x10ms)",//TODO
-    "Stereo vertraging (x10ms)",
+    "Ritardo Stereo",//TODO
+    "Stereo vertraging",
     "",//TODO
     "",
     "",//TODO
@@ -8754,8 +8754,8 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { " Delay DD/dts (x10ms)",
-    " Verzögerung DD/dts (x10ms)",
+  { " Delay DD/dts",
+    " Verzögerung DD/dts",
     "",
     "",
     "",
