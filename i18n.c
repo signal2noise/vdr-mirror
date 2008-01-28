@@ -9326,8 +9326,8 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Recordings-Timer",
-    "Aufnahme-Timer",
+  { "Recordings Timer",
+    "Aufnahme Timer",
     "",
     "",
     "",
