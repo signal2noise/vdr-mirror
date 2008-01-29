@@ -9173,7 +9173,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "eject DVD",
-    "Laufwerk wird geöffnet",
+    "DVD wird ausgeworfen",
     "",
     "",
     "",
