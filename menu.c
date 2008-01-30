@@ -625,7 +625,7 @@ void cMenuChannelItem::Set(void)
      }
      if (sortMode == csmProvider)
         asprintf(&buffer, "%d\t%s - %s", channel->Number(), channel->Provider(), channel->Name());
-     else if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
+     else if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
         asprintf(&buffer, "%02d\t%-.17s\t%-.40s\t%s", channel->Number(), channel->Name(), event?event->Title():" ", szProgressPart);
      else
         asprintf(&buffer, "%d\t%-.17s\t%s    %-.20s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
@@ -668,7 +668,7 @@ cMenuChannels::cMenuChannels(void)
   number = 0;
   Setup();
   Channels.IncBeingEdited();
-  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
+  if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
       SetCols(4, 14, 28);
   else
       SetCols(5, 18, 6);
@@ -1264,7 +1264,7 @@ cMenuBouquets::cMenuBouquets(int view)
   number = 0;
   channelMarked = -1;
   startChannel = 0;
-  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
+  if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
       SetCols(4, 14, 28);
   else
       SetCols(5, 18, 6);
@@ -2003,7 +2003,7 @@ void cMenuTimerItem::Set(void)
      day = buffer;
      }
   char *buffer = NULL;
-  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0) // Here we want use channel-name instead of channel-number
+  if (strcmp(Skins.Current()->Name(), "ReelNG") == 0) // Here we want use channel-name instead of channel-number
   {
       asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%02d:%02d\t%s",
               !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
