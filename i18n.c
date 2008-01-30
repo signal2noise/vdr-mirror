@@ -9261,7 +9261,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Language Settings",
-    "Sprach Einstellungen",
+    "Spracheinstellungen",
     "",
     "",
     "",
