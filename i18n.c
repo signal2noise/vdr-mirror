@@ -6305,7 +6305,7 @@ const tI18nPhrase Phrases[] = {
   },
 
   { "Options",
-    "Befehle",
+    "Funktionen",
     "",// TODO
     "",// TODO
     "",// TODO
