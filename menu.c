@@ -626,7 +626,7 @@ void cMenuChannelItem::Set(void)
      if (sortMode == csmProvider)
         asprintf(&buffer, "%d\t%s - %s", channel->Number(), channel->Provider(), channel->Name());
      else if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
-        asprintf(&buffer, "%d\t%-.17s\t%-.35s\t%s", channel->Number(), channel->Name(), event?event->Title():" ", szProgressPart);
+        asprintf(&buffer, "%02d\t%-.17s\t%-.40s\t%s", channel->Number(), channel->Name(), event?event->Title():" ", szProgressPart);
      else
         asprintf(&buffer, "%d\t%-.17s\t%s    %-.20s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
      }
@@ -669,7 +669,7 @@ cMenuChannels::cMenuChannels(void)
   Setup();
   Channels.IncBeingEdited();
   if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
-      SetCols(5, 14, 25);
+      SetCols(4, 14, 28);
   else
       SetCols(5, 18, 6);
 }
@@ -1265,7 +1265,7 @@ cMenuBouquets::cMenuBouquets(int view)
   channelMarked = -1;
   startChannel = 0;
   if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0)
-      SetCols(5, 14, 25);
+      SetCols(4, 14, 28);
   else
       SetCols(5, 18, 6);
   if (view == 1)
@@ -2003,17 +2003,34 @@ void cMenuTimerItem::Set(void)
      day = buffer;
      }
   char *buffer = NULL;
-  asprintf(&buffer, "%c\t%d\t%s%s%s\t%02d:%02d\t%02d:%02d\t%s",
-                    !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
-                    timer->Channel()->Number(),
-                    *name,
-                    *name && **name ? " " : "",
-                    *day,
-                    timer->Start() / 100,
-                    timer->Start() % 100,
-                    timer->Stop() / 100,
-                    timer->Stop() % 100,
-                    timer->File());
+  if (strcmp(Skins.Current()->Name(), "EnigmaNG") == 0) // Here we want use channel-name instead of channel-number
+  {
+      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%02d:%02d\t%s",
+              !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
+              timer->Channel()->Name(),
+              *name,
+              *name && **name ? " " : "",
+              *day,
+              timer->Start() / 100,
+              timer->Start() % 100,
+              timer->Stop() / 100,
+              timer->Stop() % 100,
+              timer->File());
+  }
+  else
+  {
+      asprintf(&buffer, "%c\t%d\t%s%s%s\t%02d:%02d\t%02d:%02d\t%s",
+              !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
+              timer->Channel()->Number(),
+              *name,
+              *name && **name ? " " : "",
+              *day,
+              timer->Start() / 100,
+              timer->Start() % 100,
+              timer->Stop() / 100,
+              timer->Stop() % 100,
+              timer->File());
+  }
   SetText(buffer, false);
 }
 
@@ -5495,7 +5512,7 @@ bool cMenuMain::Update(bool Force)
         int Hours = Minutes / 60;
         Minutes %= 60;
         char buffer[40];
-        snprintf(buffer, sizeof(buffer), "%s - %s %d%% %2d:%02dh %s", tr("Menu"), tr("Disk"), Percent, Hours, Minutes, tr("free"));
+        snprintf(buffer, sizeof(buffer), "%s - %s %d%% %2d:%02dh %s", tr("Title$Menu"), tr("Disk"), Percent, Hours, Minutes, tr("free"));
         //XXX -> skin function!!!
         SetTitle(buffer);
         result = true;
