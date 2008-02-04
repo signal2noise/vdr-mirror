@@ -2005,7 +2005,7 @@ void cMenuTimerItem::Set(void)
   char *buffer = NULL;
   if (strcmp(Skins.Current()->Name(), "ReelNG") == 0) // Here we want use channel-name instead of channel-number
   {
-      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%02d:%02d\t%s",
+      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%s",
               !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
               timer->Channel()->Name(),
               *name,
@@ -2013,8 +2013,6 @@ void cMenuTimerItem::Set(void)
               *day,
               timer->Start() / 100,
               timer->Start() % 100,
-              timer->Stop() / 100,
-              timer->Stop() % 100,
               timer->File());
   }
   else
@@ -3620,6 +3618,7 @@ cMenuSetupOSD::~cMenuSetupOSD()
 
 void cMenuSetupOSD::Set(void)
 {
+  SetCols(25);
   int current = Current();
   
   for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
@@ -3796,6 +3795,7 @@ cMenuSetupLang::cMenuSetupLang(void)
 
 void cMenuSetupLang::DrawMenu(void)
 {
+  SetCols(25);
   SetSection(tr("Setup.OSD$Language"));
   int current = Current();
 
@@ -4811,6 +4811,7 @@ public:
 #define IOCTL_REEL_CI_GET_STATE _IOR('d', 0x45, int)
 
 void cMenuSetupCICAM::Update(int cur) {
+  SetCols(23);
 #ifdef RBLITE
   int numDevices=1;       
   SetCols(20);
@@ -5047,6 +5048,7 @@ public:
 
 cMenuSetupMisc::cMenuSetupMisc(void)
 {
+  SetCols(27);
   updateChannelsTexts[0] = tr("off");
   updateChannelsTexts[1] = tr("names and PIDs"); // 3
   updateChannelsTexts[2] = tr("add new transponders"); // 5
