@@ -62,8 +62,8 @@ public:
   const char *Description(void) const { return event->Description(); }
   const cComponents *Components(void) const { return event->Components(); }
   const char *Aux(void) const { return aux; }
-  bool IsHD(void) { return isHD; } //TB
-  bool IsTS(void) { return isTS; } //TB
+  bool IsHD(void) const { return isHD; } //TB
+  bool IsTS(void) const { return isTS; } //TB
   bool Read(FILE *f);
   bool Write(FILE *f, const char *Prefix = "") const;
   };
@@ -102,9 +102,9 @@ public:
   void ResetResume(void) const;
   bool IsNew(void) const { return GetResume() == -1; }
   bool IsEdited(void) const;
-  bool IsHD(void); // TB
+  bool IsHD(void) const; // TB
   void SetIsHD(bool Hd); //TB
-  bool IsTS(void); //TB
+  bool IsTS(void) const; //TB
   void SetIsTS(bool Ts); //TB
   bool WriteInfo(void);
   bool Delete(void);

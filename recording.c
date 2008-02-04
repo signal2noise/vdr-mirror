@@ -829,7 +829,7 @@ bool cRecording::IsEdited(void) const
   return *s == '%';
 }
 
-bool cRecording::IsHD(void)
+bool cRecording::IsHD(void) const
 {
   return info->IsHD();
 }
@@ -839,7 +839,7 @@ void cRecording::SetIsHD(bool Hd)
   if (info) info->SetIsHD(Hd);
 }
 
-bool cRecording::IsTS(void)
+bool cRecording::IsTS(void) const
 {
   return info->IsTS();
 }
