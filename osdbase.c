@@ -198,6 +198,7 @@ void cOsdMenu::Display(void)
   cStatus::MsgOsdClear();
   displayMenu->SetTabs(cols[0], cols[1], cols[2], cols[3], cols[4]);//XXX
   displayMenu->SetTitle(title);
+  displayMenuItems = displayMenu->MaxItems(); // This is necessary if the lineHeight differs in pages
   cStatus::MsgOsdTitle(title);
   displayMenu->SetButtons(helpRed, helpGreen, helpYellow, helpBlue);
   cStatus::MsgOsdHelpKeys(helpRed, helpGreen, helpYellow, helpBlue);
