@@ -4956,6 +4956,7 @@ public:
 
 cMenuSetupRecord::cMenuSetupRecord(void)
 {
+  SetCols(27);
   PriorityTexts[0] = tr("low");
   PriorityTexts[1] = tr("normal");
   PriorityTexts[2] = tr("high");

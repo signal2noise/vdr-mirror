@@ -63,7 +63,7 @@ void cMenuEditIntItem::Set(void)
   else if (maxString && *value == max)
      SetValue(maxString);
   else {
-     char buf[16];
+     char buf[24];
      snprintf(buf, sizeof(buf), "%d", *value);
      SetValue(buf);
      }
@@ -124,7 +124,7 @@ cMenuEditBoolItem::cMenuEditBoolItem(const char *Name, int *Value, const char *F
 
 void cMenuEditBoolItem::Set(void)
 {
-  char buf[16];
+  char buf[24];
   snprintf(buf, sizeof(buf), "%s", *value ? trueString : falseString);
   SetValue(buf);
 }
@@ -890,7 +890,7 @@ void cMenuEditSatTunItem::Set(void)
   if (minString && *value == min)
      SetValue(minString);
   else {
-     char buf[16];
+     char buf[24];
      snprintf(buf, sizeof(buf), "%d", *value);
      SetValue(buf);
      }
