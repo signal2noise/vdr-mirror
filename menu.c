@@ -894,6 +894,7 @@ cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
     data = *channel;
 
   if (New) {
+  SetTitle("Add Bouquet");
     channel = NULL;
     data.groupSep = true;
     data.nid = 0;
