@@ -1295,6 +1295,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
+  { "Title$Menu",
+    "Menü",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+  },
   { "Button$Reset",
     "Rücksetzen",
     "Reset",
