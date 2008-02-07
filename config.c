@@ -274,6 +274,7 @@ cSetup::cSetup(void)
   OSDUseSymbol = 1;  // hw
   OSDScrollBarWidth = 5;  // hw
   UseSmallFont = 2;
+  FontSizes = 1; // 0 User defined, 1 Large, 2 Small fonts
   MaxVideoFileSize = MAXVIDEOFILESIZE;
   SplitEditedFiles = 0;
   MinEventTimeout = 30;
@@ -465,6 +466,7 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "OSDUseSymbol"))        OSDUseSymbol       = atoi(Value);
   else if (!strcasecmp(Name, "OSDScrollBarWidth"))   OSDScrollBarWidth  = atoi(Value);
   else if (!strcasecmp(Name, "UseSmallFont"))        UseSmallFont       = atoi(Value);
+  else if (!strcasecmp(Name, "FontSizes"))           FontSizes          = atoi(Value);
   else if (!strcasecmp(Name, "MaxVideoFileSize"))    MaxVideoFileSize   = atoi(Value);
   else if (!strcasecmp(Name, "SplitEditedFiles"))    SplitEditedFiles   = atoi(Value);
   else if (!strcasecmp(Name, "MinEventTimeout"))     MinEventTimeout    = atoi(Value);
@@ -557,6 +559,7 @@ bool cSetup::Save(void)
   Store("OSDUseSymbol",       OSDUseSymbol);
   Store("OSDScrollBarWidth",  OSDScrollBarWidth);
   Store("UseSmallFont",       UseSmallFont);
+  Store("FontSizes",          FontSizes);
   Store("MaxVideoFileSize",   MaxVideoFileSize);
   Store("SplitEditedFiles",   SplitEditedFiles);
   Store("MinEventTimeout",    MinEventTimeout);

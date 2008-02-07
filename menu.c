@@ -3582,6 +3582,7 @@ void cMenuSetupBase::Store(void)
 class cMenuSetupOSD : public cMenuSetupBase {
 private:
   const char *useSmallFontTexts[3];
+  const char *FontSizesTexts[3];
   const char *channelViewModeTexts[3];
   const char *ScrollBarWidthTexts[6];
 
@@ -3675,7 +3676,7 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
 #endif
     if (themes.NumThemes() && Skins.Current()->Theme()) {
       // hw data.UseSmallFont=2;
-      Skins.SetCurrent("Reel");
+      //Skins.SetCurrent("Reel");
       Skins.Current()->Theme()->Load(themes.FileName(themeIndex));
       strn0cpy(data.OSDTheme, themes.Name(themeIndex), sizeof(data.OSDTheme));
     }
@@ -3745,6 +3746,10 @@ void cMenuSetupOSD::DrawExpertMenu(void)
     useSmallFontTexts[0] = tr("never");
     useSmallFontTexts[1] = tr("skin dependent");
     useSmallFontTexts[2] = tr("always");
+    
+    FontSizesTexts[0] = tr("User defined");
+    FontSizesTexts[1] = tr("Large");
+    FontSizesTexts[2] = tr("Small");
 
     ScrollBarWidthTexts[0] = "5";
     ScrollBarWidthTexts[1] = "7";
@@ -3763,6 +3768,12 @@ void cMenuSetupOSD::DrawExpertMenu(void)
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Remain Time"),              &data.OSDRemainTime));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Use Symbol"),         &data.OSDUseSymbol));
     Add(new cMenuEditStraItem(tr("Setup.OSD$ScrollBar Width"),    &tmpScrollBarWidth, 6, ScrollBarWidthTexts));
+
+    if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
+    {
+    Add(new cMenuEditStraItem(tr("Setup.OSD$OSD Font Size"),     &data.FontSizes, 3, FontSizesTexts));
+    }
+    else // if not ReelNG Skin
     Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),     &data.UseSmallFont, 3, useSmallFontTexts));
 
     SetCurrent(Get(current));
