@@ -17,6 +17,8 @@
 #define COMMANDS_MAX_LENGTH 400
 
 #define DBG " DEBUG DiSEqC -- "
+//#define DEBUG_DISEQC
+
 
 #if defined DEBUG_DISEQC 
 #   define DLOG(x...) dsyslog(x)
@@ -139,7 +141,7 @@ bool cDiseqc::Parse(const char *s, bool Count)
   
   int fields = sscanf(strchr(s,'S'), "%a[^ ] %d %c %d %a[^\n]", &satName, &lofThreshold, &polarization, &lof, &commands);
 
-  DLOG(" Parse SatName T:%d  %s-  lof %d  slof %d -\n", tuner, satName, lof, lofThreshold);
+  DLOG(" Parse T:%d SatName: %s  lof: %d slof: %d\n", tuner, satName, lof, lofThreshold);
   if (fields == 4)
      commands = NULL; //XXX Apparently sscanf() doesn't work correctly if the last %a argument results in an empty string
   if (!strchr(commands,'W')) //  if SatPos west? 
@@ -849,7 +851,7 @@ void cDiseqcs::ConfigureLNBs()
       }
    }
 
-#if DEBUG_DISEQC
+#ifdef DEBUG_DISEQC
   dsyslog (" DEBUG vdr-diseqc: print all diseqcs  ");
   int i = 0;
   for(cDiseqc *diseqc = Diseqcs.First(); diseqc; diseqc=Diseqcs.Next(diseqc))
@@ -1027,7 +1029,7 @@ int cDiseqcs::GetLnbType(int Freq1, int Freq2)
     case 11080:
               return 7; 
     default:
-              esyslog (" error in \"diseqc.conf\". Please check configurations");
+              esyslog (" error in \"diseqc.conf\". Assuming Universal LNB (KU-Band)");
               return 0;
    }
    return 0;
