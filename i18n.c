@@ -10010,6 +10010,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  { "Installation Wizard",
+    "Installationsassistent",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
  { NULL }
   };
 
