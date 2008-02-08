@@ -722,8 +722,8 @@ int main(int argc, char *argv[])
 
   // Default skins:
 
-  new cSkinClassic;
-  new cSkinSTTNG;
+  //new cSkinClassic; // We donot need these skins
+  //new cSkinSTTNG;
   Skins.SetCurrent(Setup.OSDSkin);
   cThemes::Load(Skins.Current()->Name(), Setup.OSDTheme, Skins.Current()->Theme());
   CurrentSkin = Skins.Current();
