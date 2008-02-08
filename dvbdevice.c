@@ -163,7 +163,7 @@ bool cDvbTuner::Locked(int TimeoutMs)
 bool cDvbTuner::SendDiseqcCmd(dvb_diseqc_master_cmd cmd)
 {
   cMutexLock MutexLock(&mutex);
-  if (frontendType!=FE_QPSK || SendDiseqc)
+  if (frontendType != FE_QPSK && frontendType != FE_DVBS2 || SendDiseqc)
     return false;
   diseqc_cmd=cmd;
   SendDiseqc=true;
