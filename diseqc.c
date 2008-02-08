@@ -141,7 +141,7 @@ bool cDiseqc::Parse(const char *s, bool Count)
   
   int fields = sscanf(strchr(s,'S'), "%a[^ ] %d %c %d %a[^\n]", &satName, &lofThreshold, &polarization, &lof, &commands);
 
-  DLOG(" Parse T:%d SatName: %s  lof: %d slof: %d\n", tuner, satName, lof, lofThreshold);
+  DLOG(" Parse T:%d SatName: %s  lof: %d slof: %d Cmd: %s\n", tuner, satName, lof, lofThreshold, commands);
   if (fields == 4)
      commands = NULL; //XXX Apparently sscanf() doesn't work correctly if the last %a argument results in an empty string
   if (!strchr(commands,'W')) //  if SatPos west? 

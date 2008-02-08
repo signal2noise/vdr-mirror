@@ -245,7 +245,7 @@ bool cDvbTuner::SetFrontend(void)
                frequency -= diseqc->Lof();
                }
             else {
-               esyslog("ERROR: no DiSEqC parameters found for channel %d", channel.Number());
+               esyslog("ERROR: no DiSEqC parameters found for channel %d on card %d", channel.Number(), cardIndex+1);
                return false;
                }
             }
@@ -828,8 +828,8 @@ void cDvbDevice::TurnOffLiveMode(bool LiveView)
 bool cDvbDevice::ProvidesSource(int Source) const
 {
   int type = Source & cSource::st_Mask;
- 
-  if (Setup.DiSEqC && type == cSource::stSat && frontendType == FE_QPSK && Source != cSource::stSat) 
+
+  if (Setup.DiSEqC && type == cSource::stSat && ( frontendType == FE_QPSK || frontendType == FE_DVBS2 ) && Source != cSource::stSat) 
     return (Diseqcs.ProvidesSource(Source, CardIndex()+1) || cPluginManager::ProvidesSource(Source, CardIndex()+1));
 
   return type == cSource::stNone
