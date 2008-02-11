@@ -9614,7 +9614,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "My movies",
+  { "My videos",
     "Meine Videos",
     "",
     "",
