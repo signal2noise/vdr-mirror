@@ -3622,35 +3622,36 @@ void cMenuSetupOSD::Set(void)
 {
   SetCols(25);
   int current = Current();
-  
-  for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
-       skinDescriptions[Skin->Index()] = Skin->Description();
 
-  channelViewModeTexts[0] = tr("channellist");
-  channelViewModeTexts[1] = tr("current bouquet");
-  channelViewModeTexts[2] = tr("bouquet list");
+    useSmallFontTexts[0] = tr("never");
+    useSmallFontTexts[1] = tr("skin dependent");
+    useSmallFontTexts[2] = tr("always");
+
+    FontSizesTexts[0] = tr("User defined");
+    FontSizesTexts[1] = tr("Large");
+    FontSizesTexts[2] = tr("Small");
 
   Clear();
   SetSection(tr("OSD"));
-  
-#ifndef RBLITE
-    Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),               &skinIndex, numSkins, skinDescriptions));
-#endif
-    if (themes.NumThemes())
-    Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),            &themeIndex, themes.NumThemes(), themes.Descriptions()));
+
+    if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
+    {
+    Add(new cMenuEditStraItem(tr("Setup.OSD$OSD Font Size"),     &data.FontSizes, 3, FontSizesTexts));
+    }
+    else // if not ReelNG Skin
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),     &data.UseSmallFont, 3, useSmallFontTexts));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Random"),                   &data.OSDRandom));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll pages"),             &data.MenuScrollPage));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll wraps"),             &data.MenuScrollWrap));
-    Add(new cMenuEditStraItem(tr("Setup.OSD$Channellist starts with"),  &data.UseBouquetList, 3, channelViewModeTexts));
-
-  //Add(new cMenuEditStraItem(tr("Setup.OSD$Language"),               &data.OSDLanguage, I18nNumLanguages, I18nLanguages()));
-  //Add(new cMenuEditIntItem( tr("Setup.EPG$Preferred languages"),    &numLanguages, 1, I18nNumLanguages));
-  //for (int i = 1; i < numLanguages; i++) {
-  //Add(new cMenuEditStraItem(tr(" Setup.EPG$Preferred language"),     &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
-  // }
-  //Add(new cMenuEditBoolItem(tr("Setup.OSD$Timeout requested channel info"), &data.TimeoutRequChInfo));
-  //Add(new cMenuEditBoolItem(tr("Setup.OSD$Menu button closes"),     &data.MenuButtonCloses));
-  //Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),         &data.UseSmallFont, 3, useSmallFontTexts));
+    //Add(new cMenuEditStraItem(tr("Setup.OSD$Channellist starts with"),  &data.UseBouquetList, 3, channelViewModeTexts));
+    //Add(new cMenuEditStraItem(tr("Setup.OSD$Language"),               &data.OSDLanguage, I18nNumLanguages, I18nLanguages()));
+    //Add(new cMenuEditIntItem( tr("Setup.EPG$Preferred languages"),    &numLanguages, 1, I18nNumLanguages));
+    //for (int i = 1; i < numLanguages; i++) {
+    //Add(new cMenuEditStraItem(tr(" Setup.EPG$Preferred language"),     &data.EPGLanguages[i], I18nNumLanguages, I18nLanguages()));
+    // }
+    //Add(new cMenuEditBoolItem(tr("Setup.OSD$Timeout requested channel info"), &data.TimeoutRequChInfo));
+    //Add(new cMenuEditBoolItem(tr("Setup.OSD$Menu button closes"),     &data.MenuButtonCloses));
+    //Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),         &data.UseSmallFont, 3, useSmallFontTexts));
 
   SetHelp(tr("Expertmenu"));  // hw
   SetCurrent(Get(current));
@@ -3726,9 +3727,13 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
         free(d);
     }
     Set();
+    SetHelp(NULL);                                      // clear HelpKey
+    Clear();                                            // Clear OSD
+    DrawExpertMenu();                                   // Draw New OSD
   }
   return state;
 }
+
 // --- OSD ExpertMenu Init ---------------------------------------------------------
 
 void cMenuSetupOSD::ExpertMenu(void)
@@ -3743,39 +3748,36 @@ void cMenuSetupOSD::ExpertMenu(void)
 
 void cMenuSetupOSD::DrawExpertMenu(void)
 {
-    useSmallFontTexts[0] = tr("never");
-    useSmallFontTexts[1] = tr("skin dependent");
-    useSmallFontTexts[2] = tr("always");
-    
-    FontSizesTexts[0] = tr("User defined");
-    FontSizesTexts[1] = tr("Large");
-    FontSizesTexts[2] = tr("Small");
-
     ScrollBarWidthTexts[0] = "5";
     ScrollBarWidthTexts[1] = "7";
     ScrollBarWidthTexts[2] = "9";
     ScrollBarWidthTexts[3] = "11";
     ScrollBarWidthTexts[4] = "13";
     ScrollBarWidthTexts[5] = "15";
-    
+
+    channelViewModeTexts[0] = tr("channellist");
+    channelViewModeTexts[1] = tr("current bouquet");
+    channelViewModeTexts[2] = tr("bouquet list");
+
     int current = Current();
+    for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
+         skinDescriptions[Skin->Index()] = Skin->Description();
+
+#ifndef RBLITE
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),               &skinIndex, numSkins, skinDescriptions));
+#endif
+    if (themes.NumThemes())
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),            &themeIndex, themes.NumThemes(), themes.Descriptions()));
     Add(new cMenuEditIntItem(tr("Setup.OSD$Left"),                &data.OSDLeft, 0, MAXOSDWIDTH));
     Add(new cMenuEditIntItem(tr("Setup.OSD$Top"),                 &data.OSDTop, 0, MAXOSDHEIGHT));
     Add(new cMenuEditIntItem(tr("Setup.OSD$Width"),               &data.OSDWidth, MINOSDWIDTH, MAXOSDWIDTH));
     Add(new cMenuEditIntItem(tr("Setup.OSD$Height"),              &data.OSDHeight, MINOSDHEIGHT, MAXOSDHEIGHT));
     Add(new cMenuEditIntItem( tr("Setup.OSD$Channel info time (s)"),    &data.ChannelInfoTime, 1, 60));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Ok shows"),                 &data.WantChListOnOk, tr("channelinfo"), tr("channellist")));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$Channellist starts with"),  &data.UseBouquetList, 3, channelViewModeTexts));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Remain Time"),              &data.OSDRemainTime));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Use Symbol"),         &data.OSDUseSymbol));
     Add(new cMenuEditStraItem(tr("Setup.OSD$ScrollBar Width"),    &tmpScrollBarWidth, 6, ScrollBarWidthTexts));
-
-    if (strcmp(Skins.Current()->Name(), "ReelNG") == 0)
-    {
-    Add(new cMenuEditStraItem(tr("Setup.OSD$OSD Font Size"),     &data.FontSizes, 3, FontSizesTexts));
-    }
-    else // if not ReelNG Skin
-    Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),     &data.UseSmallFont, 3, useSmallFontTexts));
-
     SetCurrent(Get(current));
     Display();
 }
