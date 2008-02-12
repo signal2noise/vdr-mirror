@@ -3528,6 +3528,7 @@ public:
 cMenuSetupBase::cMenuSetupBase(void)
 {
   data = Setup;
+  printf("\n%s\n",__PRETTY_FUNCTION__);
   switch (data.OSDScrollBarWidth) {              // hw move setup to tmpsrcollbarwidth
     case 5:  {tmpScrollBarWidth = 0;
       break;
@@ -3574,6 +3575,7 @@ void cMenuSetupBase::Store(void)
     }
   }
   Setup = data;
+  printf("\n Setup.Save() %s\n",__PRETTY_FUNCTION__);
   Setup.Save();
 }
 
@@ -3582,7 +3584,7 @@ void cMenuSetupBase::Store(void)
 class cMenuSetupOSD : public cMenuSetupBase {
 private:
   const char *useSmallFontTexts[3];
-  const char *FontSizesTexts[3];
+  const char *FontSizesTexts[4];
   const char *channelViewModeTexts[3];
   const char *ScrollBarWidthTexts[6];
 
@@ -3604,6 +3606,7 @@ public:
 cMenuSetupOSD::cMenuSetupOSD(void)
 {
 
+  printf("\n%s\n",__PRETTY_FUNCTION__);
   numSkins = Skins.Count();
   skinIndex = originalSkinIndex = Skins.Current()->Index();
   skinDescriptions = new const char*[numSkins];
@@ -3614,6 +3617,7 @@ cMenuSetupOSD::cMenuSetupOSD(void)
 
 cMenuSetupOSD::~cMenuSetupOSD()
 {
+  printf("\n%s\n",__PRETTY_FUNCTION__);
   cFont::SetCode(I18nCharSets()[Setup.OSDLanguage]);
   delete[] skinDescriptions;
 }
@@ -3630,16 +3634,18 @@ void cMenuSetupOSD::Set(void)
     FontSizesTexts[0] = tr("User defined");
     FontSizesTexts[1] = tr("Large");
     FontSizesTexts[2] = tr("Small");
+    FontSizesTexts[3] = tr("Normal");
 
   Clear();
   SetSection(tr("OSD"));
 
     if (strcmp(Skins.Current()->Name(), "Reel") == 0)
     {
-    Add(new cMenuEditStraItem(tr("Setup.OSD$OSD Font Size"),     &data.FontSizes, 3, FontSizesTexts));
+    Add(new cMenuEditStraItem(tr("Setup.OSD$OSD Font Size"),     &data.FontSizes, sizeof(FontSizesTexts)/sizeof(char*), FontSizesTexts));
     }
     else // if not Reel(NG) Skin
     Add(new cMenuEditStraItem(tr("Setup.OSD$Use small font"),     &data.UseSmallFont, 3, useSmallFontTexts));
+
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Random"),                   &data.OSDRandom));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll pages"),             &data.MenuScrollPage));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Scroll wraps"),             &data.MenuScrollWrap));
@@ -3780,6 +3786,7 @@ void cMenuSetupOSD::DrawExpertMenu(void)
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Remain Time"),              &data.OSDRemainTime));
     Add(new cMenuEditBoolItem(tr("Setup.OSD$Use Symbol"),         &data.OSDUseSymbol));
     Add(new cMenuEditStraItem(tr("Setup.OSD$ScrollBar Width"),    &tmpScrollBarWidth, 6, ScrollBarWidthTexts));
+
     SetCurrent(Get(current));
     Display();
 }
@@ -3799,6 +3806,7 @@ public:
 
 cMenuSetupLang::cMenuSetupLang(void)
 {
+  printf("\n%s\n",__PRETTY_FUNCTION__);
   for (originalNumLanguages = 0; originalNumLanguages < I18nNumLanguages && data.EPGLanguages[originalNumLanguages] >= 0; originalNumLanguages++)
       ;
   //originalNumLanguages = numLanguages;
@@ -5171,6 +5179,7 @@ public:
 
 cMenuSetupPlugins::cMenuSetupPlugins(void)
 {
+  printf("\n%s\n",__PRETTY_FUNCTION__);
   SetSection(tr("System settings"));
   SetHasHotkeys();
   for (int i = 0; ; i++) {
@@ -5191,6 +5200,8 @@ cMenuSetupPlugins::cMenuSetupPlugins(void)
 
 eOSState cMenuSetupPlugins::ProcessKey(eKeys Key)
 {
+ 
+  //printf("\n%s :  \t HasSubMenu()= %d\n",__PRETTY_FUNCTION__, HasSubMenu());
   eOSState state = HasSubMenu() ? cMenuSetupBase::ProcessKey(Key) : cOsdMenu::ProcessKey(Key);
 
   if (Key == kOk) {
@@ -5209,7 +5220,10 @@ eOSState cMenuSetupPlugins::ProcessKey(eKeys Key)
            }
         }
      else if (state == osContinue)
-        Store();
+        {
+  printf("\n%s disabled Store() \n",__PRETTY_FUNCTION__);
+//	Store();
+	}
      }
   return state;
 }
@@ -5229,6 +5243,7 @@ cMenuSetup::cMenuSetup(void)
 :cOsdMenu("")
 {
   Set();
+  printf("\n%s\n", __PRETTY_FUNCTION__);
 }
 
 void cMenuSetup::Set(void)
@@ -5267,7 +5282,7 @@ eOSState cMenuSetup::ProcessKey(eKeys Key)
 {
   int osdLanguage = Setup.OSDLanguage;
   eOSState state = cOsdMenu::ProcessKey(Key);
-
+ printf("\n%s\n",__PRETTY_FUNCTION__);
   switch (state) {
     case osUser1: return AddSubMenu(new cMenuSetupOSD);
     case osUser2: return AddSubMenu(new cMenuSetupEPG);
