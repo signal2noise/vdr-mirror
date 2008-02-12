@@ -3729,6 +3729,7 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
     Set();
     SetHelp(NULL);                                      // clear HelpKey
     Clear();                                            // Clear OSD
+    SetSection(tr("OSD - Expertmenu"));                 // Title OSD
     DrawExpertMenu();                                   // Draw New OSD
   }
   return state;
@@ -3738,6 +3739,7 @@ eOSState cMenuSetupOSD::ProcessKey(eKeys Key)
 
 void cMenuSetupOSD::ExpertMenu(void)
 {
+    Set();
     SetHelp(NULL);                                      // clear HelpKey
     Clear();                                            // Clear OSD
     SetSection(tr("OSD - Expertmenu"));                 // Title OSD
