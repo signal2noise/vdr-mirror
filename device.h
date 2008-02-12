@@ -240,6 +240,9 @@ public:
          ///< Switches the primary device to the next available channel in the given
          ///< Direction (only the sign of Direction is evaluated, positive values
          ///< switch to higher channel numbers).
+  virtual int GetAspectRatio() { return 0; };
+         ///< Get aspect ratio from video signal
+
 private:
 
 protected:
