@@ -260,7 +260,7 @@ public:
   int OSDUseSymbol; 
   int OSDScrollBarWidth;
   int UseSmallFont;
-  int FontSizes;
+  int FontSizes; // 0 User defined, 1 Large, 2 Small, 3 default
   int MaxVideoFileSize;
   int SplitEditedFiles;
   int MinEventTimeout, MinUserInactivity;
