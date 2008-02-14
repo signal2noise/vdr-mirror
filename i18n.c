@@ -6663,7 +6663,7 @@ const tI18nPhrase Phrases[] = {
   },
   {
     "Background activity",
-    "Hintergrundaktivität"
+    "Hintergrundaktionen"
     "",// TODO
     "",// TODO
     "",// TODO
