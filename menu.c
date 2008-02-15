@@ -5221,7 +5221,6 @@ eOSState cMenuSetupPlugins::ProcessKey(eKeys Key)
         }
      else if (state == osContinue)
         {
-  printf("\n%s disabled Store() \n",__PRETTY_FUNCTION__);
 //	Store();
 	}
      }
