@@ -958,7 +958,7 @@ void cLiveBuffer::CreateIndexFile(const char *FileName, int64_t PTS, int EndFram
 // --- cLiveReceiver ---------------------------------------------------------
 
 cLiveReceiver::cLiveReceiver(const cChannel *Channel)
-:cReceiver(0, -1, Channel->Vpid(), Channel->Apids(), Setup.UseDolbyDigital ? Channel->Dpids() : NULL, Channel->Spids())
+:cReceiver(0, -1, Channel->Vpid(), Channel->Apids(), Channel->Dpids(), Channel->Spids()) //always use dpids (andreas)
 {
   channel = Channel;
 //  ringBuffer = new cRingBufferLinear(RECORDERBUFSIZE, TS_SIZE * 2, true, "Recorder");
