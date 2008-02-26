@@ -593,7 +593,7 @@ void cDevice::StartSectionHandler(void)
      isyslog("StartSectionHandler %p\n",this);
      sectionHandler = new cSectionHandler(this);
      AttachFilter(eitFilter = new cEitFilter);
-     AttachFilter(patFilter = new cPatFilter);
+     AttachFilter(patFilter = new cPatFilter(this));
      AttachFilter(sdtFilter = new cSdtFilter(patFilter));
      AttachFilter(nitFilter = new cNitFilter);
      }

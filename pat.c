@@ -13,8 +13,12 @@
 #include "libsi/section.h"
 #include "libsi/descriptor.h"
 #include "thread.h"
+#include "device.h"
+#include "sysconfig.h"
 
 #define PMT_SCAN_TIMEOUT  10 // seconds
+
+cSysConfig* cSysConfig::instance_ = NULL;
 
 // --- cCaDescriptor ---------------------------------------------------------
 
@@ -158,7 +162,7 @@ int cCaDescriptors::GetCaDescriptors(const unsigned short *CaSystemIds, int BufS
      for (cCaDescriptor *d = caDescriptors.First(); d; d = caDescriptors.Next(d)) {
          const unsigned short *caids = CaSystemIds;
          do {
-            if (d->CaSystem() == *caids) {
+	      if (*CaSystemIds == 0xFFFF || d->CaSystem() == *caids) {
                if (length + d->Length() <= BufSize) {
                   if (IsStream >= 0 && IsStream != d->Stream())
                      dsyslog("CAM: different stream flag in CA descriptors");
@@ -228,8 +232,9 @@ int GetCaDescriptors(int Source, int Transponder, int ServiceId, const unsigned 
 
 // --- cPatFilter ------------------------------------------------------------
 
-cPatFilter::cPatFilter(void)
+cPatFilter::cPatFilter(void *Device)
 {
+  device = Device;
   pmtIndex = 0;
   pmtPid = 0;
   pmtSid = 0;
@@ -316,6 +321,33 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
         numPmtEntries = 0; // to make sure we try again
         return;
         }
+
+     if(pmt.getServiceId()==Channel()->Sid())
+     {
+        cSysConfig::GetInstance().Load("/etc/default/sysconfig");
+	const char* buf = cSysConfig::GetInstance().GetVariable("MAPTABLE");
+
+	if (buf && strcmp(buf, "1") == 0)
+	{
+	   FILE *pmt_fout;
+	   char *fnax;
+	   char *fnam = "/tmp/pmt";
+	   int k;
+	   asprintf(&fnax, "/tmp/pmt%d.tmp",((cDevice*)device)->CardIndex());
+	   pmt_fout = fopen(fnax, "wt");
+	   for(k=0; k<Length; k++) {
+	      putc(Data[k], pmt_fout);
+	   }
+	   fclose(pmt_fout);
+	   pmt_fout = fopen(fnam, "wt");
+	   for (k=0; k<Length; k++) {
+	      putc(Data[k], pmt_fout);
+	   }
+	   fclose(pmt_fout);
+	   free(fnax);
+	}
+        cSysConfig::GetInstance().Destroy();
+     }
      cChannel *Channel = Channels.GetByServiceID(Source(), Transponder(), pmt.getServiceId());
      if (Channel) {
         SI::CaDescriptor *d;

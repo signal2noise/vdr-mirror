@@ -24,10 +24,11 @@ private:
   uint64_t pmtVersion[MAXPMTENTRIES];
   int numPmtEntries;
   bool PmtVersionChanged(int PmtPid, int Sid, int Version);
+  void *device;
 protected:
   virtual void Process(u_short Pid, u_char Tid, const u_char *Data, int Length);
 public:
-  cPatFilter(void);
+  cPatFilter(void* device);
   virtual void SetStatus(bool On);
   void Trigger(void);
   };
