@@ -324,7 +324,11 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 
      if(pmt.getServiceId()==Channel()->Sid())
      {
+#ifndef RBLITE
         cSysConfig_vdr::GetInstance().Load("/etc/default/sysconfig");
+#else
+	cSysConfig_vdr::GetInstance().Load("/etc/sysconfig");
+#endif
 	const char* buf = cSysConfig_vdr::GetInstance().GetVariable("MAPTABLE");
 
 	if (buf && strcmp(buf, "1") == 0)
@@ -334,15 +338,15 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 	   char *fnam = "/tmp/pmt";
 	   int k;
 	   asprintf(&fnax, "/tmp/pmt%d.tmp",((cDevice*)device)->CardIndex());
-	if(pmt_fout) {
 	   pmt_fout = fopen(fnax, "wt");
+	if(pmt_fout) {
 	   for(k=0; k<Length; k++) {
 	      putc(Data[k], pmt_fout);
 	   }
 	   fclose(pmt_fout);
 	}
-	if(pmt_fout) {
 	   pmt_fout = fopen(fnam, "wt");
+	if(pmt_fout) {
 	   for (k=0; k<Length; k++) {
 	      putc(Data[k], pmt_fout);
 	   }
