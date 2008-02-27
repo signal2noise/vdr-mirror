@@ -51,7 +51,7 @@ OBJS = audio.o channels.o ci.o config.o cutter.o device.o diseqc.o dvbdevice.o d
        receiver.o recorder.o recording.o reelcamlink.o reelboxbase.o remote.o remux.o  \
        ringbuffer.o sdt.o sections.o skinclassic.o skins.o skinsttng.o sources.o spu.o status.o \
        svdrp.o themes.o thread.o \
-       timers.o tools.o transfer.o vdr.o videodir.o submenu.o help.o sysconfig.o
+       timers.o tools.o transfer.o vdr.o videodir.o submenu.o help.o sysconfig_vdr.o
 
 
 # SUBMENU + TinyXML +HELP
