@@ -14,11 +14,11 @@
 #include "libsi/descriptor.h"
 #include "thread.h"
 #include "device.h"
-#include "sysconfig.h"
+#include "sysconfig_vdr.h"
 
 #define PMT_SCAN_TIMEOUT  10 // seconds
 
-cSysConfig* cSysConfig::instance_ = NULL;
+cSysConfig_vdr* cSysConfig_vdr::instance_ = NULL;
 
 // --- cCaDescriptor ---------------------------------------------------------
 
@@ -324,12 +324,8 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 
      if(pmt.getServiceId()==Channel()->Sid())
      {
-#ifndef RBLITE     
-        cSysConfig::GetInstance().Load("/etc/default/sysconfig");
-#else
-        cSysConfig::GetInstance().Load("/etc/sysconfig");
-#endif	
-	const char* buf = cSysConfig::GetInstance().GetVariable("MAPTABLE");
+        cSysConfig_vdr::GetInstance().Load("/etc/default/sysconfig");
+	const char* buf = cSysConfig_vdr::GetInstance().GetVariable("MAPTABLE");
 
 	if (buf && strcmp(buf, "1") == 0)
 	{
@@ -354,7 +350,7 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 	}
 	   free(fnax);
 	}
-        cSysConfig::GetInstance().Destroy();
+        cSysConfig_vdr::GetInstance().Destroy();
      }
      cChannel *Channel = Channels.GetByServiceID(Source(), Transponder(), pmt.getServiceId());
      if (Channel) {

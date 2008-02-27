@@ -16,7 +16,7 @@
 #include <string.h>
 #include <errno.h>
 //#include "vdr/plugin.h"
-#include "sysconfig.h"
+#include "sysconfig_vdr.h"
 //#include "debug.h"
 //#include "util.h"
 
@@ -28,10 +28,10 @@ using std::vector;
 
 #define MAXLENGTH 256
 
-// ----- class cSysConfig ------------------------------------------------------
+// ----- class cSysConfig_vdr ------------------------------------------------------
 
 
-cSysConfig::~cSysConfig()
+cSysConfig_vdr::~cSysConfig_vdr()
 {
     for (mapConstIter_t iter = sysMap_.begin(); iter != sysMap_.end(); ++iter)
     {
@@ -41,7 +41,7 @@ cSysConfig::~cSysConfig()
 
 
 bool
-cSysConfig::Load(const char *fname)
+cSysConfig_vdr::Load(const char *fname)
 {
     int count = 0;
     const char *line;
@@ -59,7 +59,7 @@ cSysConfig::Load(const char *fname)
     }
     else
     {
-        //printf(DBG  "   .............. cSysConfig -- LoadFile  %s Failed !!! \n", fname);
+        //printf(DBG  "   .............. cSysConfig_vdr -- LoadFile  %s Failed !!! \n", fname);
         DLOG("%s: can`t open: %s, errno=%d\n", ERR, fileName_.c_str(), errno);
         sysMap_.clear();
     }
@@ -68,11 +68,11 @@ cSysConfig::Load(const char *fname)
 
 
 /**
- * Save cSysConfig file
+ * Save cSysConfig_vdr file
  * @return true on success
  */
 bool
-cSysConfig::Save()
+cSysConfig_vdr::Save()
 {
     FILE *fp = fopen(fileName_.c_str(), "w");
     if (!fp)
@@ -101,7 +101,7 @@ cSysConfig::Save()
  * @param fp opened filepointer
  * @return null if EOF or allocated character String holding one line
  */
-const char *cSysConfig::ReadLine(FILE * fp)
+const char *cSysConfig_vdr::ReadLine(FILE * fp)
 {
     char c;
     char buf[1024];
@@ -115,7 +115,7 @@ const char *cSysConfig::ReadLine(FILE * fp)
             line = new char[i + 1];
             strncpy(line, buf, i);
             line[i] = '\0';
-            //dsyslog (DBG " cSysConfig readline %s ",line);
+            //dsyslog (DBG " cSysConfig_vdr readline %s ",line);
             return line;
         }
         else
@@ -130,7 +130,7 @@ const char *cSysConfig::ReadLine(FILE * fp)
  */
 
 void
-cSysConfig::AddLine(const char *line)
+cSysConfig_vdr::AddLine(const char *line)
 {
     //dsyslog(DBG  "   AddLine   %s", line);
     vector < char >v(strlen(line) + 1);
