@@ -338,16 +338,20 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 	   char *fnam = "/tmp/pmt";
 	   int k;
 	   asprintf(&fnax, "/tmp/pmt%d.tmp",((cDevice*)device)->CardIndex());
+	if(pmt_fout) {
 	   pmt_fout = fopen(fnax, "wt");
 	   for(k=0; k<Length; k++) {
 	      putc(Data[k], pmt_fout);
 	   }
 	   fclose(pmt_fout);
+	}
+	if(pmt_fout) {
 	   pmt_fout = fopen(fnam, "wt");
 	   for (k=0; k<Length; k++) {
 	      putc(Data[k], pmt_fout);
 	   }
 	   fclose(pmt_fout);
+	}
 	   free(fnax);
 	}
         cSysConfig::GetInstance().Destroy();
