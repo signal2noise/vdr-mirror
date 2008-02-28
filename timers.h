@@ -41,7 +41,7 @@ private:
   int priority;
   int fskProtection;                                               // PIN PATCH
   int lifetime;
-  char file[MaxFileName];
+  mutable char file[MaxFileName];
   char *aux;
   const cEvent *event;
 public:
@@ -125,6 +125,9 @@ public:
       ///< Upon return the internal state will be stored in State.
   void SetEvents(void);
   void DeleteExpired(void);
+  void Add(cTimer *Timer, cTimer *After = NULL);
+  void Ins(cTimer *Timer, cTimer *Before = NULL);
+  void Del(cTimer *Timer, bool DeleteObject = true);
   };
 
 extern cTimers Timers;

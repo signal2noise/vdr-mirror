@@ -705,7 +705,26 @@ cTimer *cTimers::GetNextActiveTimer(void)
 
 void cTimers::SetModified(void)
 {
+  cStatus::MsgTimerChange(NULL, tcMod);
   state++;
+}
+
+void cTimers::Add(cTimer *Timer, cTimer *After)
+{
+  cConfig<cTimer>::Add(Timer, After);
+  cStatus::MsgTimerChange(Timer, tcAdd);
+}
+
+void cTimers::Ins(cTimer *Timer, cTimer *Before)
+{
+  cConfig<cTimer>::Ins(Timer, Before);
+  cStatus::MsgTimerChange(Timer, tcAdd);
+}
+
+void cTimers::Del(cTimer *Timer, bool DeleteObject)
+{
+  cStatus::MsgTimerChange(Timer, tcDel);
+  cConfig<cTimer>::Del(Timer, DeleteObject);
 }
 
 bool cTimers::Modified(int &State)
