@@ -152,17 +152,17 @@ static void SignalHandlerCrash(int signum)
   char dtstr[16];
   time_t t=time(NULL);
   struct tm *tm=localtime(&t);
-  
-  signal(signum,SIG_DFL); // Allow core dump    
-  
+
+  signal(signum,SIG_DFL); // Allow core dump
+
   f=fopen("/var/log/vdr.crashlog","a");
   if (f) {
     strftime(dtstr, sizeof(dtstr), "%b %e %T", tm);
     size = backtrace (array, 15);
-    strings = backtrace_symbols (array, size);                                
+    strings = backtrace_symbols (array, size);
     fprintf(f,"%s ### Crash signal %i ###\n",dtstr, signum);
     for (i = 0; i < size; i++)
-      fprintf (f, "%s Backtrace %i: %s\n", dtstr, i, strings[i]);                        
+      fprintf (f, "%s Backtrace %i: %s\n", dtstr, i, strings[i]);
       free (strings);
 
       fclose(f);
@@ -186,7 +186,7 @@ static void Watchdog(int signum)
   exit(1);
 }
 
-#define MOUNTSH "mount.sh" 
+#define MOUNTSH "mount.sh"
 
 static void Eject()
 {
@@ -198,15 +198,15 @@ static void Eject()
 static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown = false )
 {
 	///< executes external shutdown command given with -s
-	
+
 	cTimer *timer = Timers.GetNextActiveTimer();
 	time_t Now   = time(NULL);
 	time_t Next  = timer ? timer->StartTime() : 0;
 	time_t Delta = timer ? Next - Now : 0;
-	
+
 	int Channel = timer ? timer->Channel()->Number() : 0;
 	const char *File = timer ? timer->File() : "";
-	
+
 	if (timer)
 		Delta = Next - Now; // compensates for Confirm() timeout
 	char *cmd;
@@ -217,6 +217,15 @@ static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown
 	free(cmd);
 }
 
+static void CancelShutdown()
+{
+	// cancel external running shutdown watchdog
+	char *cmd;
+	asprintf(&cmd, "shutdownwd.sh cancel");
+	isyslog("executing '%s'", cmd);
+	SystemExec(cmd);
+	free(cmd);
+}
 
 int main(int argc, char *argv[])
 {
@@ -921,7 +930,7 @@ int main(int argc, char *argv[])
                               const cSchedule *Schedule = Schedules->GetSchedule(Timer->Channel());
                               InVpsMargin = !Schedule; // we must make sure we have the schedule
                               NeedsTransponder = Schedule && !Schedule->PresentSeenWithin(VPSUPTODATETIME);
-                              dsyslog ("[diseqc]: NeedsTransponder? %s ", NeedsTransponder?"YES":"NO"); 
+                              dsyslog ("[diseqc]: NeedsTransponder? %s ", NeedsTransponder?"YES":"NO");
                               }
                            }
                         InhibitEpgScan |= InVpsMargin | NeedsTransponder;
@@ -945,7 +954,7 @@ int main(int argc, char *argv[])
                                break;
                                }
                             bool timeout = Now - DeviceUsed[d->DeviceNumber()] > TIMERDEVICETIMEOUT; // only check other devices if they have been left alone for a while
-                             
+
                             if (d->MaySwitchTransponder()) {
                                dsyslog ("[diseqc]: %d MaySwitchTransponder \n",i);
                                DeviceAvailable = true; // avoids using the actual diseqc below
@@ -1024,7 +1033,7 @@ int main(int argc, char *argv[])
         if(key == kStop)
         {
             //shutdown filebrowser while replaying playlists
-            struct 
+            struct
             {
                 int cmd;
             }   FileBrowserControl=
@@ -1036,7 +1045,7 @@ int main(int argc, char *argv[])
         if(key == kBack)
         {
             //halt filebrowser while replaying playlists
-            struct 
+            struct
             {
                 int cmd;
             }   FileBrowserControl=
@@ -1144,7 +1153,7 @@ int main(int argc, char *argv[])
                             else
                                 active_function = osUnknown;
                             break;
-          case kEject:      Eject(); key = kNone; break; 
+          case kEject:      Eject(); key = kNone; break;
           case kCommands:   DirectMainFunction(osCommands); break;
           case kDVB:
           case kDVD:
@@ -1342,6 +1351,8 @@ int main(int argc, char *argv[])
                }
           default: break;
           }
+        if (!ForceShutdown)
+            CancelShutdown(); //RC
         Interact = Menu ? Menu : cControl::Control(); // might have been closed in the mean time
         if (Interact) {
            eOSState state = Interact->ProcessKey(key);
@@ -1606,6 +1617,7 @@ int main(int argc, char *argv[])
                          if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                          }
+                      CancelShutdown(); //RC
                       }
                     UserShutdown = false;
                     continue; // skip the rest of the housekeeping for now
