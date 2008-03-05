@@ -217,12 +217,12 @@ static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown
 	free(cmd);
 }
 
-static void CancelShutdown()
+static void CancelShutdown(const char *msg)
 {
 	// cancel external running shutdown watchdog
 	char *cmd;
 	asprintf(&cmd, "shutdownwd.sh cancel");
-	isyslog("executing '%s'", cmd);
+	isyslog("executing '%s' (%s)", cmd, msg);
 	SystemExec(cmd);
 	free(cmd);
 }
@@ -1290,6 +1290,8 @@ int main(int argc, char *argv[])
                   break;
                   }
                LastActivity = 1; // not 0, see below!
+               CancelShutdown(""); //RC - we assume its ok to cancel the shutdown here as
+                                   //     if vdr reaches the switch/case it's still running ok
                if (cRecordControls::Active()) {
 	          if (!UserShutdown) {
 	             Skins.Message(mtInfo, tr("Activated standby after current recording"));
@@ -1351,8 +1353,6 @@ int main(int argc, char *argv[])
                }
           default: break;
           }
-        if (!ForceShutdown)
-            CancelShutdown(); //RC
         Interact = Menu ? Menu : cControl::Control(); // might have been closed in the mean time
         if (Interact) {
            eOSState state = Interact->ProcessKey(key);
@@ -1617,7 +1617,7 @@ int main(int argc, char *argv[])
                          if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                          }
-                      CancelShutdown(); //RC
+                      CancelShutdown("after SHUTDOWNWAIT"); //RC
                       }
                     UserShutdown = false;
                     continue; // skip the rest of the housekeeping for now
