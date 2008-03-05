@@ -5093,8 +5093,8 @@ cMenuSetupMisc::cMenuSetupMisc(void)
 {
   SetCols(27);
   updateChannelsTexts[0] = tr("off");
-  updateChannelsTexts[1] = tr("names and PIDs"); // 3
-  updateChannelsTexts[2] = tr("add new transponders"); // 5
+  updateChannelsTexts[1] = tr("update"); // 3
+  updateChannelsTexts[2] = tr("add"); // 5
 
   tmpUpdateChannels = (int) data.UpdateChannels / 2;
 
