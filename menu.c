@@ -3798,9 +3798,12 @@ private:
   int originalNumLanguages;
   //int numLanguages;
   int optLanguages;
+  int oldOSDLanguage;
+  bool stored;
   void DrawMenu(void);
 public:
   cMenuSetupLang(void);
+  ~cMenuSetupLang(void);
   virtual eOSState ProcessKey(eKeys Key);
   };
 
@@ -3811,10 +3814,19 @@ cMenuSetupLang::cMenuSetupLang(void)
       ;
   //originalNumLanguages = numLanguages;
   optLanguages = originalNumLanguages-1;
-
+  oldOSDLanguage = Setup.OSDLanguage;
+  stored = false;
   //SetSection(tr("Setup.OSD$Language"));
   //SetHelp(tr("Button$Scan"));
   DrawMenu();
+}
+
+cMenuSetupLang::~cMenuSetupLang(void)
+{
+  if(!stored)
+  {
+    Setup.OSDLanguage = oldOSDLanguage;
+  }
 }
 
 void cMenuSetupLang::DrawMenu(void)
@@ -3868,6 +3880,7 @@ eOSState cMenuSetupLang::ProcessKey(eKeys Key)
         Modified = true;
 	data.OSDLanguage = data.EPGLanguages[0];
         Setup.OSDLanguage = data.EPGLanguages[0];
+        stored = false;
         cFont::SetCode(I18nCharSets()[Setup.OSDLanguage]);
      }
 
@@ -3891,6 +3904,11 @@ eOSState cMenuSetupLang::ProcessKey(eKeys Key)
 	else
            DrawMenu();
      }
+  }
+  if(Key == kOk)
+  {
+    oldOSDLanguage = Setup.OSDLanguage;
+    stored = true;
   }
   return state;
 }
