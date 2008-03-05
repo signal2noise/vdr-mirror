@@ -217,7 +217,7 @@ static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown
 	free(cmd);
 }
 
-static void CancelShutdown(const char *msg)
+static void CancelShutdown(const char *msg = NULL)
 {
 	// cancel external running shutdown watchdog
 	char *cmd;
@@ -1353,6 +1353,8 @@ int main(int argc, char *argv[])
                }
           default: break;
           }
+        if (!ForceShutdown)
+            CancelShutdown(); //RC
         Interact = Menu ? Menu : cControl::Control(); // might have been closed in the mean time
         if (Interact) {
            eOSState state = Interact->ProcessKey(key);
