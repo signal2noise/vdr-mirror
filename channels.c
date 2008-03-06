@@ -1061,6 +1061,7 @@ void cChannels::ReNumber( void )
 {
   channelsHashSid.Clear();
   int Number = 1;
+  maxNumber = 0; // when empty channels.conf
   for (cChannel *channel = First(); channel; channel = Next(channel)) {
       if (channel->GroupSep()) {
          if (channel->Number() > Number)
