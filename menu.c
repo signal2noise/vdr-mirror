@@ -2006,7 +2006,8 @@ void cMenuTimerItem::Set(void)
   char *buffer = NULL;
   if (strcmp(Skins.Current()->Name(), "Reel") == 0) // Here we want use channel-name instead of channel-number
   {
-      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%s",
+//      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d\t%s",
+      asprintf(&buffer, "%c\t%s\t%s%s%s\t%02d:%02d - %02d:%02d\t%s",
               !(timer->HasFlags(tfActive)) ? ' ' : timer->FirstDay() ? '!' : timer->Recording() ? '#' : '>',
               timer->Channel()->Name(),
               *name,
@@ -2014,6 +2015,8 @@ void cMenuTimerItem::Set(void)
               *day,
               timer->Start() / 100,
               timer->Start() % 100,
+              timer->Stop() / 100,
+              timer->Stop() % 100,
               timer->File());
   }
   else
