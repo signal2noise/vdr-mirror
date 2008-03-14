@@ -1290,8 +1290,8 @@ int main(int argc, char *argv[])
                   break;
                   }
                LastActivity = 1; // not 0, see below!
-               CancelShutdown(""); //RC - we assume its ok to cancel the shutdown here as
-                                   //     if vdr reaches the switch/case it's still running ok
+               CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
+                                         //     if vdr reaches the switch/case it's still running ok
                if (cRecordControls::Active()) {
 	          if (!UserShutdown) {
 	             Skins.Message(mtInfo, tr("Activated standby after current recording"));
@@ -1353,8 +1353,8 @@ int main(int argc, char *argv[])
                }
           default: break;
           }
-        if (!ForceShutdown)
-            CancelShutdown(); //RC
+        //if (!ForceShutdown)
+        //    CancelShutdown(); //RC
         Interact = Menu ? Menu : cControl::Control(); // might have been closed in the mean time
         if (Interact) {
            eOSState state = Interact->ProcessKey(key);
@@ -1619,7 +1619,7 @@ int main(int argc, char *argv[])
                          if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                          }
-                      //CancelShutdown("after SHUTDOWNWAIT"); //RC
+                      CancelShutdown("after SHUTDOWNWAIT"); //RC
                       }
                     UserShutdown = false;
                     continue; // skip the rest of the housekeeping for now
