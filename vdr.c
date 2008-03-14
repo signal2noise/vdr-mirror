@@ -1619,7 +1619,7 @@ int main(int argc, char *argv[])
                          if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                          }
-                      CancelShutdown("after SHUTDOWNWAIT"); //RC
+                      //CancelShutdown("after SHUTDOWNWAIT"); //RC
                       }
                     UserShutdown = false;
                     continue; // skip the rest of the housekeeping for now
