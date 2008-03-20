@@ -973,7 +973,8 @@ int main(int argc, char *argv[])
                         cDevice *d = cDevice::ActualDevice();
                         if (!d->Receiving() && d->ProvidesTransponder(Timer->Channel()) && Now - DeviceUsed[d->DeviceNumber()] > TIMERDEVICETIMEOUT)
                            Device = d; // use the actual diseqc as a last resort
-                           dsyslog ("[diseqc]: tacke  actual cardIdx %d -- diseqc %d !\n", Device->CardIndex() ,Device->DeviceNumber());
+                           if(Device)
+                               dsyslog ("[diseqc]: tacke  actual cardIdx %d -- diseqc %d !\n", Device->CardIndex() ,Device->DeviceNumber());
                         }
                      // Switch the diseqc to the transponder:
                      if (Device) {
