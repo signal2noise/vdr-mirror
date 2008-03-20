@@ -973,17 +973,16 @@ int main(int argc, char *argv[])
                         cDevice *d = cDevice::ActualDevice();
                         if (!d->Receiving() && d->ProvidesTransponder(Timer->Channel()) && Now - DeviceUsed[d->DeviceNumber()] > TIMERDEVICETIMEOUT)
                            Device = d; // use the actual diseqc as a last resort
-                           if(Device)
-                               dsyslog ("[diseqc]: tacke  actual cardIdx %d -- diseqc %d !\n", Device->CardIndex() ,Device->DeviceNumber());
                         }
                      // Switch the diseqc to the transponder:
                      if (Device) {
+                        dsyslog ("[diseqc]: take  actual cardIdx %d -- diseqc %d !\n", Device->CardIndex() ,Device->DeviceNumber());
                         dsyslog ("[diseqc]: switch  to transponder \n");
                         if (!Device->IsTunedToTransponder(Timer->Channel())) {
                            if (Device == cDevice::ActualDevice() && !Device->IsPrimaryDevice())
                               cDevice::PrimaryDevice()->StopReplay(); // stop transfer mode
 
-                           dsyslog("switching diseqc %d to channe to transponder  %d", Device->DeviceNumber() + 1, Timer->Channel()->Number());
+                           dsyslog("switching device %d to channel %d", Device->DeviceNumber() + 1, Timer->Channel()->Number());
                            Device->SwitchChannel(Timer->Channel(), false);
                            DeviceUsed[Device->DeviceNumber()] = Now;
                            }
