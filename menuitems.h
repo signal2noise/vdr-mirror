@@ -94,7 +94,7 @@ private:
 protected:
   bool InEditMode(void) { return pos >= 0; }
 public:
-  cMenuEditStrItem(const char *Name, char *Value, int Length, const char *Allowed);
+  cMenuEditStrItem(const char *Name, char *Value, int Length, const char *Allowed = NULL);
   ~cMenuEditStrItem();
   virtual eOSState ProcessKey(eKeys Key);
   };

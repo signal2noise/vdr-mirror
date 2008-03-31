@@ -250,7 +250,7 @@ eOSState cMenuEditChrItem::ProcessKey(eKeys Key)
 
 // --- cMenuEditStrItem ------------------------------------------------------
 
-cMenuEditStrItem::cMenuEditStrItem(const char *Name, char *Value, int Length, const char *Allowed)
+cMenuEditStrItem::cMenuEditStrItem(const char *Name, char *Value, int Length, const char *Allowed = NULL)
 :cMenuEditItem(Name)
 {
   orgValue = NULL;

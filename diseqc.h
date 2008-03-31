@@ -159,7 +159,7 @@ public:
   int WaitMs(int Tuner = 0) const { return waitMs[Tuner]; }
   int RepeatCmd(int Tuner = 0) const { return repeatCmd[Tuner]; }
   void SetWaitMs(int ms, int Tuner = 0) { waitMs[Tuner] = ms; }
-  void SetRepeatCmd(int rep, int Tuner = 0) { repeatCmd[Tuner] = rep; dsyslog (" DiSEqC SetRepeat %d at Tuner %d ", rep, Tuner);  }
+  void SetRepeatCmd(int rep, int Tuner = 0) { repeatCmd[Tuner] = rep; /* dsyslog (" DiSEqC SetRepeat %d at Tuner %d ", rep, Tuner);*/  }
 
   bool IsUnique(int *src, int lnbs); // menu.c?? 
   };
