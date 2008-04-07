@@ -731,7 +731,7 @@ int cRepackerFast::handleStartPicture(const uchar *Data, int Count, int Flag, ui
 
 	// Check if picture start code expands over TS packet boundaries
 
-	if (len>=6) {
+	if (len>=9+6) { // +9-> Don't scan own header or part of it
 		if (buffer[len-5]==0) {
 			if (buffer[len-6]==0 && buffer[len-4]==1 && buffer[len-3]==SC_PICTURE)
 				x=6;
@@ -750,7 +750,7 @@ int cRepackerFast::handleStartPicture(const uchar *Data, int Count, int Flag, ui
 			else if (Data[0]==0 && Data[1]==1 && Data[2]==SC_PICTURE && Count>=3)
 				x=1;					
 		}
-	
+		
 		// Flush until marker, shorten PES packet
 		if (x) {
 			int n;
@@ -762,7 +762,7 @@ int cRepackerFast::handleStartPicture(const uchar *Data, int Count, int Flag, ui
 					backup[n]=buffer[len-x+n];
 				
 				len=len-x; // shorten
-				
+
 				FlushBuffer(startFlag, timestamp);
 				startFlag=16; // Fixme opt
 				insertHeader(0);
@@ -1210,7 +1210,7 @@ cRemux::cRemux(int VPid, const int *APids, const int *DPids,
 #endif
 
 	vpid=0;
-	for(int n=0;n<8;n++) {
+	for(int n=0;n<16;n++) {
 		apids[n]=0;
 		dpids[n]=0;
 	}
