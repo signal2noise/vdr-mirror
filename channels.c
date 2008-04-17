@@ -1110,14 +1110,14 @@ cChannel *cChannels::GetByChannelID(tChannelID ChannelID, bool TryWithoutRid, bo
   if (list) {
      for (cHashObject *hobj = list->First(); hobj; hobj = list->Next(hobj)) {
          cChannel *channel = (cChannel *)hobj->Object();
-         if (channel->Sid() == sid && channel->GetChannelID() == ChannelID)
+         if (channel && channel->Sid() == sid && channel->GetChannelID() == ChannelID)
             return channel;
          }
      if (TryWithoutRid) {
         ChannelID.ClrRid();
         for (cHashObject *hobj = list->First(); hobj; hobj = list->Next(hobj)) {
             cChannel *channel = (cChannel *)hobj->Object();
-            if (channel->Sid() == sid && channel->GetChannelID().ClrRid() == ChannelID)
+            if (channel && channel->Sid() == sid && channel->GetChannelID().ClrRid() == ChannelID)
                return channel;
             }
         }
@@ -1125,7 +1125,7 @@ cChannel *cChannels::GetByChannelID(tChannelID ChannelID, bool TryWithoutRid, bo
         ChannelID.ClrPolarization();
         for (cHashObject *hobj = list->First(); hobj; hobj = list->Next(hobj)) {
             cChannel *channel = (cChannel *)hobj->Object();
-            if (channel->Sid() == sid && channel->GetChannelID().ClrPolarization() == ChannelID)
+            if (channel && channel->Sid() == sid && channel->GetChannelID().ClrPolarization() == ChannelID)
                return channel;
             }
         }
