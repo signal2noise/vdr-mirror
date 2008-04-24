@@ -230,6 +230,7 @@ void cOsdMenu::Display(void)
             break;
          i++;
          }
+     displayMenu->SetScrollbar(count, first);
      }
   if (!isempty(status))
      displayMenu->SetMessage(mtStatus, status);

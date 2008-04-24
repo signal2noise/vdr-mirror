@@ -108,6 +108,10 @@ const char *cSkinDisplayMenu::GetTabbedText(const char *s, int Tab)
   return buffer;
 }
 
+void cSkinDisplayMenu::SetScrollbar(int Total, int Offset)
+{
+}
+
 int cSkinDisplayMenu::GetTextAreaWidth(void) const
 {
   return 0;
