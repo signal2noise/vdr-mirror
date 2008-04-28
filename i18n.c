@@ -9504,8 +9504,8 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Childlock",
-    "Kindersicherung",
+  { "Title$Childlock ",
+    "Kindersicherung ",
     "",
     "",
     "",
