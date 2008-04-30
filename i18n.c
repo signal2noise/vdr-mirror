@@ -10186,6 +10186,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  { "Timeshift mode",
+    "Timeshift Modus",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
  { NULL }
   };
 

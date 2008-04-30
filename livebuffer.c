@@ -1594,11 +1594,11 @@ void cLiveBufferControl::ShowMode(void)
 bool cLiveBufferControl::ShowProgress(bool Initial)
 {
   int Current, Total;
-
   if (GetIndex(Current, Total) && Total > 0) {
      if (!visible) {
         displayReplay = Skins.Current()->DisplayReplay(modeOnly);
         needsFastResponse = visible = true;
+        displayReplay->SetTitle(tr("Timeshift mode"));
         }
      if (Initial) {
         lastCurrent = lastTotal = -1;
