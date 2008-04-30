@@ -1545,7 +1545,8 @@ void cLiveBufferControl::ShowTimed(int Seconds)
 
 void cLiveBufferControl::Show(void)
 {
-  ShowTimed(3);
+  //ShowTimed(3);
+  ShowTimed(0);
 }
 
 void cLiveBufferControl::Hide(void)
@@ -1692,10 +1693,10 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                           if (player->Stop())
                              break;
                        return osUnknown;
-        case kBack:    if (visible && !modeOnly && player)
+        /*case kBack:    if (visible && !modeOnly && player) 
                           Hide();
                        else
-                          return osUnknown;
+                          return osUnknown;*/
         case kRecord:  {
                        int Current, Total;
                        GetIndex(Current,Total);
@@ -1706,7 +1707,48 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        }
         default:       if (player->NeedsPauseRec())
                           return osPause;
-                       return osUnknown;
+
+                       int current = 0;
+                       int total = 0;
+                       bool snapToIFrame = false;
+ 
+                       GetIndex(current, total, snapToIFrame);
+
+                       //show progress bar when time shift > 10s
+                       if(total - current > 10)
+                       {
+                            switch (Key) {
+                                // Menu control:
+                                case kOk:
+                                if (visible && !modeOnly) {
+                                    Hide();
+                                    DoShowMode = true;
+                                }
+                                else
+                                {
+                                    Show();
+                                }
+                                break;
+                                case kBack:
+                                if (visible && !modeOnly) {
+                                    Hide();
+                                    DoShowMode = true;
+                                }
+                                else 
+                                {
+                                    printf("--------return osEnd-----------\n ");
+                                    return osEnd;
+                                }
+                                break;
+                                default:
+                                        return osUnknown;
+                            }
+                       }
+                       else
+                       {
+                           return osUnknown;
+                       }
+                       //return osUnknown;
         }
       }
     }
