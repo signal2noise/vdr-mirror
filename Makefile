@@ -28,7 +28,7 @@ PLUGINLIBDIR= $(PLUGINDIR)/lib
 ifdef RBLITE
   EXCLUDE_PLUGINS = -e xxvautotimer -e netcv -e update -e dpkg -e dpkgopt -e ripit -e mediad -e skinreelng -e webbrowser -e music -e ipod
 else
-  EXCLUDE_PLUGINS = -e ipkg -e erfplayer -e reelcam -e xxvautotimer
+  EXCLUDE_PLUGINS = -e erfplayer -e ipkg -e reelcam -e update -e xxvautotimer
 endif
 
 VIDEODIR = /video

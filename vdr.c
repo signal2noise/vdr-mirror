@@ -930,7 +930,7 @@ int main(int argc, char *argv[])
                               const cSchedule *Schedule = Schedules->GetSchedule(Timer->Channel());
                               InVpsMargin = !Schedule; // we must make sure we have the schedule
                               NeedsTransponder = Schedule && !Schedule->PresentSeenWithin(VPSUPTODATETIME);
-                              dsyslog ("[diseqc]: NeedsTransponder? %s ", NeedsTransponder?"YES":"NO");
+                              //dsyslog ("[diseqc]: NeedsTransponder? %s ", NeedsTransponder?"YES":"NO");
                               }
                            }
                         InhibitEpgScan |= InVpsMargin | NeedsTransponder;
@@ -943,10 +943,10 @@ int main(int argc, char *argv[])
                      cDevice *Device = NULL;
                      bool DeviceAvailable = false;
                      for (int i = 0; i < cDevice::NumDevices(); i++) {
-                         dsyslog ("[diseqc]: diseqc %d \n",i);
+                         //dsyslog ("[diseqc]: diseqc %d \n",i);
                          cDevice *d = cDevice::GetDevice(i);
                          if (d && d->ProvidesTransponder(Timer->Channel())) {
-                            dsyslog ("[diseqc]: diseqc %d Provides Tp  \n",i);
+                            //dsyslog ("[diseqc]: diseqc %d Provides Tp  \n",i);
                             if (d->IsTunedToTransponder(Timer->Channel())) {
                                dsyslog ("[diseqc]: diseqc %d is tuned to TimerChannel  \n",i);
                                // if any diseqc is tuned to the transponder, we're done
