@@ -1595,7 +1595,7 @@ int main(int argc, char *argv[])
                        dsyslog("next timer event at %s", *TimeToString(Next));
                     if (WatchdogTimeout > 0)
                        signal(SIGALRM, SIG_IGN);
-                    if (Interface->Confirm(tr("Activating standby"), UserShutdown ? 2 : SHUTDOWNWAIT, true)) {
+                    if (Interface->Confirm(tr("Activating standby"), UserShutdown ? 2 : SHUTDOWNWAIT, true, true)) {
                        cControl::Shutdown();
                        /* RC: moved downwards to be executed on every shutdown, not just
                               user shutdown. See PrepareShutdownExternal().

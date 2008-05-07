@@ -220,7 +220,7 @@ bool cSkins::SetCurrent(const char *Name)
   return current != NULL;
 }
 
-eKeys cSkins::Message(eMessageType Type, const char *s, int Seconds)
+eKeys cSkins::Message(eMessageType Type, const char *s, int Seconds, bool ignorePluginKey)
 {
   switch (Type) {
     case mtInfo:    isyslog("info: %s", s); break;
@@ -229,7 +229,9 @@ eKeys cSkins::Message(eMessageType Type, const char *s, int Seconds)
     default: ;
     }
   if (!Current())
+  {
      return kNone;
+  }
  //if (!cSkinDisplay::Current() && !displayMessage)
  // Segfault fix start
   if (!cSkinDisplay::Current()) {
@@ -237,14 +239,14 @@ eKeys cSkins::Message(eMessageType Type, const char *s, int Seconds)
      delete displayMessage;
      displayMessage = Current()->DisplayMessage();
   }
- // Segfault fix end
+ // Segfault fix end 
   cSkinDisplay::Current()->SetMessage(Type, s);
   cSkinDisplay::Current()->Flush();
   cStatus::MsgOsdStatusMessage(s);
   eKeys k = kNone;
   if (Type != mtStatus) {
-     k = Interface->Wait(Seconds);
-     if (displayMessage) {
+     k = Interface->Wait(Seconds, false, ignorePluginKey);
+     if (displayMessage) { 
         delete displayMessage;
         displayMessage = NULL;
         cStatus::MsgOsdClear();

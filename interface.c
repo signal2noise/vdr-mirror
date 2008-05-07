@@ -43,28 +43,35 @@ eKeys cInterface::GetKey(bool Wait)
      return kNone;
 }
 
-eKeys cInterface::Wait(int Seconds, bool KeepChar)
-{
+eKeys cInterface::Wait(int Seconds, bool KeepChar, bool ignorePluginKey)
+{ 
   if (Seconds == 0)
      Seconds = Setup.OSDMessageTime;
   Skins.Flush();
   eKeys Key = kNone;
   time_t timeout = time(NULL) + Seconds;
   for (;;) {
-      Key = GetKey();
-      if (ISRAWKEY(Key) || time(NULL) > timeout || interrupted)
-         break;
+      Key = GetKey(); 
+      if (ISRAWKEY(Key) || time(NULL) > timeout || interrupted) 
+         {
+             if(!ignorePluginKey || Key != k_Plugin)
+             { 
+                 break;
+             }
+         }
       }
   if (KeepChar && ISRAWKEY(Key) || Key == k_Plugin)
+  {
      cRemote::Put(Key);
+  }
   interrupted = false;
   return Key;
 }
 
-bool cInterface::Confirm(const char *s, int Seconds, bool WaitForTimeout)
+bool cInterface::Confirm(const char *s, int Seconds, bool WaitForTimeout, bool ignorePluginKey)
 {
   isyslog("confirm: %s", s);
-  eKeys k = Skins.Message(mtWarning, s, Seconds);
+  eKeys k = Skins.Message(mtWarning, s, Seconds, ignorePluginKey);
   bool result = WaitForTimeout ? k == kNone : k == kOk;
   isyslog("%sconfirmed", result ? "" : "not ");
   return result;

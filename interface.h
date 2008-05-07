@@ -26,8 +26,8 @@ public:
   bool HasSVDRPConnection(void) { return SVDRP && SVDRP->HasConnection(); }
   void Interrupt(void) { interrupted = true; }
   eKeys GetKey(bool Wait = true);
-  eKeys Wait(int Seconds = 0, bool KeepChar = false);
-  bool Confirm(const char *s, int Seconds = 10, bool WaitForTimeout = false);
+  eKeys Wait(int Seconds = 0, bool KeepChar = false, bool ignorePluginKey = false);
+  bool Confirm(const char *s, int Seconds = 10, bool WaitForTimeout = false, bool ignorePluginKey = false);
   void LearnKeys(void);
   };
 

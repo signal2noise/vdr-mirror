@@ -334,7 +334,7 @@ public:
        ///< Returns a pointer to the current skin.
   bool IsOpen(void) { return cSkinDisplay::Current(); }
        ///< Returns true if there is currently a skin display object active.
-  eKeys Message(eMessageType Type, const char *s, int Seconds = 0);
+  eKeys Message(eMessageType Type, const char *s, int Seconds = 0, bool ignorePluginKey = false);
        ///< Displays the given message, either through a currently visible
        ///< display object that is capable of doing so, or by creating a
        ///< temporary cSkinDisplayMessage object.
