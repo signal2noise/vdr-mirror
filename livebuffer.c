@@ -1591,6 +1591,23 @@ void cLiveBufferControl::ShowMode(void)
      }
 }
 
+std::string  cLiveBufferControl::GetProgrammeTitle()
+{
+     cChannel *channel = Channels.GetByNumber(cDevice::CurrentChannel());
+     if(channel)
+     {
+         cSchedulesLock SchedulesLock;
+         const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
+         if (Schedules) {
+             const cSchedule *Schedule = Schedules->GetSchedule(channel);
+             if (Schedule) {
+                 return Schedule->GetPresentEvent()->Title();
+             }
+         }
+     }
+     return "";
+}
+
 bool cLiveBufferControl::ShowProgress(bool Initial)
 {
   int Current, Total;
@@ -1598,7 +1615,8 @@ bool cLiveBufferControl::ShowProgress(bool Initial)
      if (!visible) {
         displayReplay = Skins.Current()->DisplayReplay(modeOnly);
         needsFastResponse = visible = true;
-        displayReplay->SetTitle(tr("Timeshift mode"));
+        std::string title = std::string(tr("Timeshift mode")) +": " + GetProgrammeTitle();
+        displayReplay->SetTitle(title.c_str());
         }
      if (Initial) {
         lastCurrent = lastTotal = -1;

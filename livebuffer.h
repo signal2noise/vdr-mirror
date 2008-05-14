@@ -1,6 +1,8 @@
 #ifndef __LIVEBUFFER_H
 #define __LIVEBUFFER_H
 
+#include <string>
+
 #include "player.h"
 #include "receiver.h"
 #include "remux.h"
@@ -258,6 +260,7 @@ private:
   void ShowTimed(int Seconds = 0);
   void ShowMode(void);
   bool ShowProgress(bool Initial);
+  std::string GetProgrammeTitle();
 public:
   cLiveBufferControl(cLivePlayer *Player);
   ~cLiveBufferControl();
