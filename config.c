@@ -284,7 +284,7 @@ cSetup::cSetup(void)
   ResumeID = 0;
   JumpPlay = 1;
   PlayJump = 1;
-  PauseLastMark = 0;
+  PauseLastMark = 1;
   ReloadMarks = 1;
   CurrentChannel = -1;
   CurrentVolume = MAXVOLUME;
@@ -476,8 +476,8 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "ResumeID"))            ResumeID           = atoi(Value);
   else if (!strcasecmp(Name, "JumpPlay"))            JumpPlay           = atoi(Value);
   else if (!strcasecmp(Name, "PlayJump"))            PlayJump           = atoi(Value);
-  else if (!strcasecmp(Name, "PauseLastMark"))       PauseLastMark      = atoi(Value);
-  else if (!strcasecmp(Name, "ReloadMarks"))         ReloadMarks        = atoi(Value);
+  //else if (!strcasecmp(Name, "PauseLastMark"))       PauseLastMark      = atoi(Value);
+  //else if (!strcasecmp(Name, "ReloadMarks"))         ReloadMarks        = atoi(Value);
   else if (!strcasecmp(Name, "CurrentChannel"))      CurrentChannel     = atoi(Value);
   //Start by Klaus
   else if (!strcasecmp(Name, "CurrentPipChannel"))   CurrentPipChannel     = atoi(Value);
