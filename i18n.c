@@ -10761,8 +10761,8 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
-/* obsolete?  { "Childlock",
-    "Kindersicherung",
+{ "Antenna settings/DiSEqC",
+    "Antennen/DiSEqC Einstellungen",
     "",
     "",
     "",
@@ -10782,8 +10782,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  }, */
-
+  },
   { NULL }
   };
 
