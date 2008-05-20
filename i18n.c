@@ -8667,28 +8667,6 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
-  { "Child protection",                        // PIN PATCH
-   "Kindersicherung",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "" // CZ
-  },
   { "low",
     "niedrig",
     "",
@@ -9504,28 +9482,6 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Title$Childlock ",
-    "Kindersicherung ",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
   { "images",
     "Meine Bilder",
     "",
@@ -9792,6 +9748,28 @@ const tI18nPhrase Phrases[] = {
   },
   { "Undelete Recordings",
     "Gelöschte TV-Aufnahmen",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
+  { "Undelete Recordings - ",
+    "Gelöschte TV-Aufnahmen - ",
     "",
     "",
     "",
@@ -10519,6 +10497,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  { "Choose action",
+    "Aktion auswählen",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
   { "Mark as new",
     "Als neu markieren",
     "",
@@ -10718,7 +10718,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Title$Childlock ",
-    "Kindersicherung",
+    "Kindersicherung ",
     "",
     "",
     "",
@@ -10739,7 +10739,29 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Childlock",
+  { "Child protection",                        // PIN PATCH
+    "Kindersicherung",
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "",//TODO
+    "" // CZ
+  },
+/* obsolete?  { "Childlock",
     "Kindersicherung",
     "",
     "",
@@ -10760,7 +10782,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  },
+  }, */
 
   { NULL }
   };
