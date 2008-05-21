@@ -10652,7 +10652,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "Title$Setup",
-    "Title$Setup",
+    "Setup",
     "",
     "",
     "",
