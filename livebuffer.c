@@ -1733,7 +1733,7 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                        GetIndex(current, total, snapToIFrame);
 
                        //show progress bar when time shift > 10s
-                       if(total - current > 10)
+                       if(total - current > 10 && current >= 0)
                        {
                             switch (Key) {
                                 // Menu control:
