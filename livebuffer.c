@@ -990,7 +990,6 @@ void cLiveReceiver::Receive(uchar *Data, int Length)
 //  int p = ringBuffer->Put(Data, Length);
 //  if (p != Length && Running())
 //     ringBuffer->ReportOverflow(Length - p); 
-    //printf("-----------------cLiveReceiver::Receive, vor remux->Put-------------------\n");
     remux->Put(Data, Length);
 }
 
@@ -1504,10 +1503,13 @@ cLiveBufferControl::~cLiveBufferControl()
 {
   Hide();
   cTransferControl::receiverDevice = NULL;
-  cLiveBufferManager::livePlayer = NULL;
-  delete player;
-  cLiveBufferManager::liveControl = NULL;
-  cLiveBufferManager::liveReceiver->Detach();
+  //don't touch! will be needed for next livePlayer instance!
+  //cLiveBufferManager::livePlayer = NULL;
+  //delete player;
+  //TODO: identify who is owner of the  dynamically allocated objects (player, receiver, buffer) and responsible for their release
+  cLiveBufferManager::liveControl = NULL; 
+  if(cLiveBufferManager::liveReceiver) //make sure receiver hast not been resetted before
+      cLiveBufferManager::liveReceiver->Detach();
   cLiveBufferManager::liveBuffer->SetNewRemux(NULL);
   cLiveReceiver *receiver = cLiveBufferManager::liveReceiver;
   cLiveBufferManager::liveReceiver = NULL;
@@ -1515,12 +1517,13 @@ cLiveBufferControl::~cLiveBufferControl()
   if (!Setup.LiveBuffer) {
     delete cLiveBufferManager::liveBuffer;
     cLiveBufferManager::liveBuffer = NULL;
-    }
+    } 
 }
 
 bool cLiveBufferControl::GetIndex(int &Current, int &Total, bool SnapToIFrame)
 {
   if (player) {
+
      player->GetIndex(Current, Total, SnapToIFrame);
      return true;
      }
@@ -1754,7 +1757,6 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                                 }
                                 else 
                                 {
-                                    printf("--------return osEnd-----------\n ");
                                     return osEnd;
                                 }
                                 break;
@@ -1798,9 +1800,11 @@ void cLiveBufferManager::ChannelSwitch(cDevice *ReceiverDevice, const cChannel *
     sprintf(FileName,"%s/LiveBuffer",BufferDirectory);
     liveBuffer = new cLiveBuffer(FileName,liveReceiver->remux);
     }
-  if (!livePlayer) {
+  //if (!livePlayer) {
+    //create a new live player every time and avoid multiple deletes on the same player object
+    delete livePlayer;
     livePlayer = new cLivePlayer(liveBuffer);
-    }
+  //  }
   cControl::Launch(liveControl = new cLiveBufferControl(livePlayer));
   channel = Channel;
 }
@@ -1819,7 +1823,7 @@ cLiveBuffer *cLiveBufferManager::InLiveBuffer(cTimer *timer, int *StartFrame, in
   if (timer && !timer->HasFlags(tfhasLiveBuf) && liveReceiver && liveReceiver->GetChannel() == timer->Channel()) {
     int now = liveBuffer->LastIndex();
     int first = liveBuffer->FirstIndex() + 50;
-    if (now-first < 250)  // Erst wenn LiveBuffer gr��er 10s
+    if (now-first < 250)  // only when LiveBuffer > 10s
        return NULL;
     if (timer->StartTime() < time(NULL) && now-first > (time(NULL)-timer->StopTime())*FRAMESPERSEC) {
        if (StartFrame) {
