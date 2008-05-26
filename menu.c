@@ -71,14 +71,20 @@ void cMenuEditCaItem::Set(void)
   char s[64];
   if (*value == CA_FTA)
     strcpy(s, tr("Free To Air"));
+#ifdef RBLITE    
   else if (*value == 3)
     sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(2) ? "Neotion" : tr("no"), tr("internal CAM"));
+#endif    
   else if (*value == 2)
     sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(1) : tr("No CI at"), tr("upper slot"));
   else if (*value == 1)
     sprintf(s, "%s (%s)", (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) ? (cDevice::GetDevice(0))->CiHandler()->GetCamName(0) : tr("No CI at"), tr("lower slot"));
 
+#ifdef RBLITE
   if (*value <= 3)
+#else
+  if (*value <= 2)
+#endif
      SetValue(s);
   else if (*value >= CA_ENCRYPTED_MIN)
      SetValue(tr("encrypted"));
