@@ -1664,11 +1664,9 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                     player->Pause();
                  break;
         case kPlay:
-                     printf("--------- cLiveBufferControl::ProcessKey, case kPlay-------------\n");
                      if (cReplayControl::LastReplayed()) {
-                     cControl::Shutdown();
-                     printf("##############vor  cControl::Launch(new cReplayControl)############\n");
-                     cControl::Launch(new cReplayControl);
+			/* cControl::Shutdown();*/  /* Don't do that here! */
+                     	cControl::Launch(new cReplayControl);
                      }
                      else
                      {
