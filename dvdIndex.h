@@ -6,6 +6,9 @@
 #include <string>
 #include <time.h>
 
+#define DVD_DB_FILENAME "/etc/vdr/DVD.db"
+// TODO: replace with ConfigDirectory/DVD.db
+
 using namespace std;
 
 std::string SHA_directory(std::string);
