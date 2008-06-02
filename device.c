@@ -683,7 +683,7 @@ bool cDevice::SwitchChannel(const cChannel *Channel, bool LiveView)
      isyslog("switching to channel %d", Channel->Number());
   for (int i = 3; i--;) {
       switch (SetChannel(Channel, LiveView)) {
-        case scrOk:           return true;
+        case scrOk:         Setup.CurrentChannel = CurrentChannel(); return true;
         case scrNotAvailable: Skins.Message(mtInfo, tr("Channel not available!"));
                               return false;
         case scrNoTransfer:   Skins.Message(mtError, tr("Can't start Transfer Mode!"));
