@@ -1503,10 +1503,8 @@ cLiveBufferControl::~cLiveBufferControl()
 {
   Hide();
   cTransferControl::receiverDevice = NULL;
-  //don't touch! will be needed for next livePlayer instance!
-  //cLiveBufferManager::livePlayer = NULL;
-  //delete player;
-  //TODO: identify who is owner of the  dynamically allocated objects (player, receiver, buffer) and responsible for their release
+  cLiveBufferManager::livePlayer = NULL;
+  delete player;
   cLiveBufferManager::liveControl = NULL; 
   if(cLiveBufferManager::liveReceiver) //make sure receiver hast not been resetted before
       cLiveBufferManager::liveReceiver->Detach();
@@ -1664,16 +1662,11 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                     player->Pause();
                  break;
         case kPlay:
-                     if (cReplayControl::LastReplayed()) {
-			/* cControl::Shutdown();*/  /* Don't do that here! */
-                     	cControl::Launch(new cReplayControl);
-                     }
-                     else
-                     {
-                        if (player)
-                           player->Play();
-                     }
+                  {
+                     if (player)
+                         player->Play();
                      break;
+                  }
         case kPrev|k_Release:
         case kFastRew|k_Release:
                        sk = 0;
@@ -1809,7 +1802,6 @@ void cLiveBufferManager::ChannelSwitch(cDevice *ReceiverDevice, const cChannel *
     }
   //if (!livePlayer) {
     //create a new live player every time and avoid multiple deletes on the same player object
-    delete livePlayer;
     livePlayer = new cLivePlayer(liveBuffer);
   //  }
   cControl::Launch(liveControl = new cLiveBufferControl(livePlayer));
