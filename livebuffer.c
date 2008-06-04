@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include "videodir.h"
+#include "remote.h"
 
 #define MAXFILESPERRECORDING 255
 #define RECORDFILESUFFIX    "/%03d.vdr"
@@ -1663,8 +1664,19 @@ eOSState cLiveBufferControl::ProcessKey(eKeys Key)
                  break;
         case kPlay:
                   {
-                     if (player)
-                         player->Play();
+                     int current = 0;
+                     int total = 0;
+                     bool snapToIFrame = false;
+                     GetIndex(current, total, snapToIFrame);
+                     if (total - current < 10 && cReplayControl::LastReplayed()) {
+                        //trigger instant resume of last viewed recording
+                        return osUnknown;
+                     }
+                     else
+                     {
+                        if (player)
+                           player->Play();
+                     }
                      break;
                   }
         case kPrev|k_Release:
