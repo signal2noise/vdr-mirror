@@ -977,7 +977,10 @@ void cMenuSetupPage::SetPlugin(cPlugin *Plugin)
 {
   plugin = Plugin;
   char buf[40];
-  snprintf(buf, sizeof(buf), "%s", plugin->MainMenuEntry());
+  if(plugin->MenuSetupPluginEntry())
+      snprintf(buf, sizeof(buf), "%s", plugin->MenuSetupPluginEntry());
+  else
+      snprintf(buf, sizeof(buf), "%s", plugin->MainMenuEntry());
   SetSection(buf);
 }
 
