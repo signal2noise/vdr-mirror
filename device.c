@@ -152,6 +152,28 @@ int cDevice::currentChannel = 1;
 cDevice *cDevice::device[MAXDEVICES] = { NULL };
 cDevice *cDevice::primaryDevice = NULL;
 
+/*** 
+ *  returns True if Tuner-device with priority < 0 is found 
+ *  priority < 0 implies No recording
+ *  live Viewing = -1 priority
+ */
+bool AnyFreeTuners()
+{
+	cDevice* device=NULL;
+	for (int tuner=0; tuner<MAXDEVICES ; tuner++)
+	{
+		device = cDevice::GetDevice(tuner);
+		printf("tuner#%d : priority %d \n",tuner, device?device->Priority():-100 );
+		if ( device  
+				&& ( device->ProvidesSource(cSource::stSat) || 
+					device->ProvidesSource(cSource::stCable) || 
+					device->ProvidesSource(cSource::stTerr) )	 // device is a Tuner
+				&& device->Priority()<0 )			 	 // free Tuner: ie. with no recordings in this tuner
+			return true;
+	} // end for
+	return false; // no device found
+}
+
 cDevice::cDevice(void)
 {
   cardIndex = nextCardIndex++;

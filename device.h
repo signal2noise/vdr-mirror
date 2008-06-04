@@ -98,6 +98,8 @@ class cPlayer;
 class cReceiver;
 class cPesAssembler;
 
+bool AnyFreeTuners(); // returns true if a tuner without recording is found
+
 /// The cDevice class is the base from which actual devices can be derived.
 
 class cDevice : public cThread {
@@ -543,11 +545,12 @@ public:
 private:
   cMutex mutexReceiver;
   cReceiver *receiver[MAXRECEIVERS];
-protected:
+  public:
   int Priority(void) const;
       ///< Returns the priority of the current receiving session (0..MAXPRIORITY),
       ///< or -1 if no receiver is currently active. The primary device will
       ///< always return at least Setup.PrimaryLimit-1.
+protected:
   virtual bool OpenDvr(void);
       ///< Opens the DVR of this device and prepares it to deliver a Transport
       ///< Stream for use in a cReceiver.
