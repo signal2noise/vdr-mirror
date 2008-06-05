@@ -995,7 +995,11 @@ void cRecordings::Refresh(bool Foreground)
 
 void cRecordings::ScanVideoDir(const char *DirName, bool Foreground, int LinkLevel)
 {
+#ifdef RBLITE
   SetPriority(17); // TB: unimportant thread
+#else
+  SetPriority(1); // TB: unimportant thread
+#endif
 
   if (DVDPlayerActive)
       return;
