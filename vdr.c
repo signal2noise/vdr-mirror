@@ -1246,16 +1246,29 @@ int main(int argc, char *argv[])
                break;
           // Audio track control:
           case kAudio:
-               if (cControl::Control(true))
-                  cControl::Control(true)->Hide();
-               if (!cDisplayTracks::IsOpen()) {
-                  DELETE_MENU;
-                  Menu = cDisplayTracks::Create();
-                  }
-               else
-                  cDisplayTracks::Process(key);
-               key = kNone;
-               break;
+	       {
+		       // kAudio is also used for toggling (lower/upper) case
+		       eOSState audioState = osUnknown;	
+		       if( Interact )				  // if Osd open, call its processKey
+			       audioState = Interact-> ProcessKey(key); 
+
+		       if(audioState != osUnknown) 		  // Osd has already processed kAudio, so donot open tracks
+		       {
+			       key = kNone; 			  // Osd ProcessKey() is called after switch-case, to avoid double call
+			       break; // kAudio already used
+		       }
+
+		       if (cControl::Control(true))
+			       cControl::Control(true)->Hide();
+		       if (!cDisplayTracks::IsOpen()) {
+			       DELETE_MENU;
+			       Menu = cDisplayTracks::Create();
+		       }
+		       else
+			       cDisplayTracks::Process(key);
+		       key = kNone;
+	       } //  {} needed for eOSState audioState definition
+	       break;
 
           // Aspect ratio
              case kAspect:

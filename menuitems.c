@@ -371,6 +371,7 @@ eOSState cMenuEditStrItem::ProcessKey(eKeys Key)
      return osContinue;
      }
   switch (Key) {
+    case kAudio: // also toggle case
     case kRed:   // Switch between upper- and lowercase characters
                  if (InEditMode()) {
                     if (!insert || !newchar) {
