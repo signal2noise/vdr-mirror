@@ -476,7 +476,7 @@ cCiTransportLayer::cCiTransportLayer(int Fd, int NumSlots)
   fd = Fd;
   numSlots = NumSlots;
   for (int s = 0; s < numSlots; s++)
-#if defined(RBLITE) || defined(CAM_NEW)
+#if defined(RBLITE)
 //      ResetSlot(s);
         tc[s].Reset(); // GA
 #else
