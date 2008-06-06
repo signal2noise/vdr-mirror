@@ -548,7 +548,7 @@ bool cDvbDevice::Ready(void)
      }
   return true;
 }
-#if !defined(RBLITE) && !defined(CAM_NEW)
+#if defined(RBLITE) || defined(CAM_NEW)
 int cDvbDevice::ProvidesCa(const cChannel *Channel) const
 {
   int NumCams = 0;
