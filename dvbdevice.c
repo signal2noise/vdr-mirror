@@ -457,7 +457,7 @@ cDvbDevice::cDvbDevice(int n)
           frontendType = FE_DVBS2;
         else
           frontendType = feinfo.type;
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
         ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
 #else
         int fd_ca = DvbOpen(DEV_DVB_CA, n, O_RDWR); // BUG: DvbOpen always returns -1 because there is no such device
@@ -548,7 +548,43 @@ bool cDvbDevice::Ready(void)
      }
   return true;
 }
-#ifndef RBLITE
+#if !defined(RBLITE) && !defined(CAM_NEW)
+int cDvbDevice::ProvidesCa(const cChannel *Channel) const
+{
+  int NumCams = 0;
+  unsigned short ids[MAXCAIDS + 1];
+  if((cDevice::GetDevice(0))->CiHandler())
+  NumCams = (cDevice::GetDevice(0))->CiHandler()->NumCams();
+  if (Channel->Ca() ) {
+        for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
+            ids[i] = Channel->Ca(i);
+    struct ReLink link;
+    cPlugin *p = cPluginManager::GetPlugin(RE_NAME);
+    if(p){
+      PrepareReLink(&link,this,OP_PROVIDES);
+      link.caids=ids;
+      link.channelNumber=Channel->Number();
+      if (DoReLinkOp(&link) > 0)
+      return NumCams + 1;
+    }
+  }
+  if (ciHandler) {
+     NumCams = ciHandler->NumCams();
+     if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
+        unsigned short ids[MAXCAIDS + 1];
+        for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
+            ids[i] = Channel->Ca(i);
+        if (ciHandler->ProvidesCa(ids))
+           return NumCams + 1;
+        }
+     }
+
+  int result = cDevice::ProvidesCa(Channel);
+  if (result > 0)
+     result += NumCams;
+    return result;
+}
+#else
 int cDvbDevice::ProvidesCa(const cChannel *Channel) const
 {
   int NumCams = 0;
@@ -566,30 +602,6 @@ int cDvbDevice::ProvidesCa(const cChannel *Channel) const
   if (result > 0) 
      result += NumCams;   
   return result;
-}
-#else
-int cDvbDevice::ProvidesCa(const cChannel *Channel) const
-{
-  int NumCams = 0;
-  unsigned short ids[MAXCAIDS + 1];
-  NumCams = (cDevice::GetDevice(0))->CiHandler()->NumCams();
-  if (Channel->Ca() ) {
-        for (int i = 0; i <= MAXCAIDS; i++) // '<=' copies the terminating 0!
-            ids[i] = Channel->Ca(i);
-    struct ReLink link;
-    cPlugin *p = cPluginManager::GetPlugin(RE_NAME);
-    if(p){
-      PrepareReLink(&link,this,OP_PROVIDES);
-      link.caids=ids;
-      link.channelNumber=Channel->Number();
-      if (DoReLinkOp(&link) > 0)
-      return NumCams + 1;
-    }
-  }
-  int result = cDevice::ProvidesCa(Channel);
-  if (result > 0)
-     result += NumCams;
-    return result;
 }
 #endif
 
@@ -868,7 +880,7 @@ bool cDvbDevice::ProvidesChannel(const cChannel *Channel, int Priority, bool *Ne
            if (Channel->Vpid() && !HasPid(Channel->Vpid()) || Channel->Apid(0) && !HasPid(Channel->Apid(0))) {
 #ifdef DO_MULTIPLE_RECORDINGS
 #ifndef DO_MULTIPLE_CA_CHANNELS
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
               if (Ca() >= CA_ENCRYPTED_MIN || Channel->Ca() >= CA_ENCRYPTED_MIN)
                  needsDetachReceivers = Ca() != Channel->Ca();
 #else
@@ -1030,7 +1042,7 @@ void cDvbDevice::SetTransferModeForDolbyDigital(int Mode)
 void cDvbDevice::SetAudioTrackDevice(eTrackType Type)
 {
   const tTrackId *TrackId = GetTrack(Type);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   int slotOnDev = GetSlotOnDev(this);
 #endif
   if (TrackId && TrackId->id) {
@@ -1038,17 +1050,17 @@ void cDvbDevice::SetAudioTrackDevice(eTrackType Type)
      if (IS_AUDIO_TRACK(Type) || (IS_DOLBY_TRACK(Type) && SetAudioBypass(true))) {
         if (pidHandles[ptAudio].pid && pidHandles[ptAudio].pid != TrackId->id) {
            DetachAll(pidHandles[ptAudio].pid);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
            if(cDevice::GetDevice(0)->CiHandler()) {
              (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, false);
 #else
            if(ciHandler) {
              ciHandler->SetPid(pidHandles[ptAudio].pid, false);
 #endif
-             }
+           }
            pidHandles[ptAudio].pid = TrackId->id;
            SetPid(&pidHandles[ptAudio], ptAudio, true);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
            if(cDevice::GetDevice(0)->CiHandler()) {
              (cDevice::GetDevice(0))->CiHandler()->SetPid(pidHandles[ptAudio].pid, slotOnDev, true);
              (cDevice::GetDevice(0))->CiHandler()->StartDecrypting();

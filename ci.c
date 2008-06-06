@@ -34,7 +34,7 @@ static int SysLogLevel = 3;
 */
 
 // Set these to 'true' for debug output:
-static bool DumpTPDUDataTransfer = true;
+static bool DumpTPDUDataTransfer = false;
 static bool DebugProtocol = true;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
@@ -476,7 +476,7 @@ cCiTransportLayer::cCiTransportLayer(int Fd, int NumSlots)
   fd = Fd;
   numSlots = NumSlots;
   for (int s = 0; s < numSlots; s++)
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
 //      ResetSlot(s);
         tc[s].Reset(); // GA
 #else
@@ -1506,7 +1506,7 @@ cCiHandler::cCiHandler()
       sessions[i] = NULL;
   }
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   for (int i = 0; i < MAX_CI_SLOT; i++) {
       moduleReady[i] = false;
       source[i] = transponder[i] = 0;
@@ -1531,7 +1531,7 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   for (int i = 0; i < MAX_CI_SESSION; i++)
       sessions[i] = NULL;
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   for (int i = 0; i < MAX_CI_SLOT; i++) {
       moduleReady[i] = false;
       source[i] = transponder[i] = 0;
@@ -1558,28 +1558,21 @@ cCiHandler::~cCiHandler()
   close(fd);
 }
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
 int cCiHandler::GetCaFd(void)
 {
   return dup(fd);
 }
 #endif
 
-#ifdef RBLITE
-cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
-#else
 cCiHandler *cCiHandler::CreateCiHandler(int fd_ca)
-#endif
 {
-#ifdef RBLITE
-  int fd_ca = open(FileName, O_RDWR);
-#endif
   if (fd_ca >= 0) {
      ca_caps_t Caps;
      if (ioctl(fd_ca, CA_GET_CAP, &Caps) == 0) {
         int NumSlots = Caps.slot_num;
         if (NumSlots > 0) {
-           //XXX dsyslog("CAM: found %d CAM slots", NumSlots); // TODO let's do this only once we can be sure that there _really_ is a CAM adapter!
+           dsyslog("CAM: found %d CAM slots", NumSlots); // TODO lets do this only once we can be sure that there _really_ is a CAM adapter!
            if ((Caps.slot_type & CA_CI_LINK) != 0)
               return new cCiHandler(fd_ca, NumSlots);
            else
@@ -1589,12 +1582,31 @@ cCiHandler *cCiHandler::CreateCiHandler(int fd_ca)
            esyslog("ERROR: no CAM slots found");
         }
      else
-#ifdef RBLITE
+         LOG_ERROR_STR("CA_GET_CAP");
+     }
+  return NULL;
+}
+
+cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
+{
+  int fd_ca = open(FileName, O_RDWR);
+  if (fd_ca >= 0) {
+     ca_caps_t Caps;
+     if (ioctl(fd_ca, CA_GET_CAP, &Caps) == 0) {
+        int NumSlots = Caps.slot_num;
+        if (NumSlots > 0) {
+           dsyslog("CAM: found %d CAM slots", NumSlots); // TODO lets do this only once we can be sure that there _really_ is a CAM adapter!
+           if ((Caps.slot_type & CA_CI_LINK) != 0)
+              return new cCiHandler(fd_ca, NumSlots);
+           else
+              isyslog("CAM doesn't support link layer interface");
+           }
+        else
+           esyslog("ERROR: no CAM slots found");
+        }
+     else
          LOG_ERROR_STR(FileName);
     close(fd_ca);
-#else
-        LOG_ERROR_STR("CA_GET_CAP");
-#endif
      }
   return NULL;
 }
@@ -1802,13 +1814,13 @@ void cCiHandler::SendCaPmt(void)
          if (cas) {
             // build the list of CA_PMT data:
             cList<cCiCaPmt> CaPmtList;
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
             for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
 #else
             for (cCiCaProgramData *p = caProgramList.First(); p; p = caProgramList.Next(p)) {
 #endif
                 bool Active = false;
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
                 cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));
 #else
                 cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source, transponder, p->programNumber, GetCaSystemIds(Slot));
@@ -1816,7 +1828,7 @@ void cCiHandler::SendCaPmt(void)
                 if (CaPmt->Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
                        if (q->active) {
-			       printf("###### ADD PID %i %x\n",q->pid,q->pid);
+			       printf("###### ADD PID %i %x SLOT %i\n",q->pid,q->pid, Slot);
                           CaPmt->AddPid(q->pid, q->streamType);
                           Active = true;
                           }
@@ -1879,13 +1891,9 @@ cCiEnquiry *cCiHandler::GetEnquiry(void)
 
 const char *cCiHandler::GetCamName(int Slot)
 {
-#if 1 //def RBLITE
   cMutexLock MutexLock(&mutex);
   cCiApplicationInformation *ai = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
   return ai ? ai->GetMenuString() : NULL;
-#else
-  return NULL;
-#endif
 }
 
 const unsigned short *cCiHandler::GetCaSystemIds(int Slot)
@@ -1912,26 +1920,26 @@ bool cCiHandler::ProvidesCa(const unsigned short *CaSystemIds)
   return false;
 }
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
 void cCiHandler::SetSource(int Source, int Transponder, int Slot)
 #else
 void cCiHandler::SetSource(int Source, int Transponder)
 #endif
 {
   cMutexLock MutexLock(&mutex);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   if ((Slot >= 0) && (source[Slot] != Source || transponder[Slot] != Transponder)) {
 #else
   if (source != Source || transponder != Transponder) {
 #endif
      //XXX if there are active entries, send an empty CA_PMT
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
      caProgramList[Slot].Clear();
 #else
      caProgramList.Clear();
 #endif
      }
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   source[Slot] = Source;
   transponder[Slot] = Transponder;
 #else
@@ -1940,7 +1948,7 @@ void cCiHandler::SetSource(int Source, int Transponder)
 #endif
 }
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
 void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType, int Slot)
 {
   if(Slot < 0 || Slot > 2 )
@@ -1981,18 +1989,18 @@ void cCiHandler::AddPid(int ProgramNumber, int Pid, int StreamType)
 }
 #endif
 
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
 void cCiHandler::SetPid(int Pid, bool Active, int Slot)
 #else
 void cCiHandler::SetPid(int Pid, bool Active)
 #endif
 {
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   if(Slot < 0 || Slot > 2 )
     return;
 #endif
   cMutexLock MutexLock(&mutex);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
 #else
   for (cCiCaProgramData *p = caProgramList.First(); p; p = caProgramList.Next(p)) {
@@ -2012,17 +2020,17 @@ bool cCiHandler::CanDecrypt(int ProgramNumber)
   for (int Slot = 0; Slot < numSlots; Slot++) {
       cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
       if (cas) {
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
          for (cCiCaProgramData *p = caProgramList[Slot].First(); p; p = caProgramList[Slot].Next(p)) {
 #else
          for (cCiCaProgramData *p = caProgramList.First(); p; p = caProgramList.Next(p)) {
 #endif
              if (p->programNumber == ProgramNumber) {
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
                 cCiCaPmt CaPmt(CPCI_QUERY, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));//XXX???
 #else
                 cCiCaPmt CaPmt(CPCI_QUERY, source, transponder, p->programNumber, GetCaSystemIds(Slot));//XXX???
-#endif		
+#endif         
                 if (CaPmt.Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
 //XXX                       if (q->active)

@@ -4778,7 +4778,7 @@ void cMenuSetupLNB::LoadActuall()
 // --- cMenuSetupCICAM -------------------------------------------------------
 
 bool camFound[3]; //TB: has the CAM been found successfully?!
-time_t firstTimeChecked[3]; //TB: first time we did check - used for deminining when we assume an error
+time_t firstTimeChecked[3]; //TB: first time we did check - used to determine if we assume an error
 
 class cMenuSetupCICAMItem : public cOsdItem {
 private:
@@ -4799,7 +4799,7 @@ cMenuSetupCICAMItem::cMenuSetupCICAMItem(int Device, cCiHandler *CiHandler, int 
   slot = Slot;
   char buffer[64];
   const char *CamName = CiHandler->GetCamName(slot);
-#ifndef RBLITE
+#if !defined(RBLITE) && !defined(CAM_NEW)
   slot=Device;
 #endif
   device=Device;
@@ -4931,7 +4931,7 @@ eOSState cMenuSetupCICAM::Reset(void)
      int device = item->Device();
      if (item->CiHandler()->Reset(slot)) {
         Skins.Message(mtInfo, tr("CAM has been reset"));
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
         camFound[slot] = 0;
 #else
 	camFound[device] = 0;

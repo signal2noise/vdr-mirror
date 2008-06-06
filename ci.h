@@ -117,7 +117,7 @@ private:
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   int source[MAX_CI_SLOT];
   int transponder[MAX_CI_SLOT];
   cList<cCiCaProgramData> caProgramList[MAX_CI_SLOT];
@@ -128,7 +128,7 @@ private:
 #endif
   uint32_t ResourceIdToInt(const uint8_t *Data);
   bool Send(uint8_t Tag, uint16_t SessionId, uint32_t ResourceId = 0, int Status = -1);
-#ifndef RBLITE
+#if !defined(RBLITE) && !defined(CAM_NEW)
   const unsigned short *GetCaSystemIds(int Slot);
 #endif
   cCiSession *GetSessionBySessionId(uint16_t SessionId);
@@ -136,7 +136,7 @@ private:
   cCiSession *CreateSession(uint32_t ResourceId);
   bool OpenSession(int Length, const uint8_t *Data);
   bool CloseSession(uint16_t SessionId);
-#ifndef RBLITE
+#if !defined(RBLITE) && !defined(CAM_NEW)
   int CloseAllSessions(int Slot);
 #endif
   cCiHandler(int Fd, int NumSlots);
@@ -144,11 +144,8 @@ private:
 public:
   cCiHandler();
   ~cCiHandler();
-#ifdef RBLITE
-  static cCiHandler *CreateCiHandler(const char *FileName);
-#else
   static cCiHandler *CreateCiHandler(int fd_ca);
-#endif
+  static cCiHandler *CreateCiHandler(const char *FileName);
        ///< Creates a new cCiHandler for the given CA device.
   int NumSlots(void) { return numSlots; }
        ///< Returns the number of CAM slots provided by this CA device.
@@ -171,7 +168,7 @@ public:
   const char *GetCamName(int Slot);
        ///< Returns the name of the CAM in the given Slot, or NULL if there
        ///< is no CAM in that slot.
-#ifdef RBLITE
+#if defined(RBITE) || defined(CAM_NEW)
   const unsigned short *GetCaSystemIds(int Slot);
 #endif
   bool ProvidesCa(const unsigned short *CaSystemIds); //XXX Slot???
@@ -181,7 +178,7 @@ public:
        ///< usually advertise several CA system ids, while the actual
        ///< decryption is controlled by the smart card inserted into
        ///< the CAM.
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   void SetSource(int Source, int Transponder, int Slot);
 #endif
   void SetSource(int Source, int Transponder);
@@ -189,14 +186,14 @@ public:
        ///< currently tuned to. If Source or Transponder are different than
        ///< what was given in a previous call to SetSource(), any previously
        ///< added PIDs will be cleared.
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   void AddPid(int ProgramNumber, int Pid, int StreamType, int Slot);
 #else
   void AddPid(int ProgramNumber, int Pid, int StreamType);
 #endif
        ///< Adds the given PID information to the list of PIDs. A later call
        ///< to SetPid() will (de)activate one of these entries.
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   void SetPid(int Pid, bool Active, int Slot);
 #else
   void SetPid(int Pid, bool Active);
@@ -214,7 +211,7 @@ public:
        ///< Triggers sending all currently active CA_PMT entries to the CAM,
        ///< so that it will start decrypting.
   bool Reset(int Slot);
-#ifdef RBLITE
+#if defined(RBLITE) || defined(CAM_NEW)
   int CloseAllSessions(int Slot);
   int GetCaFd(void);
 #endif
