@@ -5290,7 +5290,7 @@ void cMenuSetup::Set(void)
   Add(new cOsdItem(hk(tr("Recording settings")),     osUser6));
   Add(new cOsdItem(hk(tr("Replay settings")),        osUser7));
   Add(new cOsdItem(hk(tr("Miscellaneous")), osUser8));
-  Add(new cOsdItem(hk(tr("Permanent Timeshift")),osLiveBuffer));
+  Add(new cOsdItem(hk(tr("Permanent Timeshift")), osLiveBuffer));
   if (cPluginManager::HasPlugins())
   Add(new cOsdItem(hk(tr("Plugins")),       osUser9));
   Add(new cOsdItem(hk(tr("Restart")),       osUser10));

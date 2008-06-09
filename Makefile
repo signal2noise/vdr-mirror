@@ -26,7 +26,7 @@ PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= $(PLUGINDIR)/lib
 
 ifdef RBLITE
-  EXCLUDE_PLUGINS = -e xxvautotimer -e netcv -e update -e dpkg -e dpkgopt -e ripit -e mediad -e skinreelng -e webbrowser -e music -e ipod -e reelblog
+  EXCLUDE_PLUGINS = -e xxvautotimer -e netcv -e update -e dpkg -e dpkgopt -e ripit -e mediad -e skinreelng -e webbrowser -e ipod -e reelblog
 else
   EXCLUDE_PLUGINS = -e ipkg -e reelcam -e update -e xxvautotimer
 endif
