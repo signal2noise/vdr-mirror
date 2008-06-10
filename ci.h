@@ -168,7 +168,7 @@ public:
   const char *GetCamName(int Slot);
        ///< Returns the name of the CAM in the given Slot, or NULL if there
        ///< is no CAM in that slot.
-#if defined(RBITE) || defined(CAM_NEW)
+#if defined(RBLITE) || defined(CAM_NEW)
   const unsigned short *GetCaSystemIds(int Slot);
 #endif
   bool ProvidesCa(const unsigned short *CaSystemIds); //XXX Slot???
