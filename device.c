@@ -515,7 +515,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
             if (cDevice::GetDevice(0)->CiHandler()) {
               cDevice::GetDevice(0)->CiHandler()->SetPid(Pid, true, slotOnDev);
 			}
+#ifndef RBLITE
            CiSetPid(Pid, true);
+#endif
 #else
             if (ciHandler) {
               ciHandler->SetPid(Pid, true);
@@ -558,7 +560,9 @@ bool cDevice::AddPid(int Pid, ePidType PidType)
              ciHandler->SetPid(Pid, true);
            }
 #endif
+#ifndef RBLITE
            CiSetPid(Pid, true);
+#endif
         }
      }
   return true;
@@ -597,7 +601,9 @@ void cDevice::DelPid(int Pid, ePidType PidType)
                 ciHandler->SetPid(Pid, false);
                 }
 #endif
+#ifndef RBLITE
            CiSetPid(Pid, false);
+#endif
               }
            }
         PRINTPIDS("E");
@@ -883,7 +889,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
            ciHandler0->StartDecrypting();
 
-#if defined(RBLITE) || defined(CAM_NEW)
+#ifndef RBLITE
      CiSetSource(Channel->Source(), Channel->Transponder());
      if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
         CiAddPid(Channel->Sid(), Channel->Vpid(), 2);
@@ -1581,8 +1587,9 @@ bool cDevice::AttachReceiver(cReceiver *Receiver)
            cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
          }
 #endif
+#ifndef RBLITE
 	CiStartDecrypting();
-
+#endif
          return true;
          }
       }
@@ -1614,7 +1621,9 @@ void cDevice::Detach(cReceiver *Receiver)
     cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
   }
 #endif
+#ifndef RBLITE
 	CiStartDecrypting();
+#endif
 
   if (!receiversLeft)
      Cancel(3);
