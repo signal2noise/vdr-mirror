@@ -1777,9 +1777,10 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
                              SetStatus(NULL);
 			     unsigned int i;
-                             if((viewMode == mode_edit && !move) || channelMarked.empty()){
+                             if((viewMode == mode_edit && !move) || (channelMarked.empty() && viewMode == mode_view)){
 				Mark();
-				break;
+				return osContinue;
+				//break;
 			     }
 			     move = false;
                              std::sort(channelMarked.begin(), channelMarked.end());
@@ -1847,6 +1848,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			       else
 				  Mark();
 			   }
+		           return osContinue;
                            break;
               case kRed:   if(edit && channelMarked.size() == 0)
                                return EditChannel();
@@ -1871,12 +1873,25 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                             else
                                return NextBouquet();
                              break;
-              case kBlue:   if(edit && !move)
+              case kBlue:   if(viewMode == mode_view) {
+			     if(edit && !move)
+                               return NewChannel();
+                             else {
+                               //edit = true;
+			       viewMode = mode_edit;
+			       //SetGroup(Current());
+			       SetGroup(GetChannel(Current())->Index());
+                               Display();
+				
+                             }
+                            } else {
+			     if(edit && !move)
                                return NewChannel();
                              else {
                                edit = true;
                                Options();
                              }
+			    }
                              break;
               case k2digit:  AddFavourite(false);
 	                     break;
