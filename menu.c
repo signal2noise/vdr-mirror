@@ -1848,7 +1848,6 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			       else
 				  Mark();
 			   }
-		           return osContinue;
                            break;
               case kRed:   if(edit && channelMarked.size() == 0)
                                return EditChannel();
