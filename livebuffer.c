@@ -840,6 +840,8 @@ void cLiveBuffer::Action(void)
 {
   while (Running()) {
     int Count;
+    usleep(20); //hack to avoid a busy situation, when no other thread will get the mutex
+                //TODO: restrict Lock to a few code segments or implement a fair mutex
     Lock(); 
     uchar *p = remux->Get(Count, &pictureType, 1);
     if (p) {
@@ -855,6 +857,7 @@ void cLiveBuffer::Action(void)
 
 void cLiveBuffer::SetNewRemux(cRemux *Remux, bool Clear)
 { 
+  printf("------cLiveBuffer::SetNewRemux--------\n");
   if (Clear) {
     index->Switched();
     }
@@ -866,10 +869,13 @@ void cLiveBuffer::SetNewRemux(cRemux *Remux, bool Clear)
     Start();
     }
   else {
+    printf("------cLiveBuffer::SetNewRemux, vor Lock--------\n");
     Lock();
+    printf("------cLiveBuffer::SetNewRemux, nach Lock--------\n");
     remux = Remux;
     Unlock();
-    }
+    } 
+   printf("------cLiveBuffer::SetNewRemux, vor return--------\n");
 }
 
 int cLiveBuffer::GetFrame(uchar **Buffer, int Number, int Off)
