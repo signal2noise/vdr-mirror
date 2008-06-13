@@ -1415,16 +1415,16 @@ void cMenuBouquets::Mark()
         cMenuChannelItem *p = (cMenuChannelItem *)Get(Current());
 	if (p) {
 	   if (p->IsMarked()){
-              printf("UNMARKED chan nr: %i name: %s\n", Current(), GetChannel(Current())->Name());
+              //printf("UNMARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name());
 	      p->SetMarked(false);
               unsigned int i;
 	      for (i=0; i<channelMarked.size(); i++)
-		if (channelMarked.at(i) == GetChannel(Current())->Index())
+		if (channelMarked.at(i) == GetChannel(Current())->Number())
 	           channelMarked.erase(channelMarked.begin()+i);
 	   } else {
-              printf("MARKED chan nr: %i name: %s\n", Current(), GetChannel(Current())->Name() );
+              //printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
 	      p->SetMarked(true);
-              channelMarked.push_back(GetChannel(Current())->Index());
+              channelMarked.push_back(GetChannel(Current())->Number());
 	      CursorDown();
            }
            p->Set();
@@ -1529,10 +1529,13 @@ eOSState cMenuBouquets::DeleteChannel(void)
  	/* the numbers of the channels that still have to be deleted will change */
         if(!channelMarked.empty())
 	   std::sort(channelMarked.begin(), channelMarked.end());
-	for (i=channelMarked.size()-1; i>=0; i--) {
-           int Index = channelMarked.at(i);
-           cChannel *channel = GetChannel(channelMarked.at(i));
+	//printf("XXX: size: %i\n", channelMarked.size());
+	for (i=channelMarked.size(); i>0; i--) {
+           //int Index = channelMarked.at(i);
+           cChannel *channel = Channels.GetByNumber(channelMarked.at(i-1)); //GetChannel(channelMarked.at(i));
+	   //int Index = channel->Index();
            int DeletedChannel = channel->Number();
+	   //printf("XXX: i: %i at(i): %i Name: %s index: %i\n", i-1, channelMarked.at(i-1), channel->Name(), channel->Index());
            // Check if there is a timer using this channel:
            for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti)) {
                if (ti->Channel() == channel) {
@@ -1543,12 +1546,27 @@ eOSState cMenuBouquets::DeleteChannel(void)
            if (confirmed || Interface->Confirm(tr("Delete channels?"))) {
 	      confirmed = true;
               Channels.Del(channel);
-              cOsdMenu::Del(Index);
+
+		  int start = Current() - LOAD_RANGE;
+		  int end = Current() + LOAD_RANGE;
+		  cChannel *channel;
+		  if(Count() < end) end = Count();
+		  if(start < 0) start = 0;
+ 
+ 		 for(int i = start; i<end; i++){
+  		    cMenuChannelItem *p = (cMenuChannelItem *)Get(i);
+   		    if(p) {
+   		      if(p->IsMarked())
+			cOsdMenu::Del(i);
+      		    }
+  		}
+               //cOsdMenu::Del(Index);
               Propagate();
               isyslog("channel %d deleted", DeletedChannel);
            }
          }
-	channelMarked.clear();
+	if(!channelMarked.empty())
+		channelMarked.clear();
      }
   }
   return osContinue;
@@ -1844,7 +1862,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              break;
               case kYellow: if(edit && !move)  // Delete
                                DeleteChannel();
-                             else
+                            else
                                return NextBouquet();
                              break;
               case kBlue:   if(edit && !move)
