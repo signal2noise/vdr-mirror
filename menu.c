@@ -1411,6 +1411,7 @@ void cMenuBouquets::Mark()
 {
 
   if (Count()) {
+     edit = false;
      if (viewMode == mode_edit) {
         cMenuChannelItem *p = (cMenuChannelItem *)Get(Current());
 	if (p) {
@@ -1430,8 +1431,9 @@ void cMenuBouquets::Mark()
            p->Set();
 	   Display();
 	}
+	if(!channelMarked.empty())
+		edit=true;
      }
-     edit = false;
      Options();
      //SetStatus(tr("1-9 for new location - OK to move"));
      if (viewMode == mode_view)
@@ -1680,10 +1682,10 @@ void cMenuBouquets::Options()
         SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
   } else {
      if(edit && !move) {
-	if(channelMarked.size() >= 0 && channelMarked.size() <= 1)
+	if(channelMarked.size() == 0)
            SetHelp(tr("Edit"), tr("Move"), tr("Delete"), tr("New"));
 	else
-	   SetHelp(NULL, tr("Move"), tr("Delete"), tr("New"));
+	   SetHelp(tr("Bouquets"), tr("Move"), tr("Delete"), tr("New"));
      } else
         SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
   }
@@ -1775,7 +1777,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
                              SetStatus(NULL);
 			     unsigned int i;
-                             if(viewMode == mode_edit && !move){
+                             if((viewMode == mode_edit && !move) || channelMarked.empty()){
 				Mark();
 				break;
 			     }
@@ -1846,7 +1848,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				  Mark();
 			   }
                            break;
-              case kRed:   if(edit && !move)
+              case kRed:   if(edit && channelMarked.size() == 0)
                                return EditChannel();
                             else
                                return ListBouquets();
