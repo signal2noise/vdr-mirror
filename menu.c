@@ -1386,8 +1386,8 @@ void cMenuBouquets::SetGroup(int Index)
             currentItem = item;
 	 unsigned int i;
 	 for (i=0; i<channelMarked.size(); i++) {
-	    if (channelMarked.at(i) == channel->Index()){
-	       printf("MARKING chan nr: %i name: %s\n", i, channel->Name());
+	    if (channelMarked.at(i) == channel->Number()){
+	       //printf("MARKING chan pos %i nr: %i name: %s\n", i, channel->Number(), channel->Name());
 	       item->SetMarked(true);
 	       item->Set();
             }
@@ -1583,7 +1583,11 @@ void cMenuBouquets::Move(int From, int To)
 {
   int CurrentChannelNr = cDevice::CurrentChannel();
   cChannel *CurrentChannel = Channels.GetByNumber(CurrentChannelNr);
-  cChannel *FromChannel = (cChannel*) Channels.Get(From);
+  cChannel *FromChannel;
+  if(viewMode == mode_view)
+     FromChannel = (cChannel*) Channels.Get(From);
+  else
+     FromChannel = (cChannel*) Channels.GetByNumber(From);
   cChannel *ToChannel = (cChannel*) Channels.Get(To);
   if (FromChannel && ToChannel && (From != To)) {
      int FromNumber = FromChannel->Number();
@@ -1779,7 +1783,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              std::sort(channelMarked.begin(), channelMarked.end());
 	
                              for (i = 0; i < channelMarked.size(); i++) {
-				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name(), current);
+				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.GetByNumber(channelMarked.at(i))->Name(), current);
 				   cMenuChannelItem *p = (cMenuChannelItem *)Get(current);
 				   //printf("1 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
 				   if(p){
