@@ -1387,6 +1387,7 @@ void cMenuBouquets::SetGroup(int Index)
 	 unsigned int i;
 	 for (i=0; i<channelMarked.size(); i++) {
 	    if (channelMarked.at(i) == channel->Index()){
+	       printf("MARKING chan nr: %i name: %s\n", i, channel->Name());
 	       item->SetMarked(true);
 	       item->Set();
             }
@@ -1416,7 +1417,7 @@ void cMenuBouquets::Mark()
 	   if (p->IsMarked()){
               printf("UNMARKED chan nr: %i name: %s\n", Current(), GetChannel(Current())->Name());
 	      p->SetMarked(false);
-              int i;
+              unsigned int i;
 	      for (i=0; i<channelMarked.size(); i++)
 		if (channelMarked.at(i) == GetChannel(Current())->Index())
 	           channelMarked.erase(channelMarked.begin()+i);
@@ -1521,7 +1522,7 @@ eOSState cMenuBouquets::DeleteChannel(void)
            isyslog("channel %d deleted", DeletedChannel);
            }
      } else {
-        int i;
+        int unsigned i;
         bool confirmed = false;
         /* sort and begin from behind: */ 
  	/* channels must be deleted from the end, otherwise */
@@ -1751,7 +1752,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              int current;
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
                              SetStatus(NULL);
-			     int i;
+			     unsigned int i;
                              if(viewMode == mode_edit && !move){
 				Mark();
 				break;
@@ -1788,7 +1789,6 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->Set();
 				   }
 		
-				   Display();
 				   if (channelMarked.at(i)>current)
 					current++;
 
@@ -1798,7 +1798,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->SetMarked(false);
 				      p->Set();
 				   }
-				   int j;
+				   unsigned int j;
 				   for(j=i; j<channelMarked.size(); j++)
 					if(channelMarked.at(j) < current)
 						channelMarked[j]--;
@@ -1816,6 +1816,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			     //printf("\n");
 			     channelMarked.clear();
 			     edit = false;
+ 			     SetGroup(current);
                            } else {
 			       if(viewMode == mode_view)
                                   return Switch();
