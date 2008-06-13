@@ -558,33 +558,40 @@ eOSState cMenuEditChannel::ProcessKey(eKeys Key)
 
 class cMenuChannelItem : public cOsdItem {
 public:
+  enum eViewMode { mode_edit, mode_view };
   enum eChannelSortMode { csmNumber, csmName, csmProvider };
 private:
   static eChannelSortMode sortMode;
+  enum eViewMode viewMode;
   cChannel *channel;
   cSchedulesLock schedulesLock;
   const cSchedules *schedules;
   const cEvent *event;
   char szProgressPart[12];
   bool isSet;
+  bool isMarked;
 public:
-  cMenuChannelItem(cChannel *Channel);
+  cMenuChannelItem(cChannel *Channel, eViewMode viewMode = mode_view);
   static void SetSortMode(eChannelSortMode SortMode) { sortMode = SortMode; }
   static void IncSortMode(void) { sortMode = eChannelSortMode((sortMode == csmProvider) ? csmNumber : sortMode + 1); }
   static eChannelSortMode SortMode(void) { return sortMode; }
   virtual int Compare(const cListObject &ListObject) const;
   virtual void Set(void);
   bool IsSet(void);
+  bool IsMarked(void) { return isMarked; }
+  void SetMarked(bool marked) { isMarked = marked; }
   cChannel *Channel(void) { return channel; }
   };
 
 cMenuChannelItem::eChannelSortMode cMenuChannelItem::sortMode = csmNumber;
 
-cMenuChannelItem::cMenuChannelItem(cChannel *Channel)
+cMenuChannelItem::cMenuChannelItem(cChannel *Channel, eViewMode vMode)
 {
   channel = Channel;
   event = NULL;
   isSet = false;
+  isMarked = false;
+  viewMode = vMode;
   szProgressPart[0] = '\0'; /* initialize to valid string */
   if (channel->GroupSep())
      SetSelectable(false);
@@ -616,7 +623,7 @@ void cMenuChannelItem::Set(void)
   char *buffer = NULL;
   if (!channel->GroupSep()) {
      schedules = cSchedules::Schedules(schedulesLock);
-     if (schedules) {
+     if (schedules && viewMode == mode_view) {
 	const cSchedule *Schedule = schedules->GetSchedule(channel->GetChannelID());
 	if (Schedule) {
 	   event = Schedule->GetPresentEvent();
@@ -634,7 +641,13 @@ void cMenuChannelItem::Set(void)
      }
      if (sortMode == csmProvider)
         asprintf(&buffer, "%d\t%s - %s", channel->Number(), channel->Provider(), channel->Name());
-     else if (strcmp(Skins.Current()->Name(), "Reel") == 0)
+     else if (viewMode == mode_edit) {
+	if(isMarked)
+	    //TB: hack: \x87 is only displayed when followed by some ascii char - so using the invisible \x7f
+           asprintf(&buffer, "\x87 \x7f \t%d\t%s", channel->Number(), channel->Name());
+	else
+           asprintf(&buffer, "\t%d\t%s", channel->Number(), channel->Name());
+     } else if (strcmp(Skins.Current()->Name(), "Reel") == 0)
         asprintf(&buffer, "%02d\t%-.17s\t%s%-.40s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
      else
         asprintf(&buffer, "%d\t%-.17s\t%s    %-.20s", channel->Number(), channel->Name(), szProgressPart, event?event->Title():" ");
@@ -651,7 +664,10 @@ void cMenuChannelItem::Set(void)
 #define CHANNELNUMBERTIMEOUT 1500 //ms
 
 class cMenuChannels : public cOsdMenu {
+public:
+  enum eViewMode { mode_view, mode_edit };
 private:
+  enum eViewMode viewMode;
   int number;
   cTimeMs numberTimer;
   void Setup(void);
@@ -665,16 +681,17 @@ protected:
   eOSState Delete(void);
   virtual void Move(int From, int To);
 public:
-  cMenuChannels(void);
+  cMenuChannels(eViewMode mode = mode_view);
   ~cMenuChannels();
   virtual eOSState ProcessKey(eKeys Key);
   virtual void Display(void);
   };
 
-cMenuChannels::cMenuChannels(void)
+cMenuChannels::cMenuChannels(eViewMode mode)
 :cOsdMenu(tr("Channels"), CHNUMWIDTH)
 {
   number = 0;
+  viewMode = mode;
   Setup();
   Channels.IncBeingEdited();
   if (strcmp(Skins.Current()->Name(), "Reel") == 0)
@@ -1266,18 +1283,27 @@ eOSState cMenuBouquetsList::ProcessKey(eKeys Key)
 
 //#define CHANNELNUMBERTIMEOUT 1000 //ms
 
-cMenuBouquets::cMenuBouquets(int view)
+cMenuBouquets::cMenuBouquets(int view, enum eViewMode mode)
 :cOsdMenu("", CHNUMWIDTH)
 {
   edit = false;
+  viewMode = mode;
+  move = false;
   favourite = false;
   number = 0;
-  channelMarked = -1;
+  //channelMarked = -1;
   startChannel = 0;
-  if (strcmp(Skins.Current()->Name(), "Reel") == 0)
-      SetCols(4, 14, 6);
-  else
-      SetCols(5, 18, 6);
+  if (viewMode == mode_view) {
+    if (strcmp(Skins.Current()->Name(), "Reel") == 0)
+        SetCols(4, 14, 6);
+    else
+        SetCols(5, 18, 6);
+  } else {
+    if (strcmp(Skins.Current()->Name(), "Reel") == 0)
+        SetCols(4, 4, 14, 6);
+    else
+        SetCols(4, 5, 18, 6);
+  }
   if (view == 1)
     AddSubMenu(new cMenuBouquetsList());
   else if (view == 2) {
@@ -1350,12 +1376,23 @@ void cMenuBouquets::SetGroup(int Index)
   Clear();
   for (cChannel *channel = firstChannel; channel && !channel->GroupSep(); channel = Channels.Next(channel)) {
       if (/*cMenuChannelItem::SortMode() == cMenuChannelItem::csmNumber &&*/ *channel->Name()) {
-         cMenuChannelItem *item = new cMenuChannelItem(channel);
+            cMenuChannelItem *item;
+	 if(viewMode == mode_edit)
+            item = new cMenuChannelItem(channel, cMenuChannelItem::mode_edit);
+	 else
+            item = new cMenuChannelItem(channel);
          Add(item);
          if (channel == currentChannel)
             currentItem = item;
-         }
-      }
+	 unsigned int i;
+	 for (i=0; i<channelMarked.size(); i++) {
+	    if (channelMarked.at(i) == channel->Index()){
+	       item->SetMarked(true);
+	       item->Set();
+            }
+	 }
+       }
+    }
 //  if (cMenuChannelItem::SortMode() != cMenuChannelItem::csmNumber)
 //     Sort();
 
@@ -1372,12 +1409,32 @@ cChannel *cMenuBouquets::GetChannel(int Index)
 void cMenuBouquets::Mark()
 {
 
-  if (Count() && channelMarked < 0) {
-     channelMarked = GetChannel(Current())->Index();
+  if (Count()) {
+     if (viewMode == mode_edit) {
+        cMenuChannelItem *p = (cMenuChannelItem *)Get(Current());
+	if (p) {
+	   if (p->IsMarked()){
+              printf("UNMARKED chan nr: %i name: %s\n", Current(), GetChannel(Current())->Name());
+	      p->SetMarked(false);
+              int i;
+	      for (i=0; i<channelMarked.size(); i++)
+		if (channelMarked.at(i) == GetChannel(Current())->Index())
+	           channelMarked.erase(channelMarked.begin()+i);
+	   } else {
+              printf("MARKED chan nr: %i name: %s\n", Current(), GetChannel(Current())->Name() );
+	      p->SetMarked(true);
+              channelMarked.push_back(GetChannel(Current())->Index());
+	      CursorDown();
+           }
+           p->Set();
+	   Display();
+	}
+     }
      edit = false;
      Options();
      //SetStatus(tr("1-9 for new location - OK to move"));
-     SetStatus(tr("Up/Dn for new location - OK to move"));
+     if (viewMode == mode_view)
+        SetStatus(tr("Up/Dn for new location - OK to move"));
      }
 }
 
@@ -1446,23 +1503,53 @@ eOSState cMenuBouquets::EditChannel(void)
 eOSState cMenuBouquets::DeleteChannel(void)
 {
   if (!HasSubMenu() && Count() > 0) {
-     int Index = Current();
-     cChannel *channel = GetChannel(Current());
-     int DeletedChannel = channel->Number();
-     // Check if there is a timer using this channel:
-     for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti)) {
-         if (ti->Channel() == channel) {
-            Skins.Message(mtError, tr("Channel is being used by a timer!"));
-            return osContinue;
+     if (viewMode == mode_view || channelMarked.empty()) {
+        int Index = Current();
+        cChannel *channel = GetChannel(Current());
+        int DeletedChannel = channel->Number();
+        // Check if there is a timer using this channel:
+        for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti)) {
+            if (ti->Channel() == channel) {
+               Skins.Message(mtError, tr("Channel is being used by a timer!"));
+               return osContinue;
+               }
             }
+        if (Interface->Confirm(tr("Delete channel?"))) {
+           Channels.Del(channel);
+           cOsdMenu::Del(Index);
+           Propagate();
+           isyslog("channel %d deleted", DeletedChannel);
+           }
+     } else {
+        int i;
+        bool confirmed = false;
+        /* sort and begin from behind: */ 
+ 	/* channels must be deleted from the end, otherwise */
+ 	/* the numbers of the channels that still have to be deleted will change */
+        if(!channelMarked.empty())
+	   std::sort(channelMarked.begin(), channelMarked.end());
+	for (i=channelMarked.size()-1; i>=0; i--) {
+           int Index = channelMarked.at(i);
+           cChannel *channel = GetChannel(channelMarked.at(i));
+           int DeletedChannel = channel->Number();
+           // Check if there is a timer using this channel:
+           for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti)) {
+               if (ti->Channel() == channel) {
+                  Skins.Message(mtError, tr("Channel is being used by a timer!"));
+                  return osContinue;
+                  }
+               }
+           if (confirmed || Interface->Confirm(tr("Delete channels?"))) {
+	      confirmed = true;
+              Channels.Del(channel);
+              cOsdMenu::Del(Index);
+              Propagate();
+              isyslog("channel %d deleted", DeletedChannel);
+           }
          }
-     if (Interface->Confirm(tr("Delete channel?"))) {
-        Channels.Del(channel);
-        cOsdMenu::Del(Index);
-        Propagate();
-        isyslog("channel %d deleted", DeletedChannel);
-        }
+	channelMarked.clear();
      }
+  }
   return osContinue;
 }
 
@@ -1487,7 +1574,7 @@ void cMenuBouquets::Move(int From, int To)
      SetGroup(startChannel);
      Display();
      if(ToNumber)
-     isyslog("channel %d moved to %d", FromNumber, ToNumber);
+       isyslog("channel %d moved to %d", FromNumber, ToNumber);
      else
        isyslog("channel %d moved to %s", FromNumber, ToChannel->Name());
      if (CurrentChannel && CurrentChannel->Number() != CurrentChannelNr)
@@ -1563,10 +1650,20 @@ eOSState cMenuBouquets::NextBouquet()
 
 void cMenuBouquets::Options()
 {
-  if(edit)
-    SetHelp(tr("Edit"), tr("Move"), tr("Delete"), tr("New"));
-  else
-    SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
+  if (viewMode == mode_view) {
+     if(edit)
+        SetHelp(tr("Edit"), tr("Move"), tr("Delete"), tr("New"));
+     else
+        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
+  } else {
+     if(edit && !move) {
+	if(channelMarked.size() >= 0 && channelMarked.size() <= 1)
+           SetHelp(tr("Edit"), tr("Move"), tr("Delete"), tr("New"));
+	else
+	   SetHelp(NULL, tr("Move"), tr("Delete"), tr("New"));
+     } else
+        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
+  }
 }
 
 #define LOAD_RANGE 20
@@ -1593,6 +1690,7 @@ void cMenuBouquets::Display(void){
   }
   else
     SetTitle("");
+  Options();
   cOsdMenu::Display();
 }
 
@@ -1648,41 +1746,112 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                   }
                             Setup();
                             break;
-              case kOk:    if (channelMarked >= 0)
+              case kOk:    if (channelMarked.size() > 0)
                            {
                              int current;
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
                              SetStatus(NULL);
-                             if (channelMarked != current)
-                             {
-                                if(current < channelMarked && Channels.Get(current)->GroupSep()) current++;
-                                    Move(channelMarked , current);
-                             }
-                              channelMarked = -1;
-                            }
-                            else
-                               return Switch();
-                            break;
-              case kRed:   if(edit)
+			     int i;
+                             if(viewMode == mode_edit && !move){
+				Mark();
+				break;
+			     }
+			     move = false;
+                             std::sort(channelMarked.begin(), channelMarked.end());
+	
+                             for (i = 0; i < channelMarked.size(); i++) {
+				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name(), current);
+				   cMenuChannelItem *p = (cMenuChannelItem *)Get(current);
+				   //printf("1 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
+				   if(p){
+				      p->SetMarked(false);
+				      p->Set();
+				   }
+                                if (channelMarked.at(i) != current)
+                                {
+                                  if(current < channelMarked.at(i) && Channels.Get(current)->GroupSep()) current++;
+				  if(i== 0 && channelMarked.at(i) < current)
+					current--;
+                                  Move(channelMarked.at(i) , current);
+                                }
+			        if (viewMode == mode_edit) {
+				   p = (cMenuChannelItem *)Get(current);
+				   //printf("2 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
+				   if(p){
+				      p->SetMarked(false);
+				      p->Set();
+				   }
+		                   p = (cMenuChannelItem *)Get(channelMarked.at(i));
+				   //printf("3 UNMARKING nr. %i name: %s\n", channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name()); 
+				   if(p){
+				      p->SetMarked(false);
+				      p->Set();
+				   }
+		
+				   Display();
+				   if (channelMarked.at(i)>current)
+					current++;
+
+				   p = (cMenuChannelItem *)Get(current);
+				   //printf("4 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
+				   if(p){
+				      p->SetMarked(false);
+				      p->Set();
+				   }
+				   int j;
+				   for(j=i; j<channelMarked.size(); j++)
+					if(channelMarked.at(j) < current)
+						channelMarked[j]--;
+			        }
+                              }
+			     //printf("5 UNMARKING ");
+                             for (i = 0; i < channelMarked.size(); i++) {
+				   //printf("nr. %i name: %s, ", channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name()); 
+		                   cMenuChannelItem *p = (cMenuChannelItem *)Get(channelMarked.at(i));
+				   if(p){
+				      p->SetMarked(false);
+				      p->Set();
+				   }
+			     }					
+			     //printf("\n");
+			     channelMarked.clear();
+			     edit = false;
+                           } else {
+			       if(viewMode == mode_view)
+                                  return Switch();
+			       else
+				  Mark();
+			   }
+                           break;
+              case kRed:   if(edit && !move)
                                return EditChannel();
                             else
                                return ListBouquets();
-              case kGreen:  if(edit) // Move
-                               Mark();
-                             else
-                               return PrevBouquet();
+              case kGreen:   if (viewMode == mode_view) {
+			        if(edit) // Move
+                                  Mark();
+                                else
+                                  return PrevBouquet();
+                             } else {
+			        if(edit && !move) { // Move
+                                  SetStatus(tr("Up/Dn for new location - OK to move"));
+                                  move = true;
+				  Options();
+                                } else
+                                  return PrevBouquet();
+			     }
                              break;
-              case kYellow: if(edit)  // Delete
+              case kYellow: if(edit && !move)  // Delete
                                DeleteChannel();
                              else
                                return NextBouquet();
                              break;
-              case kBlue:   if(edit)
+              case kBlue:   if(edit && !move)
                                return NewChannel();
                              else {
                                edit = true;
                                Options();
-                               }
+                             }
                              break;
               case k2digit:  AddFavourite(false);
 	                     break;
@@ -5653,7 +5822,7 @@ eOSState cMenuMain::ProcessKey(eKeys Key)
 
   switch (state) {
     case osSchedule:   return AddSubMenu(new cMenuSchedule);
-    case osChannels:   return AddSubMenu(new cMenuChannels);
+    case osChannels:   return AddSubMenu(new cMenuBouquets(0, cMenuBouquets::mode_edit)); //TB cMenuChannels);
     case osTimers:     return AddSubMenu(new cMenuTimers);
     case osRecordings: return AddSubMenu(new cMenuRecordings);
     case osSetup:      return AddSubMenu(new cMenuSetup);

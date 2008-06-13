@@ -20,6 +20,7 @@
 #include "skins.h"
 #include "submenu.h"
 #include "help.h"
+#include <vector>
 
 class cMenuText : public cOsdMenu {
 private:
@@ -304,12 +305,16 @@ public:
   };
 
 class cMenuBouquets : public cOsdMenu {
+public:
+  enum eViewMode { mode_view, mode_edit };
 private:
+  enum eViewMode viewMode;
   bool edit;
   bool favourite;
+  bool move;
   int startChannel;
   int number;
-  int channelMarked;
+  std::vector<int> channelMarked;
   cTimeMs numberTimer;
   void Setup(void);
   void SetGroup(int Index);
@@ -329,7 +334,7 @@ protected:
   void Mark(void);
   virtual void Move(int From, int To);
 public:
-  cMenuBouquets(int view);
+  cMenuBouquets(int view, eViewMode viewMode = mode_view);
   ~cMenuBouquets(void);
   void AddFavourite(bool active);
   virtual eOSState ProcessKey(eKeys Key);
