@@ -1927,7 +1927,9 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              break;
               case k2digit:  AddFavourite(false);
 	                     break;
-              case kGreater: return AddSubMenu(new cMenuChannels());
+              case kGreater: if (viewMode == mode_view)
+			        return AddSubMenu(new cMenuChannels());
+			     break;
     	      default: break;
               }
             }
