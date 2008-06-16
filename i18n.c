@@ -11058,15 +11058,15 @@ const tI18nPhrase Phrases[] = {
     "",// TODO Dansk
     "",// TODO »esky (Czech)
   },
-  { "Timer conflicts",
-    "Timer-Konflikte",
+  { "Timer conflicts -",
+    "Timer-Konflikte -",
     "",// TODO
     "",// TODO
     "",// TODO
     "",// TODO
-    "Conflits de programmation",
+    "Conflits de programmation -",
     "",// TODO
-    "P‰‰llekk‰iset ajastimet",
+    "P‰‰llekk‰iset ajastimet -",
     "",// TODO
     "",// TODO
     "",// TODO
