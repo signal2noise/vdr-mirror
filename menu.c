@@ -431,6 +431,7 @@ private:
   cChannel *channel;
   cChannel data;
   char name[256];
+  char titleBuf[128];
   void Setup(void);
 public:
   cMenuEditChannel(cChannel *Channel, bool New = false);
@@ -441,6 +442,9 @@ cMenuEditChannel::cMenuEditChannel(cChannel *Channel, bool New)
 :cOsdMenu(tr("Edit channel"), 16)
 {
   channel = Channel;
+  strcpy((char*)&titleBuf, tr("Edit channel"));
+  strcat((char*)&titleBuf, "menunormalhidden");
+  SetTitle((const char*)&titleBuf);
   if (channel) {
      data = *channel;
      if (New) {
