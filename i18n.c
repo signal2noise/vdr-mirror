@@ -436,29 +436,6 @@ const tI18nPhrase Phrases[] = {
     "Indstillinger",
     "Nastavení",
   },
-  { "Setup.OSD$OSD Font Size",
-    "Menü Schriftgröße",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-  },
-
   { "Changes done",
     "Einstellungen übernommen",
     "",
@@ -1077,7 +1054,7 @@ const tI18nPhrase Phrases[] = {
     "Ukonèit",
   },
   { "Button$Resume",
-    "Weiter",
+    "Fortsetzen",
     "Nadaljuj",
     "Riprendi",
     "Verder",
@@ -1759,7 +1736,7 @@ const tI18nPhrase Phrases[] = {
     "Tryk vilkårlig tast for at annullere sluk",
     "Jakákoliv klávesa zru¹í vypnutí",
   },
-  { VDRNAME " shutting down", // VDRNAME will be replayed by the name of the box, i.e. ReelBox
+  { VDRNAME " shutting down", // VDRNAME will be replaced by the name of the box, i.e. ReelBox
     VDRNAME " fährt herunter",
     "",//TODO
     "",//TODO
@@ -2249,7 +2226,7 @@ const tI18nPhrase Phrases[] = {
     "Prenos",
     "Trasmissione",
     "Transmissie",
-	"Transmission",
+    "Transmission",
     "Transmission",
     "Transmission",
     "Transmissio",
@@ -2309,6 +2286,50 @@ const tI18nPhrase Phrases[] = {
     "Hierarhia",
     "Hierarki",
     "Hierarchy",
+  },
+  { "Select channels with OK",
+    "Wählen sie mit OK gewünschte Kanäle aus",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
+  { "Delete channels?",
+    "Ausgewählte Kanäle löschen?",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   // Timer parameters:
   { "Active",
@@ -3501,7 +3522,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "Setup.OSD$OSD Font Size",
+  { "Setup.OSD$OSD Font Size",
     "OSD Schrift Größe",
     "",
     "",
@@ -3522,7 +3543,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   },
+  },
   { "Large",
     "groß",
     "",
@@ -3963,7 +3984,7 @@ const tI18nPhrase Phrases[] = {
     "Optagelser i foldere",
     "Seznam nahrávek",
   },
-   { "Setup.OSD$Ok shows",
+  { "Setup.OSD$Ok shows",
     "Ok Taste zeigt",
     "",
     "",
@@ -3985,7 +4006,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "Setup.OSD$Use Symbol",
+  { "Setup.OSD$Use Symbol",
     "Symbol anzeigen",
     "",
     "",
@@ -4007,7 +4028,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "Setup.OSD$ScrollBar Width",
+  { "Setup.OSD$ScrollBar Width",
     "Breite Scrollbalken",
     "",
     "",
@@ -4029,7 +4050,51 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "Expertmenu",
+  { "Setup.OSD$OSD Font Size",
+    "Menü Schriftgröße",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  },
+  { "Setup.OSD$Remain Time",
+    "Kanalinfo Restlaufzeit anzeigen",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
+  { "Expertmenu",
     "Expertenmenü",
     "",
     "",
@@ -4051,7 +4116,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "OSD - Expertmenu",
+  { "OSD - Expertmenu",
     "OSD - Expertenmenü",
     "",
     "",
@@ -4073,7 +4138,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
-   { "channelinfo", //note that this is the second part of channel... so it is either channelinfo or channellist
+  { "channelinfo", //note that this is the second part of channel... so it is either channelinfo or channellist
     "Kanalinfo",
     "",
     "",
@@ -4116,7 +4181,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   },
+  },
   { "Dish settings",
     "Antenneneinstellungen",
     "",
@@ -4138,7 +4203,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   },
+  },
   { "System settings",
     "Systemeinstellungen",
     "",
@@ -4160,7 +4225,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   },
+  },
   { "Languages / OSD",
     "Sprache / OSD",
     "",
@@ -4182,7 +4247,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   },
+  },
   { "Setup.EPG$EPG scan timeout (h)",
     "Zeit bis zur EPG-Aktualisierung (h)",
     "Èas do EPG pregleda (h)",
@@ -4336,7 +4401,7 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
     "" // CZ
-   },
+  },
   { "Setup.EPG$Preferred language", // note the singular
     "Bevorzugte Sprache",
     "Prednostni jezik",
@@ -5260,8 +5325,7 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "" //
     "" // CZ
-   },
-
+  },
   { "LNB / DiSEqC",
     "LNB / DiSEqC",
     "LNB / DiSEqC",
@@ -5375,11 +5439,11 @@ const tI18nPhrase Phrases[] = {
   { "Expert",
     "Experten",
     "",
-  "Esperto",
+    "Esperto",
     "Expert",
-   "",
     "",
-   "",
+    "",
+    "",
     "",
     "",
     "",
@@ -5393,7 +5457,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  },
+ },
  { "Normal",
     "Normal",
     "",
@@ -5456,7 +5520,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   "",
+    "",
     "",
     "" // CZ
   },
@@ -5486,7 +5550,7 @@ const tI18nPhrase Phrases[] = {
     "GotoX benutzen",
     "",
     "Utilizza Vai a X",
-   "GotoX gebruiken",
+    "GotoX gebruiken",
     "",
     "Utiliser Aller à X",
     "",
@@ -5529,10 +5593,10 @@ const tI18nPhrase Phrases[] = {
   { "East or West",
     "Ost oder West",
     "",
-   "Est o Ovest",
+    "Est o Ovest",
     "Oost of West",
     "",
-   "Est ou Ouest",
+    "Est ou Ouest",
     "",
     "",
     "",
@@ -5545,7 +5609,7 @@ const tI18nPhrase Phrases[] = {
     "²ÞáâÞÚ ØÛØ ×ÐßÐÔ",
     "",
     "",
-   "",
+    "",
     "" // CZ
   },
   { "East",
@@ -5561,7 +5625,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   "",
+    "",
     "",
     "",
     "ÒÞáâÞÚ",
@@ -5571,7 +5635,7 @@ const tI18nPhrase Phrases[] = {
     "" // CZ
   },
   { "West",
-   "West",
+    "West",
     "",
     "Ovest",
     "West",
@@ -5642,7 +5706,7 @@ const tI18nPhrase Phrases[] = {
     "Sud",
     "Zuid",
     "",
-   "Sud",
+    "Sud",
     "",
     "",
     "",
@@ -5674,12 +5738,12 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "",
-   "áÕÒÕà",
+    "áÕÒÕà",
     "",
-   "",
     "",
-   "" // CZ
- },
+    "",
+    "" // CZ
+  },
   { "Setup.Recording$Margin at start (min)",
     "Zeitpuffer bei Anfang (min)",
     "Premik zaèetka snemanja (min)",
@@ -6097,7 +6161,7 @@ const tI18nPhrase Phrases[] = {
     "", // Eesti
     "", // Dansk
     "" // CZ
-},
+  },
   { "Setup.Replay$Play&Jump",
     "Sprung bei Schnittmarke",
     "", // Slovenski
@@ -6162,9 +6226,7 @@ const tI18nPhrase Phrases[] = {
     "", // Hrvatski / Croatian
     "", // Eesti / Estonian
     "", // Dansk / Danish
-#if VDRVERSNUM >= 10342
     "", // Èesky / Czech
-#endif
   },
   { "Setup.Replay$Play&Jump", // English
     "Sprung bei Schnittmarke", // Deutsch / German
@@ -6186,9 +6248,7 @@ const tI18nPhrase Phrases[] = {
     "", // Hrvatski / Croatian
     "", // Eesti / Estonian
     "", // Dansk / Danish
-#if VDRVERSNUM >= 10342
     "", // Èesky / Czech
-#endif
   },
   { "Setup.Replay$Pause at last mark", // English
     "Pause bei letzter Marke", // Deutsch / German
@@ -6210,9 +6270,7 @@ const tI18nPhrase Phrases[] = {
     "", // Hrvatski / Croatian
     "", // Eesti / Estonian
     "", // Dansk / Danish
-#if VDRVERSNUM >= 10342
     "", // Èesky / Czech
-#endif
   },
   { "Setup.Replay$Reload marks", // English
     "Marken aktualisieren", // Deutsch / German
@@ -6234,9 +6292,7 @@ const tI18nPhrase Phrases[] = {
     "", // Hrvatski / Croatian
     "", // Eesti / Estonian
     "", // Dansk / Danish
-#if VDRVERSNUM >= 10342
     "", // Èesky / Czech
-#endif
   },
   { "Setup.Miscellaneous$Min. event timeout (min)",
     "Brückenzeit zwischen Timern (min)",
@@ -6436,7 +6492,6 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
   },
-
   { "Options",
     "Funktionen",
     "",// TODO
@@ -6459,7 +6514,6 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
   },
-
   { "Edit",
     "Editieren",
     "",// TODO
@@ -6482,7 +6536,6 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
   },
-
   { "Delete",
     "Löschen",
     "",// TODO
@@ -6505,7 +6558,6 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
   },
-
   { "New",
     "Neu",
     "",// TODO
@@ -6527,7 +6579,7 @@ const tI18nPhrase Phrases[] = {
     "",// TODO
     "",// TODO
     "",// TODO
-  },
+ },
  { "bouquet list",
     "Bouqetliste",
     "",// TODO
@@ -8329,7 +8381,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "Nimeä tallenne",
     "",//TODO
-   "",//TODO
+    "",//TODO
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8337,7 +8389,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "¿ÕàÕØÜÕÝÞÒÐâì ×ÐßØáì",
     "",//TODO
-   "Ümbernimetamine",
+    "Ümbernimetamine",
     "",//TODO
   },
   { "Setup.OSD$Main Menu command position",
@@ -8370,7 +8422,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "Näytä aikajana",
-  "",//TODO
+    "",//TODO
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8416,7 +8468,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "",//TODO
-   "",//TODO
+    "",//TODO
     "",//TODO
     "",//TODO
     "¿ÞÚÐ×ëÒÐâì ÒàÕÜï ×ÐßØáØ",
@@ -8429,7 +8481,7 @@ const tI18nPhrase Phrases[] = {
     "Länge der Aufnahme anzeigen",
     "",//TODO
     "Mostra durata",//TODO
-   "Toon opname lengte",
+    "Toon opname lengte",
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8447,7 +8499,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
- { "Path",
+  { "Path",
     "Pfad",
     "",//TODO
     "Percorso",//TODO
@@ -8483,7 +8535,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "",//TODO
-   "",//TODO
+    "",//TODO
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8497,9 +8549,9 @@ const tI18nPhrase Phrases[] = {
     "Giu",//TODO
     "Omlaag",
     "",//TODO
-   "",//TODO
     "",//TODO
-   "Alemmas",
+    "",//TODO
+    "Alemmas",
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8570,7 +8622,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "",//TODO
-   "",//TODO
+    "",//TODO
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8579,7 +8631,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
- { "TV / Radio",
+  { "TV / Radio",
     "TV / Radio",
     "",//TODO
     "TV / Radio",//TODO
@@ -8598,14 +8650,14 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "",//TODO
-   "",//TODO
+    "",//TODO
     "" // CZ
   },
   { "PVR / Timers",
     "PVR / Timer",
     "",//TODO
     "PVR / Timers",//TODO
-   "PVR / Timers",
+    "PVR / Timers",
     "",//TODO
     "",//TODO
     "",//TODO
@@ -8617,19 +8669,19 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "",//TODO
     "",//TODO
-   "",//TODO
     "",//TODO
-  "",//TODO
+    "",//TODO
+    "",//TODO
     "",//TODO
     "PVR / Èasovaè",
- },
+  },
   { "Mediacenter",
     "Mediacenter",
     "",//TODO
     "Mediacenter",//TODO
     "Media Centrum",//TODO
     "",//TODO
-   "",//TODO
+    "",//TODO
     "",//TODO
     "",
     "",//TODO
@@ -8887,7 +8939,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { " Delay DD/dts",
+  /* { " Delay DD/dts",
     " Verzögerung DD/dts",
     "",
     "",
@@ -8908,7 +8960,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
     "" // CZ
-  },
+  }, */
   { "Videorecorder",
     "Videorekorder",
     "",
@@ -8953,7 +9005,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "lower slot",
+  { "lower slot",
     "Unterer Slot",
     "",
     "",
@@ -8975,7 +9027,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "upper slot",
+  { "upper slot",
     "Oberer Slot",
     "",
     "",
@@ -9019,7 +9071,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "Internet-Radio",
+  { "Internet-Radio",
     "Internet-Radio",
     "",
     "",
@@ -9041,7 +9093,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
- { "EPG Service",
+  { "EPG Service",
     "EPG Service",
     "",
     "",
@@ -9087,28 +9139,6 @@ const tI18nPhrase Phrases[] = {
   },
   { "Streaming",
     "Streaming",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
-  { "Setup.OSD$Remain Time",
-    "Kanalinfo Restlaufzeit anzeigen",
     "",
     "",
     "",
@@ -9415,7 +9445,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-// skin start
+  // skin start
   { "Language Settings",
     "Spracheinstellungen",
     "",
@@ -10364,7 +10394,6 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-
   { "Installation",
     "Installation",
     "",
@@ -10739,6 +10768,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  ///plugin pin
   { "Title$Childlock ",
     "Kindersicherung ",
     "",
@@ -10783,7 +10813,8 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
-{ "Antenna settings/DiSEqC",
+  ///plugin netcv
+  { "Antenna settings/DiSEqC",
     "Antennen/DiSEqC Einstellungen",
     "",
     "",
@@ -10805,7 +10836,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-{ "NetCeiver diagnostics",
+  { "NetCeiver diagnostics",
     "NetCeiver Diagnose",
     "",
     "",
@@ -10827,8 +10858,10 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-{ "Musicplayer",
-    "Musikplayer",
+
+  ///plugin epgsearch
+  { "Search actions",
+    "Suchaktionen",
     "",
     "",
     "",
@@ -10849,225 +10882,273 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Search actions",
-  "Suchaktionen",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
-  },
   { "Edit search",
-  "Suche editieren",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Suche editieren",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { "Edit timer",
-  "Timer editieren",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Timer editieren",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { "Search entries",
-  "Sucheinträge",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Sucheinträge",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { "Edit blacklist",
-  "Ausschlussliste editieren",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Ausschlussliste editieren",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { "Search templates",
-  "Such-Vorlagen",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Such-Vorlagen",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { "Edit template",
-  "Vorlage editieren",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Vorlage editieren",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
-  { "Select channels with OK",
-  "Wählen sie mit OK gewünschte Kanäle aus",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+  { "found recordings",
+    "gefundene Aufnahmen",
+    "",// TODO
+    "registrazioni trovate",// Italiano
+    "gevonden opname's",
+    "",// TODO
+    "Enregistrements trouvées",
+    "",// TODO
+    "löydetyt tallenteet",
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO Eesti
+    "",// TODO Dansk
+    "",// TODO Èesky (Czech)
   },
-  { "Delete channels?",
-  "Ausgewählte Kanäle löschen?",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+  { "Select directory",
+    "Verzeichnis wählen",
+    "",// TODO
+    "Selezionare una cartella",// Italiano
+    "Selekteer directory",
+    "",// TODO
+    "Selectionner le dossier",// Francais Pat
+    "",// TODO
+    "Valitse hakemisto",
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO Eesti
+    "",// TODO Dansk
+    "",// TODO Èesky (Czech)
   },
+  { "Timer conflicts",
+    "Timer-Konflikte",
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "Conflits de programmation",
+    "",// TODO
+    "Päällekkäiset ajastimet",
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO
+    "",// TODO Eesti
+    "",// TODO Dansk
+    "",// TODO Èesky (Czech)
+  },
+
+  ///plugin xepg
+  { "External BBC-SKY EPG",
+    "Externer BBC-SKY EPG",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
+
+  ///plugin mediaplayer
   { "My dvds",
-  "Meine Dvds",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "" // CZ
+    "Meine Dvds",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
+  },
+  { "Musicplayer",
+    "Musikplayer",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "" // CZ
   },
   { NULL }
   };
