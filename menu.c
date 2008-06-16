@@ -4025,10 +4025,11 @@ void cMenuSetupOSD::DrawExpertMenu(void)
     int current = Current();
     for (cSkin *Skin = Skins.First(); Skin; Skin = Skins.Next(Skin))
          skinDescriptions[Skin->Index()] = Skin->Description();
-
+/*
 #ifndef RBLITE
     Add(new cMenuEditStraItem(tr("Setup.OSD$Skin"),               &skinIndex, numSkins, skinDescriptions));
 #endif
+*/
     if (themes.NumThemes())
     Add(new cMenuEditStraItem(tr("Setup.OSD$Theme"),            &themeIndex, themes.NumThemes(), themes.Descriptions()));
     Add(new cMenuEditIntItem(tr("Setup.OSD$Left"),                &data.OSDLeft, 0, MAXOSDWIDTH));
