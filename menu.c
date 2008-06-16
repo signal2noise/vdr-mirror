@@ -1880,6 +1880,10 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			       viewMode = mode_edit;
 			       //SetGroup(Current());
 			       SetGroup(GetChannel(Current())->Index());
+                               if (strcmp(Skins.Current()->Name(), "Reel") == 0)
+                                  SetCols(4, 4, 14, 6);
+                               else
+                                  SetCols(4, 5, 18, 6);
                                Display();
 				
                              }
