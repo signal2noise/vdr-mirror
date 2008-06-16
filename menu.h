@@ -323,6 +323,7 @@ private:
   void GetFavourite(void);
   eOSState PrevBouquet(void);
   eOSState NextBouquet(void);
+  char titleBuf[128];
 protected:
   void Options(void);
   eOSState Switch(void);

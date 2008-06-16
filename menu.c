@@ -1292,6 +1292,7 @@ cMenuBouquets::cMenuBouquets(int view, enum eViewMode mode)
   favourite = false;
   number = 0;
   //channelMarked = -1;
+  titleBuf[0] = '\0'; // Initialize to empty string
   startChannel = 0;
   if (viewMode == mode_view) {
     if (strcmp(Skins.Current()->Name(), "Reel") == 0)
@@ -1708,10 +1709,16 @@ void cMenuBouquets::Display(void){
   }
   channel = Channels.Get(startChannel);
   if(channel && channel->GroupSep()) {
-    if(channel->Name() || strlen(channel->Name()) > 0)
-      SetTitle(channel->Name());
-    else
+    if(channel->Name() || strlen(channel->Name()) > 0){
+        if(viewMode == mode_edit){
+	   strncpy((char*)&titleBuf, channel->Name(), 100);
+	   strcat((char*)(&titleBuf), "menunormalhidden");
+           SetTitle((const char*)&titleBuf);
+	} else 
+	   SetTitle(channel->Name());
+    } else {
       SetTitle("");
+    }
   }
   else
     SetTitle("");
