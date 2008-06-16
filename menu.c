@@ -1704,7 +1704,7 @@ void cMenuBouquets::Options()
 	else
 	   SetHelp(tr("Bouquets"), tr("Move"), tr("Delete"), tr("New"));
      } else
-        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
+        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Edit"));
   }
 }
 
