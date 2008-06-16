@@ -1499,6 +1499,14 @@ eOSState cMenuBouquets::NewChannel(void)
     ch = Channels.GetByNumber(cDevice::CurrentChannel());
     favourite = false;
   }
+  /* better default values for the new channel */
+  if(ch) {
+     int nullArray[2] = {0, 0};
+     char nullStrings[2][8] = { { 0, 0, 0, 0, 0, 0, 0, 0} , { 0, 0, 0, 0, 0, 0, 0, 0} };
+     ch->SetName(tr("New"), "", "");
+     ch->SetId(0,0,0,0);
+     ch->SetPids(0,0,(int*)&nullArray,nullStrings,(int*)&nullArray,nullStrings,0);
+  }
   return AddSubMenu(new cMenuEditChannel(ch, true));
 }
 
