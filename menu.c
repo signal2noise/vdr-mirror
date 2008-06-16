@@ -1599,7 +1599,7 @@ eOSState cMenuBouquets::ListBouquets(void)
   return AddSubMenu(new cMenuBouquetsList(Channels.Get(startChannel)));
 }
 
-void cMenuBouquets::Move(int From, int To)
+void cMenuBouquets::Move(int From, int To, bool doSwitch)
 {
   int CurrentChannelNr = cDevice::CurrentChannel();
   cChannel *CurrentChannel = Channels.GetByNumber(CurrentChannelNr);
@@ -1620,7 +1620,7 @@ void cMenuBouquets::Move(int From, int To)
        isyslog("channel %d moved to %d", FromNumber, ToNumber);
      else
        isyslog("channel %d moved to %s", FromNumber, ToChannel->Name());
-     if (CurrentChannel && CurrentChannel->Number() != CurrentChannelNr)
+     if (CurrentChannel && CurrentChannel->Number() != CurrentChannelNr && doSwitch)
         Channels.SwitchTo(CurrentChannel->Number());
      }
 }
@@ -1761,7 +1761,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
             else
               current = Channels.GetNextGroup(startChannel);
             if( -1 < current && current < Channels.Count())
-              Move(channel->Index() , current);
+              Move(channel->Index() , current, true);
             else
               Add(new cMenuChannelItem(channel), true);
             return CloseSubMenu();
@@ -1830,7 +1830,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				  if(i== 0 && channelMarked.at(i) < current) {
 					current--;
                                   }
-                                  Move(channelMarked.at(i) , current);
+                                  Move(channelMarked.at(i) , current, false);
                                 }
 			        if (viewMode == mode_edit) {
 				   p = (cMenuChannelItem *)Get(current);
@@ -1870,6 +1870,8 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->Set();
 				   }
 			     }					
+                             Channels.SwitchTo( GetChannel(Current())->Number() );
+			     
 			     //printf("\n");
 			     channelMarked.clear();
 			     edit = false;
