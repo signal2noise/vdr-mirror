@@ -452,6 +452,13 @@ cMenuEditChannel::cMenuEditChannel(cChannel *Channel, bool New)
         data.nid = 0;
         data.tid = 0;
         data.rid = 0;
+	data.sid = 0;
+	data.apids[0] = data.apids[1] = 0;
+	data.vpid = 0;
+	data.tpid = 0;
+	data.caids[0] = 0;
+	data.ppid = 0;
+        data.SetName(tr("New"), "", "");
         }
      Setup();
      }
@@ -1498,14 +1505,6 @@ eOSState cMenuBouquets::NewChannel(void)
   if (!ch || favourite) {
     ch = Channels.GetByNumber(cDevice::CurrentChannel());
     favourite = false;
-  }
-  /* better default values for the new channel */
-  if(ch) {
-     int nullArray[2] = {0, 0};
-     char nullStrings[2][8] = { { 0, 0, 0, 0, 0, 0, 0, 0} , { 0, 0, 0, 0, 0, 0, 0, 0} };
-     ch->SetName(tr("New"), "", "");
-     ch->SetId(0,0,0,0);
-     ch->SetPids(0,0,(int*)&nullArray,nullStrings,(int*)&nullArray,nullStrings,0);
   }
   return AddSubMenu(new cMenuEditChannel(ch, true));
 }
