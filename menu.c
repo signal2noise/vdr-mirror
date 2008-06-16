@@ -1609,7 +1609,7 @@ void cMenuBouquets::Move(int From, int To)
   else
      FromChannel = (cChannel*) Channels.GetByNumber(From);
   cChannel *ToChannel = (cChannel*) Channels.Get(To);
-  if (FromChannel && ToChannel && (From != To)) {
+  if (FromChannel && ToChannel /* && (From != To) */) {
      int FromNumber = FromChannel->Number();
      int ToNumber = ToChannel->Number();
      Channels.Move(FromChannel, ToChannel);
@@ -1809,6 +1809,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			     }
 			     move = false;
                              std::sort(channelMarked.begin(), channelMarked.end());
+			     bool inced = false;
 	
                              for (i = 0; i < channelMarked.size(); i++) {
 				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.GetByNumber(channelMarked.at(i))->Name(), current);
@@ -1818,11 +1819,17 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->SetMarked(false);
 				      p->Set();
 				   }
-                                if (channelMarked.at(i) != current)
+                                if (channelMarked.at(i) != current || viewMode == mode_edit)
                                 {
-                                  if(current < channelMarked.at(i) && Channels.Get(current)->GroupSep()) current++;
-				  if(i== 0 && channelMarked.at(i) < current)
+                                  if(/*current < channelMarked.at(i) &&*/ Channels.Get(current)->GroupSep()) {
+				        if(!inced){
+				          inced = true;
+				          current++;
+                                        }
+                                  }
+				  if(i== 0 && channelMarked.at(i) < current) {
 					current--;
+                                  }
                                   Move(channelMarked.at(i) , current);
                                 }
 			        if (viewMode == mode_edit) {
