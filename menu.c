@@ -1886,6 +1886,8 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                                   return PrevBouquet();
                              } else {
 			        if(edit && !move) { // Move
+				  if (channelMarked.empty())
+				     break;
                                   SetStatus(tr("Up/Dn for new location - OK to move"));
                                   move = true;
 				  Options();
