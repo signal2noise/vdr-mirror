@@ -1697,7 +1697,7 @@ void cMenuBouquets::Options()
      if(edit)
         SetHelp(tr("Edit"), tr("Move"), tr("Delete"), tr("New"));
      else
-        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
+        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Edit"));
   } else {
      if(edit && !move) {
 	if(channelMarked.size() == 0)
@@ -1705,7 +1705,7 @@ void cMenuBouquets::Options()
 	else
 	   SetHelp(tr("Bouquets"), tr("Move"), tr("Delete"), tr("New"));
      } else
-        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Edit"));
+        SetHelp(tr("Bouquets"), tr("Back"), tr("Next"), tr("Options"));
   }
 }
 
