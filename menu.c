@@ -1728,8 +1728,8 @@ void cMenuBouquets::Display(void){
   if(channel && channel->GroupSep()) {
     if(channel->Name() || strlen(channel->Name()) > 0){
         if(viewMode == mode_edit && strcmp(Skins.Current()->Name(), "Reel") == 0){
-	   strncpy((char*)&titleBuf, channel->Name(), 100);
-	   strcat((char*)(&titleBuf), "menunormalhidden");
+	   strcpy((char*)&titleBuf, "menunormalhidden$");
+	   strncat((char*)&titleBuf, channel->Name(), 100);
            SetTitle((const char*)&titleBuf);
 	} else 
 	   SetTitle(channel->Name());
