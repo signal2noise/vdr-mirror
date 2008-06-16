@@ -11150,6 +11150,29 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
+  ///plugin channelscan
+  { "Channel lists",
+  "Kanallisten",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "" // CZ
+  },
   { NULL }
   };
 
