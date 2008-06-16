@@ -442,9 +442,11 @@ cMenuEditChannel::cMenuEditChannel(cChannel *Channel, bool New)
 :cOsdMenu(tr("Edit channel"), 16)
 {
   channel = Channel;
-  strcpy((char*)&titleBuf, tr("Edit channel"));
-  strcat((char*)&titleBuf, "menunormalhidden");
-  SetTitle((const char*)&titleBuf);
+  if (strcmp(Skins.Current()->Name(), "Reel") == 0) {
+     strcpy((char*)&titleBuf, tr("Edit channel"));
+     strcat((char*)&titleBuf, "menunormalhidden");
+     SetTitle((const char*)&titleBuf);
+  }
   if (channel) {
      data = *channel;
      if (New) {
@@ -1725,7 +1727,7 @@ void cMenuBouquets::Display(void){
   channel = Channels.Get(startChannel);
   if(channel && channel->GroupSep()) {
     if(channel->Name() || strlen(channel->Name()) > 0){
-        if(viewMode == mode_edit){
+        if(viewMode == mode_edit && strcmp(Skins.Current()->Name(), "Reel") == 0){
 	   strncpy((char*)&titleBuf, channel->Name(), 100);
 	   strcat((char*)(&titleBuf), "menunormalhidden");
            SetTitle((const char*)&titleBuf);
