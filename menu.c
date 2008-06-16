@@ -1322,6 +1322,10 @@ cMenuBouquets::cMenuBouquets(int view, enum eViewMode mode)
     Setup();
   Options();
   Channels.IncBeingEdited();
+
+  if(viewMode == mode_edit)
+     SetStatus(tr("Select channels with OK"));
+	
 }
 
 cMenuBouquets::~cMenuBouquets()
@@ -1782,7 +1786,8 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                            {
                              int current;
                              Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
-                             SetStatus(NULL);
+			     if(viewMode == mode_view)
+                                SetStatus(NULL);
 			     unsigned int i;
                              if((viewMode == mode_edit && !move) || (channelMarked.empty() && viewMode == mode_view)){
 				Mark();
@@ -1849,6 +1854,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			     channelMarked.clear();
 			     edit = false;
  			     SetGroup(current);
+     			     SetStatus(tr("Select channels with OK"));
                            } else {
 			       if(viewMode == mode_view)
                                   return Switch();
@@ -1891,6 +1897,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                                   SetCols(4, 4, 14, 6);
                                else
                                   SetCols(4, 5, 18, 6);
+     			       SetStatus(tr("Select channels with OK"));
                                Display();
 				
                              }
