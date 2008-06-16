@@ -1613,9 +1613,11 @@ void cMenuBouquets::Move(int From, int To, bool doSwitch)
      int FromNumber = FromChannel->Number();
      int ToNumber = ToChannel->Number();
      Channels.Move(FromChannel, ToChannel);
-     Propagate();
-     SetGroup(startChannel);
-     Display();
+     if(doSwitch) {
+        Propagate();
+        SetGroup(startChannel);
+        Display();
+     }
      if(ToNumber)
        isyslog("channel %d moved to %d", FromNumber, ToNumber);
      else
@@ -1810,7 +1812,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			     move = false;
                              std::sort(channelMarked.begin(), channelMarked.end());
 			     bool inced = false;
-	
+			     	
                              for (i = 0; i < channelMarked.size(); i++) {
 				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.GetByNumber(channelMarked.at(i))->Name(), current);
 				   cMenuChannelItem *p = (cMenuChannelItem *)Get(current);
@@ -1870,13 +1872,16 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->Set();
 				   }
 			     }					
-                             Channels.SwitchTo( GetChannel(Current())->Number() );
 			     
 			     //printf("\n");
 			     channelMarked.clear();
 			     edit = false;
+		             Propagate();
  			     SetGroup(current);
      			     SetStatus(tr("Select channels with OK"));
+			     if(GetChannel(Current()))
+                                Channels.SwitchTo( GetChannel(Current())->Number() );
+			     Display();
                            } else {
 			       if(viewMode == mode_view)
                                   return Switch();
