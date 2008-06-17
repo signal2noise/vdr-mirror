@@ -1569,7 +1569,7 @@ eOSState cMenuBouquets::DeleteChannel(void)
 
 		  int start = Current() - LOAD_RANGE;
 		  int end = Current() + LOAD_RANGE;
-		  cChannel *channel;
+		  //cChannel *channel;
 		  if(Count() < end) end = Count();
 		  if(start < 0) start = 0;
  
@@ -1597,6 +1597,11 @@ eOSState cMenuBouquets::ListBouquets(void)
   if (HasSubMenu())
     return osContinue;
   return AddSubMenu(new cMenuBouquetsList(Channels.Get(startChannel)));
+}
+
+void cMenuBouquets::Move(int From, int To)
+{
+  Move(From, To, true); 
 }
 
 void cMenuBouquets::Move(int From, int To, bool doSwitch)
