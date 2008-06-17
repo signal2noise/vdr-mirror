@@ -443,8 +443,8 @@ cMenuEditChannel::cMenuEditChannel(cChannel *Channel, bool New)
 {
   channel = Channel;
   if (strcmp(Skins.Current()->Name(), "Reel") == 0) {
-     strcpy((char*)&titleBuf, tr("Edit channel"));
-     strcat((char*)&titleBuf, "menunormalhidden$");
+     strcpy((char*)&titleBuf, "menunormalhidden$");
+     strcat((char*)&titleBuf, tr("Edit channel"));
      SetTitle((const char*)&titleBuf);
   }
   if (channel) {
