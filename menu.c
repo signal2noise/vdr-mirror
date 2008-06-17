@@ -1440,6 +1440,7 @@ void cMenuBouquets::Mark()
 	      for (i=0; i<channelMarked.size(); i++)
 		if (channelMarked.at(i) == GetChannel(Current())->Number())
 	           channelMarked.erase(channelMarked.begin()+i);
+	      CursorDown();
 	   } else {
               //printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
 	      p->SetMarked(true);
