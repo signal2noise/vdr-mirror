@@ -1517,8 +1517,10 @@ eOSState cMenuBouquets::EditChannel(void)
   if (HasSubMenu() || Count() == 0)
      return osContinue;
   cChannel *ch = GetChannel(Current());
-  if (ch)
+  if (ch) {
+     edit = false;
      return AddSubMenu(new cMenuEditChannel(ch, false));
+  }
   return osContinue;
 }
 
