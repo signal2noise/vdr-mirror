@@ -333,7 +333,8 @@ protected:
   eOSState ListBouquets(void);
   eOSState Number(eKeys Key);
   void Mark(void);
-  virtual void Move(int From, int To, bool doSwitch);
+  virtual void Move(int From, int To);
+  void Move(int From, int To, bool doSwitch);
 public:
   cMenuBouquets(int view, eViewMode viewMode = mode_view);
   ~cMenuBouquets(void);
