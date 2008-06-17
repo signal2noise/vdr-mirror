@@ -1857,10 +1857,6 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 				      p->SetMarked(false);
 				      p->Set();
 				   }
-				   unsigned int j;
-				   for(j=i; j<channelMarked.size(); j++)
-					if(channelMarked.at(j) < current)
-						channelMarked[j]--;
 			        }
                               }
 			     //printf("5 UNMARKING ");
