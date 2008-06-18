@@ -88,7 +88,9 @@ DEFINES += -DVDR_USER=\"$(VDR_USER)\"
 endif
 
 ifdef RBLITE
-DEFINES += -DRBLITE
+    DEFINES += -DRBLITE
+else
+    DEFINES += -DCAM_NEW
 endif
 
 ifdef ALWAYS_TS
