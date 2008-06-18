@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include "thread.h"
 #include "tools.h"
+#include "channels.h"
 
 class cCiMMI;
 
@@ -120,6 +121,7 @@ private:
 #if defined(RBLITE) || defined(CAM_NEW)
   int source[MAX_CI_SLOT];
   int transponder[MAX_CI_SLOT];
+  cChannel *channel[MAX_CI_SLOT];
   cList<cCiCaProgramData> caProgramList[MAX_CI_SLOT];
 #else
   int source;
@@ -179,7 +181,7 @@ public:
        ///< decryption is controlled by the smart card inserted into
        ///< the CAM.
 #if defined(RBLITE) || defined(CAM_NEW)
-  void SetSource(int Source, int Transponder, int Slot);
+  void SetSource(int Source, int Transponder, int Slot, const cChannel *chan);
 #endif
   void SetSource(int Source, int Transponder);
        ///< Sets the Source and Transponder of the device this cCiHandler is

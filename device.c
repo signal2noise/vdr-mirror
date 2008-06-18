@@ -817,7 +817,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
         ciHandler->SetSource(Channel->Source(), Channel->Transponder());
 // Men at work - please stand clear! ;-)
 #ifdef XXX_DO_MULTIPLE_CA_CHANNELS
-        if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
+        if (Channel->Ca()){ // >= CA_ENCRYPTED_MIN) {
 #endif
            ciHandler->AddPid(Channel->Sid(), Channel->Vpid(), 2);
            for (const int *Apid = Channel->Apids(); *Apid; Apid++)
@@ -832,7 +832,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
         }
 
      CiSetSource(Channel->Source(), Channel->Transponder());
-     if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
+     if (Channel->Ca()){ // >= CA_ENCRYPTED_MIN) {
         CiAddPid(Channel->Sid(), Channel->Vpid(), 2);
         for (const int *Apid = Channel->Apids(); *Apid; Apid++)
             CiAddPid(Channel->Sid(), *Apid, 4);
@@ -881,7 +881,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
        int slotOnDev = GetSlotOnDev(this);
        cCiHandler *ciHandler0 = (cDevice::GetDevice(0))->CiHandler();
        if(ciHandler0) {
-         ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev);
+         ciHandler0->SetSource(Channel->Source(), Channel->Transponder(), slotOnDev, Channel);
          ciHandler0->AddPid(Channel->Sid(), Channel->Vpid(), 2, slotOnDev);
          for (const int *Apid = Channel->Apids(); *Apid; Apid++)
            ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
@@ -891,7 +891,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
 
 #ifndef RBLITE
      CiSetSource(Channel->Source(), Channel->Transponder());
-     if (Channel->Ca() >= CA_ENCRYPTED_MIN) {
+     if (Channel->Ca()){ // >= CA_ENCRYPTED_MIN) {
         CiAddPid(Channel->Sid(), Channel->Vpid(), 2);
         for (const int *Apid = Channel->Apids(); *Apid; Apid++)
             CiAddPid(Channel->Sid(), *Apid, 4);

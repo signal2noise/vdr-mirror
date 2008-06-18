@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "pat.h"
 #include "tools.h"
+#include "channels.h"
 
 /* these might come in handy in case you want to use this code without VDR's other files:
 #ifndef MALLOC
@@ -35,7 +36,7 @@ static int SysLogLevel = 3;
 
 // Set these to 'true' for debug output:
 static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = true;
+static bool DebugProtocol = false;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
 
@@ -891,19 +892,22 @@ private:
   int caDescriptorsLength;
   uint8_t caDescriptors[2048];
   bool streamFlag;
-  void AddCaDescriptors(int Length, const uint8_t *Data);
+  unsigned short magicCaId;
+  //void AddCaDescriptors(int Length, const uint8_t *Data);
 public:
-  cCiCaPmt(uint8_t CmdId, int Source, int Transponder, int ProgramNumber, const unsigned short *CaSystemIds);
+  cCiCaPmt(uint8_t CmdId, int Source, int Transponder, int ProgramNumber, const unsigned short *CaSystemIds, unsigned short MagicCaId=0);
   void SetListManagement(uint8_t ListManagement);
   bool Valid(void);
   void AddPid(int Pid, uint8_t StreamType);
+  void AddCaDescriptors(int Length, const uint8_t *Data);
   };
 
-cCiCaPmt::cCiCaPmt(uint8_t CmdId, int Source, int Transponder, int ProgramNumber, const unsigned short *CaSystemIds)
+cCiCaPmt::cCiCaPmt(uint8_t CmdId, int Source, int Transponder, int ProgramNumber, const unsigned short *CaSystemIds, unsigned short MagicCaId)
 {
   cmdId = CmdId;
   caDescriptorsLength = GetCaDescriptors(Source, Transponder, ProgramNumber, CaSystemIds, sizeof(caDescriptors), caDescriptors, streamFlag);
   length = 0;
+  magicCaId = MagicCaId;
   capmt[length++] = CPLM_ONLY;
   capmt[length++] = (ProgramNumber >> 8) & 0xFF;
   capmt[length++] =  ProgramNumber       & 0xFF;
@@ -911,8 +915,8 @@ cCiCaPmt::cCiCaPmt(uint8_t CmdId, int Source, int Transponder, int ProgramNumber
   esInfoLengthPos = length;
   capmt[length++] = 0x00; // program_info_length H (at program level)
   capmt[length++] = 0x00; // program_info_length L
-  if (!streamFlag)
-     AddCaDescriptors(caDescriptorsLength, caDescriptors);
+//  if (!streamFlag)
+//     AddCaDescriptors(caDescriptorsLength, caDescriptors);
 }
 
 void cCiCaPmt::SetListManagement(uint8_t ListManagement)
@@ -935,7 +939,7 @@ void cCiCaPmt::AddPid(int Pid, uint8_t StreamType)
      esInfoLengthPos = length;
      capmt[length++] = 0x00; // ES_info_length H (at ES level)
      capmt[length++] = 0x00; // ES_info_length L
-     if (streamFlag)
+//     if (streamFlag)
         AddCaDescriptors(caDescriptorsLength, caDescriptors);
      }
 }
@@ -945,8 +949,19 @@ void cCiCaPmt::AddCaDescriptors(int Length, const uint8_t *Data)
   if (esInfoLengthPos) {
      if (length + Length < int(sizeof(capmt))) {
         capmt[length++] = cmdId;
-        memcpy(capmt + length, Data, Length);
-        length += Length;
+	/* TB: HACK */
+        u_int32_t bla = 0x0409;	
+        memcpy(capmt + length, &bla, 2);
+	bla =0x0;
+        memcpy(capmt + length+2, &bla, 1);
+	bla = magicCaId;
+	memcpy(capmt + length+3, &bla, 1);
+        bla =0x0;
+        memcpy(capmt + length+4, &bla, 1);
+	bla = magicCaId;
+        memcpy(capmt + length+5, &bla, 1);
+        memcpy(capmt + length+6, Data, Length);
+        length += Length+6;
         int l = length - esInfoLengthPos - 2;
         capmt[esInfoLengthPos]     = (l >> 8) & 0xFF;
         capmt[esInfoLengthPos + 1] =  l       & 0xFF;
@@ -1821,19 +1836,26 @@ void cCiHandler::SendCaPmt(void)
 #endif
                 bool Active = false;
 #if defined(RBLITE) || defined(CAM_NEW)
-                cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot));
+		unsigned short MagicCaId = channel[Slot]->Ca();
+		if(MagicCaId >= 0 && MagicCaId < CA_ENCRYPTED_MIN)
+			; //printf("ASDASDF: %#04x\n", MagicCaId);
+		else
+			MagicCaId = 0;
+                cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source[Slot], transponder[Slot], p->programNumber, GetCaSystemIds(Slot), MagicCaId);
 #else
                 cCiCaPmt *CaPmt = new cCiCaPmt(CPCI_OK_DESCRAMBLING, source, transponder, p->programNumber, GetCaSystemIds(Slot));
 #endif
+
                 if (CaPmt->Valid()) {
                    for (cCiCaPidData *q = p->pidList.First(); q; q = p->pidList.Next(q)) {
                        if (q->active) {
-			       printf("###### ADD PID %i %x SLOT %i\n",q->pid,q->pid, Slot);
+			  printf("###### ADD PID %i %x SLOT %i\n",q->pid,q->pid, Slot);
                           CaPmt->AddPid(q->pid, q->streamType);
                           Active = true;
                           }
                        }
                    }
+
                 if (Active)
                    CaPmtList.Add(CaPmt);
                 else
@@ -1921,7 +1943,7 @@ bool cCiHandler::ProvidesCa(const unsigned short *CaSystemIds)
 }
 
 #if defined(RBLITE) || defined(CAM_NEW)
-void cCiHandler::SetSource(int Source, int Transponder, int Slot)
+void cCiHandler::SetSource(int Source, int Transponder, int Slot, const cChannel *chan)
 #else
 void cCiHandler::SetSource(int Source, int Transponder)
 #endif
@@ -1942,6 +1964,7 @@ void cCiHandler::SetSource(int Source, int Transponder)
 #if defined(RBLITE) || defined(CAM_NEW)
   source[Slot] = Source;
   transponder[Slot] = Transponder;
+  channel[Slot] = (cChannel*)chan;
 #else
   source = Source;
   transponder = Transponder;
