@@ -941,6 +941,28 @@ cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
     data.rid = 0;
     }
   bouquetCaId = 0;
+
+  /* TB: if all channels of the bouqet have the same CAID, show this in the menu */
+  cChannel *channelE;
+  int tempCaId = 0;
+  bool first = 1;
+  /* loop through all channels of the bouquet */
+  for(channelE = (cChannel*)channel->Next(); channelE && !channelE->GroupSep(); channelE = (cChannel*) channelE->Next()){
+     /* remember the first CAID */
+     if(first) {
+	first = false;
+        tempCaId = channelE->Ca();
+     } else if(channelE->Ca() != tempCaId){
+        /* remeber if there is one differing CAID */
+	tempCaId = 0;
+     }
+  }
+
+  /* we found that alle CAIDs are the same value, so we can show it */
+  if(tempCaId > 0 && tempCaId < 3){
+	bouquetCaId = tempCaId;
+  }
+ 
   Setup();
 }
 
