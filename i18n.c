@@ -4578,28 +4578,6 @@ const tI18nPhrase Phrases[] = {
     "Anvend Dolby Digital",
     "Pou¾ívat zvuk v Dolby Digital",
   },
-  { "Delay Stereo",
-    "Verzögerung Stereo",
-    "",
-    "Ritardo Stereo",//TODO
-    "Stereo vertraging",
-    "",//TODO
-    "",
-    "",//TODO
-    "",
-    "",//TODO
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",//TODO
-    "",//TODO
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  },
   { "Setup.DVB$Update channels",
     "Kanäle aktualisieren",
     "Posodobi kanale",
@@ -8939,28 +8917,6 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  /* { " Delay DD/dts",
-    " Verzögerung DD/dts",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "" // CZ
-  }, */
   { "Videorecorder",
     "Videorekorder",
     "",
