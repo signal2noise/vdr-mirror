@@ -324,11 +324,8 @@ void cPatFilter::Process(u_short Pid, u_char Tid, const u_char *Data, int Length
 
      if(pmt.getServiceId()==Channel()->Sid())
      {
-#ifndef RBLITE
         cSysConfig_vdr::GetInstance().Load("/etc/default/sysconfig");
-#else
-	cSysConfig_vdr::GetInstance().Load("/etc/sysconfig");
-#endif
+	
 	const char* buf = cSysConfig_vdr::GetInstance().GetVariable("MAPTABLE");
 
 	if (buf && strcmp(buf, "1") == 0)
