@@ -1562,7 +1562,8 @@ void cLiveBufferControl::Hide(void)
   if (visible) {
      delete displayReplay;
      displayReplay = NULL;
-     needsFastResponse = visible = false;
+     SetNeedsFastResponse(false);
+     visible = false;
      modeOnly = false;
      lastPlay = lastForward = false;
      lastSpeed = -2; // an invalid value
@@ -1622,7 +1623,8 @@ bool cLiveBufferControl::ShowProgress(bool Initial)
   if (GetIndex(Current, Total) && Total > 0) {
      if (!visible) {
         displayReplay = Skins.Current()->DisplayReplay(modeOnly);
-        needsFastResponse = visible = true;
+        SetNeedsFastResponse(true);
+        visible = true;
         std::string title = std::string(tr("Timeshift mode")) +": " + GetProgrammeTitle();
         displayReplay->SetTitle(title.c_str());
         }
