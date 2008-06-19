@@ -1914,7 +1914,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			       else
 				  Mark();
 			   }
-                           break;
+                           return osContinue;
               case kRed:   if(edit && channelMarked.size() == 0)
                                return EditChannel();
                             else
