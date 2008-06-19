@@ -7010,7 +7010,8 @@ void cReplayControl::Hide(void)
   if (visible) {
      delete displayReplay;
      displayReplay = NULL;
-     needsFastResponse = visible = false;
+     SetNeedsFastResponse(false);
+     visible = false;
      modeOnly = false;
      lastPlay = lastForward = false;
      lastSpeed = -2; // an invalid value
@@ -7051,7 +7052,8 @@ bool cReplayControl::ShowProgress(bool Initial)
      if (!visible) {
         displayReplay = Skins.Current()->DisplayReplay(modeOnly);
         displayReplay->SetMarks(&marks);
-        needsFastResponse = visible = true;
+        SetNeedsFastResponse(true);
+        visible = true;
         }
      if (Initial) {
         if (title)

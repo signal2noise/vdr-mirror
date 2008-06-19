@@ -76,8 +76,9 @@ class cOsdObject {
   friend class cOsdMenu;
 private:
   bool isMenu;
-protected:
   bool needsFastResponse;
+protected:
+  void SetNeedsFastResponse(bool NeedsFastResponse) { needsFastResponse = NeedsFastResponse; }
 public:
   cOsdObject(bool FastResponse = false) { isMenu = false; needsFastResponse = FastResponse; }
   virtual ~cOsdObject() {}
