@@ -1944,6 +1944,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
 			     if(edit && !move)
                                return NewChannel();
                              else {
+#if 0
                                //edit = true;
 			       viewMode = mode_edit;
 			       //SetGroup(Current());
@@ -1954,7 +1955,8 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                                   SetCols(4, 5, 18, 6);
      			       SetStatus(tr("Select channels with OK"));
                                Display();
-				
+#endif
+			       return EditChannel();				
                              }
                             } else {
 			     if(edit && !move)
