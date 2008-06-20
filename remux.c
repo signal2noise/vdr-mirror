@@ -209,10 +209,10 @@ int cRemux::ScanVideoPacket(const uchar *Data, int Count, int Offset, uchar &Pic
 // Hack: Looks only at two TS packets
 int cRemux::ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, int &StreamFormat)
 {
-	uchar buffer[2*188];
+	uchar buffer[2*TS_SIZE];
 	int l=0;
 
-	for(int n=0;n<Count && n<2*188; n+=188) {
+	for(int n=0;n<Count && n<2*TS_SIZE; n+=TS_SIZE) {
 		int offset;
 		int adapfield=Data[3]&0x30;
 		
@@ -221,16 +221,16 @@ int cRemux::ScanVideoPacketTS(const uchar *Data, int Count, uchar &PictureType, 
 
 		if (adapfield==0x30) {
 			offset=5+Data[4];
-			if (offset>188)
+			if (offset>TS_SIZE)
 				continue;
 		}
 		else
 			offset=4;
 
-		memcpy(buffer+l, Data, 188-offset);
-		l+=188-offset;
+		memcpy(buffer+l, Data, TS_SIZE-offset);
+		l+=TS_SIZE-offset;
 
-		Data+=188;
+		Data+=TS_SIZE;
 	}
 
 	const uchar *p = buffer;
@@ -575,7 +575,7 @@ void cPacketBuffer::Invalidate(void)
 //--------------------------------------------------------------------------
 
 #define MAX_PACKET_SIZE 2048
-#define MAX_TS_PACKET_SIZE (64*188)
+#define MAX_TS_PACKET_SIZE (64*TS_SIZE)
 
 class cRepacker {
 protected:
@@ -1279,7 +1279,7 @@ int cRemux::Put(const uchar *Data, int Count)
 	int pes_start;
 	unsigned int offset;
 
-	Count=188*(Count/188);
+	Count=TS_SIZE*(Count/TS_SIZE);
 	for (int i = 0; i < Count; i += TS_SIZE, Data+=TS_SIZE) {
 
 // already filtered out by dvb-api
@@ -1297,7 +1297,7 @@ int cRemux::Put(const uchar *Data, int Count)
 
 		if (adapfield==0x30) {
 			offset=5+Data[4];
-			if (offset>188)
+			if (offset>TS_SIZE)
 				continue;
 		}
 		else
@@ -1316,7 +1316,7 @@ int cRemux::Put(const uchar *Data, int Count)
 						Clear();
 						tsmode_valid=2;
 					}
-					if (repacker[t]->PutRaw(Data, 188, pes_start,timestamp++)) {
+					if (repacker[t]->PutRaw(Data, TS_SIZE, pes_start,timestamp++)) {
 						printf("CLEAR PID %x\n",pid);
 						Clear();
 					}
@@ -1324,7 +1324,7 @@ int cRemux::Put(const uchar *Data, int Count)
 				else 
 #endif				
 				{
-					if (repacker[t]->Put(Data+offset, 188-offset, pes_start,timestamp++)) 
+					if (repacker[t]->Put(Data+offset, TS_SIZE-offset, pes_start,timestamp++)) 
 						Clear();
 				}
 				break;
@@ -1412,7 +1412,7 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 			   and frame type fits in the first packet
 			*/
 			if (PictureType) {
-				int l=ScanVideoPacketTS(resultData, (resultCount>2*188?2*188:resultCount), pt, sf);
+				int l=ScanVideoPacketTS(resultData, (resultCount>2*TS_SIZE?2*TS_SIZE:resultCount), pt, sf);
 				// UGLY HACK: If no frame found, fake an I-FRAME
 				if (pt==NO_PICTURE)
 					pt=I_FRAME;
@@ -1617,7 +1617,7 @@ int cRemux::GetPATPMT(uchar *data, int maxlen)
 	int len,n;
 	int crc;
 
-	if (maxlen<188)
+	if (maxlen<TS_SIZE)
 		return 0;
 	memcpy(data,tspid0,TS_SIZE);
 	data[3]|=tsindex&0xf;
@@ -1627,7 +1627,7 @@ int cRemux::GetPATPMT(uchar *data, int maxlen)
 	data[19]=crc>>8;
 	data[20]=crc;
 
-	data+=188;
+	data+=TS_SIZE;
 	memset(data,255,TS_SIZE);
 	
 	data[0]=0x47;

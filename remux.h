@@ -70,7 +70,7 @@ private:
   int tsmode_valid;
   int sfmode;
   
-  uchar patpmt[2*188];
+  uchar patpmt[2*TS_SIZE];
   int patpmt_valid;
   int tsindex;
   int vpid;
