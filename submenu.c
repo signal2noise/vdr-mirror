@@ -42,11 +42,15 @@ namespace setup
     string::size_type pos = configDir.find("plugin");
     configDir.erase(pos-1);
 
+#ifdef EXTRA_VERBOSE_DEBUG
     cout << " Config Dir : " << configDir  <<  endl;
+#endif
 
     if (FileType == "configDirecory") // vdr config base directory 
     {
+#if EXTRA_VERBOSE_DEBUG
        cout << "DEBUG [setup]: ConfigDirectory   " << configDir <<   endl;
+#endif
        return configDir;
     }
     if (FileType == "help") // returns symbolic link
@@ -66,31 +70,41 @@ namespace setup
          configFile += tmp;
        }
        configFile += ".xml";
+#ifdef EXTRA_VERBOSE_DEBUG
        cout << " debug config file: " << configFile <<   endl;
+#endif
        return configFile;
     }
 
     //else if (FileType == "channelsFile") // returns  channels.conf
     else if (FileType == "link") // returns symbolic link
     {
+#ifdef EXTRA_VERBOSE_DEBUG
        cout << " Config Dir : " << configDir  << "/channels.conf" <<  endl;
+#endif
        return configDir += "/channels.conf";
     }
     else if (FileType == "channels") // returns channels dir;
     {
+#ifdef EXTRA_VERBOSE_DEBUG
        cout << " Config Dir : " << configDir  << "/channels" <<  endl;
+#endif
        return configDir += "/channels";
     }
     else if (FileType == "setup") // returns plugins/setup dir; change to  "configDir"  
     {
+#ifdef EXTRA_VERBOSE_DEBUG
        cout << " Config Dir : " << configDir  << "/plugins/setup" <<  endl;
+#endif
        return configDir += "/plugins/setup";
     }
 
     configDir.append("/");
     configDir += "/channels/";
     configDir += FileType;
+#ifdef EXTRA_VERBOSE_DEBUG
     cout << " Config Dir end  : " << configDir << ".conf"  <<  endl;
+#endif
 
     return configDir += ".conf";
   }
