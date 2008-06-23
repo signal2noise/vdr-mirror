@@ -569,33 +569,6 @@ eOSState cMenuEditChannel::ProcessKey(eKeys Key)
 
 // --- cMenuChannelItem ------------------------------------------------------
 
-class cMenuChannelItem : public cOsdItem {
-public:
-  enum eViewMode { mode_edit, mode_view };
-  enum eChannelSortMode { csmNumber, csmName, csmProvider };
-private:
-  static eChannelSortMode sortMode;
-  enum eViewMode viewMode;
-  cChannel *channel;
-  cSchedulesLock schedulesLock;
-  const cSchedules *schedules;
-  const cEvent *event;
-  char szProgressPart[12];
-  bool isSet;
-  bool isMarked;
-public:
-  cMenuChannelItem(cChannel *Channel, eViewMode viewMode = mode_view);
-  static void SetSortMode(eChannelSortMode SortMode) { sortMode = SortMode; }
-  static void IncSortMode(void) { sortMode = eChannelSortMode((sortMode == csmProvider) ? csmNumber : sortMode + 1); }
-  static eChannelSortMode SortMode(void) { return sortMode; }
-  virtual int Compare(const cListObject &ListObject) const;
-  virtual void Set(void);
-  bool IsSet(void);
-  bool IsMarked(void) { return isMarked; }
-  void SetMarked(bool marked) { isMarked = marked; }
-  cChannel *Channel(void) { return channel; }
-  };
-
 cMenuChannelItem::eChannelSortMode cMenuChannelItem::sortMode = csmNumber;
 
 cMenuChannelItem::cMenuChannelItem(cChannel *Channel, eViewMode vMode)
@@ -1371,8 +1344,10 @@ cMenuBouquets::~cMenuBouquets()
 void cMenuBouquets::Setup(void)
 {
   int Index = Current();
-  if(Index < 0 && Channels.GetByNumber(cDevice::CurrentChannel())) Index = Channels.GetByNumber(cDevice::CurrentChannel())->Index();
-  if(Index > -1) SetGroup(Index);
+  if(Index < 0 && Channels.GetByNumber(cDevice::CurrentChannel()))
+     Index = Channels.GetByNumber(cDevice::CurrentChannel())->Index();
+  if(Index > -1)
+     SetGroup(Index);
   Display();
 }
 
@@ -1447,25 +1422,38 @@ cChannel *cMenuBouquets::GetChannel(int Index)
   return p ? (cChannel *)p->Channel() : NULL;
 }
 
+/* just removes the checkmark */
+void cMenuBouquets::UnMark(cMenuChannelItem *p)
+{
+	if(p){
+		p->SetMarked(false);
+		p->Set();
+	}
+}
+
 void cMenuBouquets::Mark()
 {
-
   if (Count()) {
-     edit = false;
+     if(viewMode == mode_view)
+        edit = false;
      if (viewMode == mode_edit) {
         cMenuChannelItem *p = (cMenuChannelItem *)Get(Current());
 	if (p) {
 	   if (p->IsMarked()){
-              //printf("UNMARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name());
+              printf("UNMARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name());
+	      /* remove checkmark */
 	      p->SetMarked(false);
               unsigned int i;
+	      /* erase from "marked channels"-list */
 	      for (i=0; i<channelMarked.size(); i++)
 		if (channelMarked.at(i) == GetChannel(Current())->Number())
 	           channelMarked.erase(channelMarked.begin()+i);
 	      CursorDown();
 	   } else {
-              //printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
+              printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
+	      /* set checkmark */
 	      p->SetMarked(true);
+	      /* put into "marked channels-list */
               channelMarked.push_back(GetChannel(Current())->Number());
 	      CursorDown();
            }
@@ -1475,9 +1463,8 @@ void cMenuBouquets::Mark()
 	if(!channelMarked.empty())
 		edit=true;
      }
-     Options();
      //SetStatus(tr("1-9 for new location - OK to move"));
-     if (viewMode == mode_view)
+     if (viewMode == mode_view || (viewMode == mode_edit && !channelMarked.empty()))
         SetStatus(tr("Up/Dn for new location - OK to move"));
      }
 }
@@ -1634,11 +1621,15 @@ void cMenuBouquets::Move(int From, int To, bool doSwitch)
   int CurrentChannelNr = cDevice::CurrentChannel();
   cChannel *CurrentChannel = Channels.GetByNumber(CurrentChannelNr);
   cChannel *FromChannel;
-  if(viewMode == mode_view)
+  cChannel *ToChannel;
+  if (viewMode == mode_view) {
      FromChannel = (cChannel*) Channels.Get(From);
-  else
+     ToChannel = (cChannel*) Channels.Get(To);
+  } else {
      FromChannel = (cChannel*) Channels.GetByNumber(From);
-  cChannel *ToChannel = (cChannel*) Channels.Get(To);
+     ToChannel = (cChannel*) Channels.GetByNumber(To);
+
+  }
   if (FromChannel && ToChannel /* && (From != To) */) {
      int FromNumber = FromChannel->Number();
      int ToNumber = ToChannel->Number();
@@ -1655,6 +1646,100 @@ void cMenuBouquets::Move(int From, int To, bool doSwitch)
      if (CurrentChannel && CurrentChannel->Number() != CurrentChannelNr && doSwitch)
         Channels.SwitchTo(CurrentChannel->Number());
      }
+}
+
+enum directions { dir_none, dir_forward, dir_backward  };
+
+eOSState cMenuBouquets::MoveMultiple(void)
+{
+	int current, currentIndex;
+	unsigned int i;
+	enum directions direction = dir_none;
+
+	Current() > -1 ? current = GetChannel(Current())->Number(): current = startChannel;
+	Current() > -1 ? currentIndex = GetChannel(Current())->Index(): currentIndex = startChannel;
+
+	/* we are finishing the "move-mode" */
+	move = false;
+	/* sort the list of channels to change - makes it easier */
+	std::sort(channelMarked.begin(), channelMarked.end());
+	bool inced = false;
+			     	
+	/* for all marked channels */
+	for (i = 0; i < channelMarked.size(); i++) {
+		Channels.ReNumber();
+		if(!startChannel || current <= channelMarked.at(i)+1)
+			direction = dir_backward;
+		else
+			direction = dir_forward;
+
+		/* the channel shall be moved before the channel highlighted by the cursor */
+		/* so decrease BUT NOT if "current-1" is a separator */
+		/* and NOT if two channels with a distance of 1 should be swapped */
+		if (direction == dir_forward && current != startChannel && current > 1 /* && !((cChannel*)Channels.GetByNumber(current)->Prev())->GroupSep() */ && !(current-channelMarked.at(i)==1 /*&& !GetChannel(currentIndex-1)->GroupSep()*/)){
+			current--;
+			currentIndex--;
+		}
+
+		cMenuChannelItem *p = (cMenuChannelItem *)Get(currentIndex);
+		UnMark(p);
+		if (channelMarked.at(i) != current || viewMode == mode_edit)
+		{
+			if (!Channels.Get(currentIndex)->GroupSep()) {
+				if(channelMarked.at(i) != current){
+					Channels.Move(Channels.GetByNumber(channelMarked.at(i)) , Channels.GetByNumber(current));
+					int j;
+					/* if we are moving forward, the target number has to be decreased */
+					if(direction == dir_forward)
+						for(j=i; j<channelMarked.size(); j++)
+							if(channelMarked.at(j) > 1 && !Channels.GetByNumber(channelMarked.at(j)-1)->GroupSep()){
+								channelMarked[j]--;
+							}
+				}
+			} else {
+				cChannel *chan = Channels.GetByNumber(channelMarked.at(i));
+				Channels.Del(Channels.GetByNumber(channelMarked.at(i)), false);
+				if(direction == dir_forward){
+					Channels.Add(chan, Channels.Get(currentIndex-1));
+
+				int j;
+
+				/* if we are moving forward, the target number has to be decreased */
+				if(direction == dir_forward)
+					for(j=i; j<channelMarked.size(); j++)
+						if(channelMarked.at(j) > 1 && !Channels.GetByNumber(channelMarked.at(j)-1)->GroupSep()){
+							channelMarked[j]--;
+						}
+					currentIndex--;
+				} else { 
+					Channels.Add(chan, Channels.Get(currentIndex));
+				}
+			}
+		}
+		if (viewMode == mode_edit) {
+			p = (cMenuChannelItem *)Get(current);
+			UnMark(p);
+			p = (cMenuChannelItem *)Get(channelMarked.at(i));
+			UnMark(p);	
+			p = (cMenuChannelItem *)Get(current);
+			UnMark(p);
+		}
+	}
+	for (i = 0; i < channelMarked.size(); i++) {
+		cMenuChannelItem *p = (cMenuChannelItem *)Get(channelMarked.at(i));
+		UnMark(p);
+	}					
+			     
+	edit = false;
+	channelMarked.clear();
+	SetGroup(current);
+	channelMarked.clear();
+	Propagate();
+	SetStatus(tr("Select channels with OK"));
+	if(GetChannel(current))
+		Channels.SwitchTo( GetChannel(Current())->Number() );
+	Display();
+	return osContinue;
 }
 
 void cMenuBouquets::GetFavourite(void)
@@ -1829,85 +1914,13 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                             break;
               case kOk:    if (channelMarked.size() > 0)
                            {
-                             int current;
-                             Current() > -1 ? current = GetChannel(Current())->Index(): current = startChannel;
 			     if(viewMode == mode_view)
                                 SetStatus(NULL);
-			     unsigned int i;
-                             if((viewMode == mode_edit && !move) || (channelMarked.empty() && viewMode == mode_view)){
+			     if((viewMode == mode_edit && !move) || (channelMarked.empty() && viewMode == mode_view)){
 				Mark();
-				return osContinue;
-				//break;
-			     }
-			     move = false;
-                             std::sort(channelMarked.begin(), channelMarked.end());
-			     bool inced = false;
-			     	
-                             for (i = 0; i < channelMarked.size(); i++) {
-				//printf("XX i:%i moving channel nr: %i name: %s to pos %i\n", i, channelMarked.at(i), Channels.GetByNumber(channelMarked.at(i))->Name(), current);
-				   cMenuChannelItem *p = (cMenuChannelItem *)Get(current);
-				   //printf("1 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
-				   if(p){
-				      p->SetMarked(false);
-				      p->Set();
-				   }
-                                if (channelMarked.at(i) != current || viewMode == mode_edit)
-                                {
-                                  if(/*current < channelMarked.at(i) &&*/ Channels.Get(current)->GroupSep()) {
-				        if(!inced){
-				          inced = true;
-				          current++;
-                                        }
-                                  }
-				  if(i== 0 && channelMarked.at(i) < current) {
-					current--;
-                                  }
-                                  Move(channelMarked.at(i) , current, false);
-                                }
-			        if (viewMode == mode_edit) {
-				   p = (cMenuChannelItem *)Get(current);
-				   //printf("2 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
-				   if(p){
-				      p->SetMarked(false);
-				      p->Set();
-				   }
-		                   p = (cMenuChannelItem *)Get(channelMarked.at(i));
-				   //printf("3 UNMARKING nr. %i name: %s\n", channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name()); 
-				   if(p){
-				      p->SetMarked(false);
-				      p->Set();
-				   }
-		
-				   if (channelMarked.at(i)>current)
-					current++;
-
-				   p = (cMenuChannelItem *)Get(current);
-				   //printf("4 UNMARKING nr. %i name: %s\n", current, Channels.Get(current)->Name()); 
-				   if(p){
-				      p->SetMarked(false);
-				      p->Set();
-				   }
-			        }
-                              }
-			     //printf("5 UNMARKING ");
-                             for (i = 0; i < channelMarked.size(); i++) {
-				   //printf("nr. %i name: %s, ", channelMarked.at(i), Channels.Get(channelMarked.at(i))->Name()); 
-		                   cMenuChannelItem *p = (cMenuChannelItem *)Get(channelMarked.at(i));
-				   if(p){
-				      p->SetMarked(false);
-				      p->Set();
-				   }
-			     }					
-			     
-			     //printf("\n");
-			     channelMarked.clear();
-			     edit = false;
-		             Propagate();
- 			     SetGroup(current);
-     			     SetStatus(tr("Select channels with OK"));
-			     if(GetChannel(Current()))
-                                Channels.SwitchTo( GetChannel(Current())->Number() );
-			     Display();
+			        return osContinue;
+	                     }
+			     return MoveMultiple();
                            } else {
 			       if(viewMode == mode_view)
                                   return Switch();
@@ -1964,6 +1977,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                              else {
                                edit = true;
                                Options();
+                               //return EditChannel();
                              }
 			    }
                              break;

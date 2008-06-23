@@ -304,6 +304,33 @@ public:
   static void ClearLastReplayed(const char *FileName);
   };
 
+class cMenuChannelItem : public cOsdItem {
+public:
+  enum eViewMode { mode_edit, mode_view };
+  enum eChannelSortMode { csmNumber, csmName, csmProvider };
+private:
+  static eChannelSortMode sortMode;
+  enum eViewMode viewMode;
+  cChannel *channel;
+  cSchedulesLock schedulesLock;
+  const cSchedules *schedules;
+  const cEvent *event;
+  char szProgressPart[12];
+  bool isSet;
+  bool isMarked;
+public:
+  cMenuChannelItem(cChannel *Channel, eViewMode viewMode = mode_view);
+  static void SetSortMode(eChannelSortMode SortMode) { sortMode = SortMode; }
+  static void IncSortMode(void) { sortMode = eChannelSortMode((sortMode == csmProvider) ? csmNumber : sortMode + 1); }
+  static eChannelSortMode SortMode(void) { return sortMode; }
+  virtual int Compare(const cListObject &ListObject) const;
+  virtual void Set(void);
+  bool IsSet(void);
+  bool IsMarked(void) { return isMarked; }
+  void SetMarked(bool marked) { isMarked = marked; }
+  cChannel *Channel(void) { return channel; }
+  };
+
 class cMenuBouquets : public cOsdMenu {
 public:
   enum eViewMode { mode_view, mode_edit };
@@ -335,6 +362,8 @@ protected:
   void Mark(void);
   virtual void Move(int From, int To);
   void Move(int From, int To, bool doSwitch);
+  eOSState MoveMultiple(void);
+  void UnMark(cMenuChannelItem *p);
 public:
   cMenuBouquets(int view, eViewMode viewMode = mode_view);
   ~cMenuBouquets(void);
