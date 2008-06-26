@@ -1732,7 +1732,7 @@ eOSState cMenuBouquets::MoveMultiple(void)
 			     
 	edit = false;
 	channelMarked.clear();
-	SetGroup(current);
+	SetGroup(currentIndex);
 	channelMarked.clear();
 	Propagate();
 	SetStatus(tr("Select channels with OK"));
