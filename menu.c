@@ -1735,7 +1735,6 @@ eOSState cMenuBouquets::MoveMultiple(void)
 	edit = false;
 	channelMarked.clear();
 	SetGroup(currentIndex);
-	channelMarked.clear();
 	Propagate();
 	SetStatus(tr("Select channels with OK"));
 	if(GetChannel(current))
