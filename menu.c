@@ -1466,6 +1466,8 @@ void cMenuBouquets::Mark()
      //SetStatus(tr("1-9 for new location - OK to move"));
      if (viewMode == mode_view || (viewMode == mode_edit && !channelMarked.empty()))
         SetStatus(tr("Up/Dn for new location - OK to move"));
+     else if (viewMode == mode_edit)
+	SetStatus(tr("Select channels with OK"));
      }
 }
 
