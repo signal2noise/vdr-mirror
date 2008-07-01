@@ -19,6 +19,8 @@
 #include "receiver.h"
 #include "status.h"
 #include "transfer.h"
+#include <sys/time.h>
+#include <time.h>
 
 //#define DETACH_UNUSED_DEVICES
 
@@ -434,7 +436,7 @@ bool cDevice::HasPid(int Pid) const
 #ifndef RBLITE
 void cDevice::CiStartDecrypting(void)
 {
-  if (ciHandler)
+  if (ciHandler && cDevice::GetDevice(0) != this)
      ciHandler->StartDecrypting();
 }
 
@@ -706,8 +708,10 @@ bool cDevice::MaySwitchTransponder(void)
   return !Receiving(true) && !(pidHandles[ptAudio].pid || pidHandles[ptVideo].pid || pidHandles[ptDolby].pid);
 }
 
+struct timeval switchTime;
 bool cDevice::SwitchChannel(const cChannel *Channel, bool LiveView)
 {
+  gettimeofday(&switchTime, NULL);
   if (LiveView)
      isyslog("switching to channel %d", Channel->Number());
   for (int i = 3; i--;) {
@@ -887,7 +891,7 @@ eSetChannelResult cDevice::SetChannel(const cChannel *Channel, bool LiveView)
            ciHandler0->AddPid(Channel->Sid(), *Apid, 4, slotOnDev);
          for (const int *Dpid = Channel->Dpids(); *Dpid; Dpid++)
            ciHandler0->AddPid(Channel->Sid(), *Dpid, 0, slotOnDev);
-           ciHandler0->StartDecrypting();
+         ciHandler0->StartDecrypting();
 
 #ifndef RBLITE
      CiSetSource(Channel->Source(), Channel->Transponder());
@@ -1550,7 +1554,7 @@ int cDevice::GetTSPackets(uchar *Data, int count)
 }
 #endif
 
-bool cDevice::AttachReceiver(cReceiver *Receiver)
+bool cDevice::AttachReceiver(cReceiver *Receiver, bool StartDecrypting)
 {
   if (!Receiver)
      return false;
@@ -1583,12 +1587,13 @@ bool cDevice::AttachReceiver(cReceiver *Receiver)
          if (!Running())
             Start();
 #if defined(RBLITE) || defined(CAM_NEW)
-         if (cDevice::GetDevice(0)->CiHandler()) {
+         if (StartDecrypting && cDevice::GetDevice(0)->CiHandler()) {
            cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
          }
 #endif
 #ifndef RBLITE
-	CiStartDecrypting();
+        if (StartDecrypting)
+	  CiStartDecrypting();
 #endif
          return true;
          }

@@ -128,7 +128,7 @@ cDevice *cTransferControl::receiverDevice = NULL;
 cTransferControl::cTransferControl(cDevice *ReceiverDevice, int VPid, const int *APids, const int *DPids, const int *SPids)
 :cControl(transfer = new cTransfer(VPid, APids, DPids, SPids), true)
 {
-  ReceiverDevice->AttachReceiver(transfer);
+  ReceiverDevice->AttachReceiver(transfer, true);
   receiverDevice = ReceiverDevice;
 }
 

@@ -23,6 +23,8 @@
 #include "channels.h"
 #include "thread.h"
 #include "tools.h"
+#include <sys/time.h>
+#include <time.h>
 
 #include "remux.h"
 #include "libsi/util.h" // for crc
@@ -1335,6 +1337,7 @@ int cRemux::Put(const uchar *Data, int Count)
 	return Count;
 }
 //--------------------------------------------------------------------------
+extern struct timeval switchTime;
 uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 {
 	uint64 starttime=0;
@@ -1434,7 +1437,10 @@ uchar* cRemux::Get(int &Count, uchar *PictureType, int mode, int *start)
 #ifdef ENABLE_TS_MODE
 			if (!tsmode_valid) { // Find type (MPEG2/h264)
 				if (sf!=SF_UNKNOWN) {
-					printf("\n\n======================= DETECTED %i\n\n",sf);
+                                       struct timeval now;
+                                       gettimeofday(&now, NULL);
+                                       float secs = ((float)((1000000 * now.tv_sec + now.tv_usec) - (switchTime.tv_sec * 1000000 + switchTime.tv_usec))) / 1000000;
+                                       printf("\n\n======================= DETECTED %i : time since channelswitch-start: secs: %f\n\n",sf, secs);
 					sfmode=sf;
                                         rmode = rAuto; // TB: hack to force rmode to rAuto
 					switch(rmode) {

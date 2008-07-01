@@ -571,7 +571,7 @@ public:
        ///< Returns the ca of the current receiving session(s).
   bool Receiving(bool CheckAny = false) const;
        ///< Returns true if we are currently receiving.
-  bool AttachReceiver(cReceiver *Receiver);
+  bool AttachReceiver(cReceiver *Receiver, bool StartDecrypting = false);
        ///< Attaches the given receiver to this device.
   void Detach(cReceiver *Receiver);
        ///< Detaches the given receiver from this device.

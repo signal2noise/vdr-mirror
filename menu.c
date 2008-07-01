@@ -6675,7 +6675,7 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
            }
      }
      recorder = new cRecorder(fileName, ch->Ca(), timer->Priority(), ch->Vpid(), ch->Apids(), ch->Dpids(), ch->Spids(), liveBuffer);
-     if (device->AttachReceiver(recorder)) {
+     if (device->AttachReceiver(recorder, true)) {
         time_t start_t=time(0);
         while(recorder->GetRemux()->SFmode()==SF_UNKNOWN && (time(0)-start_t)<2) 
            usleep(50*1000); //TB: give recorder's remux a chance to detect mode
