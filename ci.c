@@ -1761,7 +1761,8 @@ bool cCiHandler::Ready(void)
          cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
          if (!cas || !*cas->GetCaSystemIds())
             return false;
-         }
+         } else
+         return false;
       }
   return true;
 }
@@ -1800,6 +1801,7 @@ bool cCiHandler::Process(int Slot)
             }
          else if (CloseAllSessions(slot)) {
             tpl->ResetSlot(slot);
+	    moduleReady[slot] = false;
             result = false;
             }
          else if (tpl->ModuleReady(slot)) {
@@ -2092,5 +2094,6 @@ bool cCiHandler::Reset(int Slot)
 {
   cMutexLock MutexLock(&mutex);
   CloseAllSessions(Slot);
+  moduleReady[Slot] = false;
   return tpl->ResetSlot(Slot, true);
 }

@@ -765,8 +765,8 @@ int main(int argc, char *argv[])
 
   // Channel:
 
-  if (!cDevice::WaitForAllDevicesReady(DEVICEREADYTIMEOUT))
-     dsyslog("not all devices ready after %d seconds", DEVICEREADYTIMEOUT);
+  //TB if (!cDevice::WaitForAllDevicesReady(DEVICEREADYTIMEOUT)) //TB don't wait until all cams are ready
+  //TB   dsyslog("not all devices ready after %d seconds", DEVICEREADYTIMEOUT); //TB don't wait until all cams are ready
   if (Setup.InitialChannel > 0)
      Setup.CurrentChannel = Setup.InitialChannel;
   if (Setup.InitialVolume >= 0)
