@@ -1565,28 +1565,28 @@ int cRemux::makeStreamType(uchar *data, int type, int pid)
 	switch (type) {
 	case 0: // MPEG2-Video
 		data[0]=0x02;
-		data[1]=0xe0|(pid>>8)&0xf;
+		data[1]=0xe0|(pid>>8)&0x1f;
 		data[2]=pid&0xff;
 		data[3]=0xf0;
 		data[4]=0x00;
 		return 5;
 	case 1: // H264-Video
 		data[0]=0x1b;
-		data[1]=0xe0|(pid>>8)&0xf;
+		data[1]=0xe0|(pid>>8)&0x1f;
 		data[2]=pid&0xff;
 		data[3]=0xf0;
 		data[4]=0x00;
 		return 5;
 	case 2: // MPEG-Audio
 		data[0]=0x04;
-		data[1]=0xe0|(pid>>8)&0xf;
+		data[1]=0xe0|(pid>>8)&0x1f;
 		data[2]=pid&0xff;
 		data[3]=0xf0;
 		data[4]=0x00;
 		return 5;
 	case 3: // AC3
 		data[0]=0x06;
-		data[1]=0xe0|(pid>>8)&0xf;
+		data[1]=0xe0|(pid>>8)&0x1f;
 		data[2]=pid&0xff;
 		data[3]=0xf0;
 		data[4]=0x03;
