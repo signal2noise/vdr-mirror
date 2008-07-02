@@ -34,6 +34,8 @@
 #include "diseqc.h"
 #include "help.h"
 
+#include <time.h>
+#include <sys/time.h>
 
 #define MAXWAIT4EPGINFO   3 // seconds
 #define MODETIMEOUT       3 // seconds
@@ -7080,9 +7082,23 @@ void cReplayControl::ShowMode(void)
      }
 }
 
+static struct timeval lastUpdate = { 0 };
+
 bool cReplayControl::ShowProgress(bool Initial)
 {
   int Current, Total;
+  struct timeval now = { 0 };
+  gettimeofday(&now, NULL);
+
+  /* TB: if "lastUpdate" is not set (first call), fill it */
+  if(lastUpdate.tv_sec == 0 && lastUpdate.tv_usec == 0)
+       lastUpdate = now;
+  
+  /* TB: 4 times/second is really enough */
+  if(!Initial && (now.tv_sec*1000*1000 + now.tv_usec) - (lastUpdate.tv_sec*1000*1000 + lastUpdate.tv_usec) < 250*1000 ) {
+       return true;
+  }
+  lastUpdate = now;
 
   if (GetIndex(Current, Total) && Total > 0) {
      if (!visible) {
