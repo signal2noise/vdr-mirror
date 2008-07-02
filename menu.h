@@ -247,6 +247,7 @@ public:
   };
 
 class cRecordControls {
+  friend class cRecordControl;
 private:
   static cRecordControl *RecordControls[];
   static int state;

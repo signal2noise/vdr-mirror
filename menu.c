@@ -6605,6 +6605,9 @@ eOSState cDisplayTracks::ProcessKey(eKeys Key)
 
 // --- cRecordControl --------------------------------------------------------
 
+cRecordControl *cRecordControls::RecordControls[MAXRECORDCONTROLS] = { NULL };
+int cRecordControls::state = 0;
+
 cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
 {
   // We're going to manipulate an event here, so we need to prevent
@@ -6653,6 +6656,26 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
      timer = NULL;
      return;
      }
+
+  /* TB: only one instant recording per channel */
+  for (int i = 0; i < MAXRECORDCONTROLS; i++) {
+    if (cRecordControls::RecordControls[i] && cRecordControls::RecordControls[i]!=this) {
+       if(instantId && strcmp(instantId, cRecordControls::RecordControls[i]->InstantId()) == 0){
+          isyslog("an instant recording is already running '%s'", fileName);
+          if(!Interface->Confirm(tr("recording already runnig - Start another?"))){
+            if (Timer) {
+              timer->SetPending(false);
+              timer->SetRecording(false);
+              timer->OnOff();
+            } else {
+              Timers.Del(timer);
+              Timers.SetModified();
+            }
+           return;
+          }
+       }
+    }
+  }
 
   cRecordingUserCommand::InvokeCommand(RUC_BEFORERECORDING, fileName);
   isyslog("record %s", fileName);
@@ -6759,10 +6782,6 @@ bool cRecordControl::Process(time_t t)
 }
 
 // --- cRecordControls -------------------------------------------------------
-
-cRecordControl *cRecordControls::RecordControls[MAXRECORDCONTROLS] = { NULL };
-int cRecordControls::state = 0;
-
 bool cRecordControls::Start(cTimer *Timer, bool Pause)
 {
   static time_t LastNoDiskSpaceMessage = 0;
