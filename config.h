@@ -26,7 +26,7 @@
 
 // The plugin API's version number:
 
-#define APIVERSION  "1.4.9"
+#define APIVERSION  "1.4.9-1"
 #define APIVERSNUM   10409  // Version * 10000 + Major * 100 + Minor
 
 // When loading plugins, VDR searches them by their APIVERSION, which
