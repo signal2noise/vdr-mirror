@@ -652,12 +652,12 @@ void cDvbPlayer::Action ( void )
 					if (playDir == pdBackward) i = -i;
 					if(!PATPMT) i=1;
 					int delay = 1000000/(25*Speeds[trickSpeed]*2);
-					printf("Mode %d Dir %d Trick %d Speed %d (%d * (%d = %d - %d))\n", playMode, playDir, trickSpeed, Speeds[trickSpeed], delay, i, playFrame->Index(), last_index);
+//					printf("Mode %d Dir %d Trick %d Speed %d (%d * (%d = %d - %d))\n", playMode, playDir, trickSpeed, Speeds[trickSpeed], delay, i, playFrame->Index(), last_index);
 					while(i-- > 0 && delay > 0 && delay <= 1000000)
 						usleep(delay); 
 				} else if ( playMode == pmSlow && playDir == pdBackward ) {
 					int delay = (2*Speeds[trickSpeed]*1000000)/-8;
-					printf("SlowBack %d %d %d\n", delay, trickSpeed, Speeds[trickSpeed]);
+//					printf("SlowBack %d %d %d\n", delay, trickSpeed, Speeds[trickSpeed]);
 					if(delay > 0 && delay <= 2000000)
 						usleep(delay);
 				} // if
