@@ -922,6 +922,7 @@ cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
   int tempCaId = 0;
   bool first = 1;
   /* loop through all channels of the bouquet */
+  if(!New)
   for(channelE = (cChannel*)channel->Next(); channelE && !channelE->GroupSep(); channelE = (cChannel*) channelE->Next()){
      /* remember the first CAID */
      if(first) {
