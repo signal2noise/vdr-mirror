@@ -395,7 +395,7 @@ void cDvbPlayer::Activate ( bool On )
 	else
 		Cancel ( 9 );
 }
-
+static int init_repeat = 0;
 void cDvbPlayer::Action ( void )
 {
 	uchar *b = NULL;
@@ -453,7 +453,7 @@ void cDvbPlayer::Action ( void )
 				{
 					if ( !nonBlockingFileReader->Reading() )
 					{
-						if ( playMode == pmFast || ( playMode == pmSlow && playDir == pdBackward ) )
+						if ( playMode == pmFast || ( playMode == pmSlow && playDir == pdBackward ))
 						{
 							uchar FileNumber;
 							int FileOffset;
@@ -630,6 +630,13 @@ void cDvbPlayer::Action ( void )
 
 					if ( w > 0 )
 					{
+						while(init_repeat && playMode != pmPlay) {
+							if ( PATPMT != NULL )
+								PlayTS ( p, pc, playMode != pmPlay );
+							else
+								PlayPes ( p, pc, playMode != pmPlay );
+							init_repeat--;
+						} // while
 						p += w;
 						pc -= w;
 					}
@@ -640,12 +647,19 @@ void cDvbPlayer::Action ( void )
 					}
 				}
 #ifdef DELAYED_FAST_TRICKMODE
-				if(playMode == pmFast && last_index >= 0) {
+				if((playMode == pmFast) && (last_index >= 0)) {
 					int i = playFrame->Index()-last_index;
 					if (playDir == pdBackward) i = -i;
 					if(!PATPMT) i=1;
-					while(i-- > 0)
-						usleep(1000000/(25*Speeds[trickSpeed]*2)); 
+					int delay = 1000000/(25*Speeds[trickSpeed]*2);
+					printf("Mode %d Dir %d Trick %d Speed %d (%d * (%d = %d - %d))\n", playMode, playDir, trickSpeed, Speeds[trickSpeed], delay, i, playFrame->Index(), last_index);
+					while(i-- > 0 && delay > 0 && delay <= 1000000)
+						usleep(delay); 
+				} else if ( playMode == pmSlow && playDir == pdBackward ) {
+					int delay = (2*Speeds[trickSpeed]*1000000)/-8;
+					printf("SlowBack %d %d %d\n", delay, trickSpeed, Speeds[trickSpeed]);
+					if(delay > 0 && delay <= 2000000)
+						usleep(delay);
 				} // if
 				last_index = playFrame->Index();
 #endif
@@ -730,6 +744,7 @@ void cDvbPlayer::Forward ( void )
 				playDir = pdForward;
 				trickSpeed = NORMAL_SPEED;
 				TrickSpeed ( Setup.MultiSpeedMode ? 1 : MAX_SPEEDS );
+				init_repeat=5;
 			}
 			break;
 			case pmSlow:
@@ -783,6 +798,7 @@ void cDvbPlayer::Backward ( void )
 				playDir = pdBackward;
 				trickSpeed = NORMAL_SPEED;
 				TrickSpeed ( Setup.MultiSpeedMode ? 1 : MAX_SPEEDS );
+				init_repeat=5;
 			}
 			break;
 			case pmSlow:
@@ -807,6 +823,7 @@ void cDvbPlayer::Backward ( void )
 				playDir = pdBackward;
 				trickSpeed = NORMAL_SPEED;
 				TrickSpeed ( Setup.MultiSpeedMode ? -1 : -MAX_SPEEDS );
+				init_repeat=5;
 			}
 			break;
 		}
@@ -850,6 +867,7 @@ void cDvbPlayer::SkipSeconds ( int Seconds )
 
 void cDvbPlayer::Goto ( int Index, bool Still )
 {
+	printf("goto %d %d\n", Index, Still);
 	if ( index )
 	{
 		LOCK_THREAD;
