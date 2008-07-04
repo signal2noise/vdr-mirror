@@ -524,7 +524,7 @@ bool cCiTransportLayer::ModuleReady(int Slot)
   ca_slot_info_t sinfo;
   sinfo.num = Slot;
   if (ioctl(fd, CA_GET_SLOT_INFO, &sinfo) != -1)
-     return sinfo.flags & CA_CI_MODULE_READY;
+     return (sinfo.flags & CA_CI_MODULE_READY && sinfo.flags & CA_CI_MODULE_PRESENT);
   else
      esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
@@ -996,6 +996,7 @@ private:
   int numCaSystemIds;
   unsigned short caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
 public:
+  int GetState() { return state; }
   cCiConditionalAccessSupport(uint16_t SessionId, cCiTransportConnection *Tc);
   virtual bool Process(int Length = 0, const uint8_t *Data = NULL);
   const unsigned short *GetCaSystemIds(void) { return caSystemIds; }
@@ -1755,16 +1756,18 @@ int cCiHandler::NumCams(void)
 
 bool cCiHandler::Ready(void)
 {
+  bool result = true;
   cMutexLock MutexLock(&mutex);
   for (int Slot = 0; Slot < numSlots; Slot++) {
-      if (moduleReady[Slot]) {
+        if (moduleReady[Slot]) {
          cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
-         if (!cas || !*cas->GetCaSystemIds())
-            return false;
-         } else
-         return false;
+         if (/*!cas ||*/ (cas && !*cas->GetCaSystemIds()) || (cas && cas->GetState() < 3 && cas->GetState() >= 0))
+            result = false;
+        } else {
+	 result = false;
+        }
       }
-  return true;
+  return result;
 }
 
 bool cCiHandler::Process(int Slot)

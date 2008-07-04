@@ -436,7 +436,7 @@ bool cDevice::HasPid(int Pid) const
 #ifndef RBLITE
 void cDevice::CiStartDecrypting(void)
 {
-  if (ciHandler)
+  if (ciHandler && cDevice::GetDevice(0) != this)
      ciHandler->StartDecrypting();
 }
 
