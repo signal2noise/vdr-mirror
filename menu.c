@@ -1443,7 +1443,7 @@ void cMenuBouquets::Mark()
         cMenuChannelItem *p = (cMenuChannelItem *)Get(Current());
 	if (p) {
 	   if (p->IsMarked()){
-              printf("UNMARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name());
+              //printf("UNMARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name());
 	      /* remove checkmark */
 	      p->SetMarked(false);
               unsigned int i;
@@ -1453,7 +1453,7 @@ void cMenuBouquets::Mark()
 	           channelMarked.erase(channelMarked.begin()+i);
 	      CursorDown();
 	   } else {
-              printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
+              //printf("MARKED chan nr: %i chnr: %i name: %s\n", Current(), GetChannel(Current())->Number(), GetChannel(Current())->Name() );
 	      /* set checkmark */
 	      p->SetMarked(true);
 	      /* put into "marked channels-list */
@@ -1463,8 +1463,10 @@ void cMenuBouquets::Mark()
            p->Set();
 	   Display();
 	}
-	if(!channelMarked.empty())
-		edit=true;
+	if(!channelMarked.empty()){
+		edit = true;
+		Options();
+        }
      }
      //SetStatus(tr("1-9 for new location - OK to move"));
      if (viewMode == mode_view || (viewMode == mode_edit && !channelMarked.empty()))
