@@ -1810,7 +1810,7 @@ void cLiveBufferManager::ChannelSwitch(cDevice *ReceiverDevice, const cChannel *
   if (!liveReceiver) {
     cTransferControl::receiverDevice = ReceiverDevice;
     liveReceiver = new cLiveReceiver(Channel);
-    ReceiverDevice->AttachReceiver(liveReceiver, false);
+    ReceiverDevice->AttachReceiver(liveReceiver, true);
   }
   if (liveBuffer) {
     liveBuffer->SetNewRemux(liveReceiver->remux, Channel != channel);
