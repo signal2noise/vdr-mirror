@@ -1219,11 +1219,21 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      char bouquetName[128];
      if (Setup.AddNewChannels != 0) // 0 : add at the end, 1: add in bouquets
          snprintf(bouquetName,127, ".. %s", strlen(Provider)>0? Provider:"Unknown Provider"); // XXX translate ???
+     // if no provider, add under unknown provider
      else
          snprintf(bouquetName,127,"auto added");
 
-     // if no provider, add under unknown provider
      int size = 0;
+
+     // start check for "Favorites"
+     ch = First();
+     if (ch && strcmp(ch->Name(), "Favorites") != 0) // "Favorites is always the first entry
+     {
+         InsBouquet("Favorites", ch); 
+     }
+     // end check for "favorites"
+
+
      for (ch = First(); ch ; ch = Next(ch) )
      {
          size++;
@@ -1239,8 +1249,10 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
          ch = AddBouquet("auto added", NULL); // XXX translate ???
      }
      if (ch==NULL) // bouquet not found
-     { // should not reach here. as there is always the last bouquet "auto added"
+     { 
+        // should not reach here. as there is always the last bouquet "auto added"
          c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
+         AddBouquet("auto added",NULL); //
      }
      else
      {
