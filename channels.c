@@ -1174,6 +1174,32 @@ int cChannels::Modified(void)
   return Result;
 }
 
+// start Balaji
+cChannel *cChannels::InsBouquet(char* b_name, cChannel*before)
+{
+
+    cChannel *newBouquet = new cChannel;
+    newBouquet->SetGroupSep(true);
+    newBouquet->SetName(b_name,"","");
+    newBouquet->SetId(0,0,0,0);
+
+    Ins(newBouquet, before);
+    return newBouquet;
+}
+
+cChannel *cChannels::AddBouquet(char* b_name, cChannel*after)
+{
+
+    cChannel *newBouquet = new cChannel;
+    newBouquet->SetGroupSep(true);
+    newBouquet->SetName(b_name,"","");
+    newBouquet->SetId(0,0,0,0);
+
+    Add(newBouquet, after);
+    return newBouquet;
+}
+//end Balaji
+
 cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, const char *ShortName, const char *Provider, int Nid, int Tid, int Sid, int Rid)
 {
   if (Transponder) {
@@ -1182,7 +1208,45 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      NewChannel->CopyTransponderData(Transponder);
      NewChannel->SetId(Nid, Tid, Sid, Rid);
      NewChannel->SetName(Name, ShortName, Provider);
-     Add(NewChannel);
+
+     //started by Balaji
+     printf("Name = %s/%s \t\t vpid() = %d\n",Name, Provider, Transponder->Vpid());
+
+     // Add to appropriate bouquet 
+     cChannel *ch=NULL, *c_bouquet=NULL;
+
+     char bouquetName[128];
+     snprintf(bouquetName,127, ".. %s", strlen(Provider)>0? Provider:"Unknown Provider"); // XXX translate ???
+     //if ( !NewChannel->Vpid() ) strcat(bouquetName, "-Radio");
+
+     // if no provider, add under unknown provider
+     int size = 0;
+     for (ch = First(); ch ; ch = Next(ch) )
+     {
+         size++;
+         if (size > 1 && ch->GroupSep() && strcmp(ch->Name(), bouquetName) >= 0 ) break; 
+         // skip "Favorites"
+     }
+
+     if (size<=0) // Favor
+     {
+         AddBouquet("Favorites", NULL); // XXX translate ???
+     }
+     if (ch==NULL) // bouquet not found
+     {
+         c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
+     }
+     else
+     {
+         if ( strcmp(ch->Name(), bouquetName) == 0 ) 
+             c_bouquet = ch;
+         else // strcmp returns greater than
+             c_bouquet = InsBouquet(bouquetName,ch);
+     }
+
+     Add(NewChannel,c_bouquet);
+     //End by Balaji
+
      ReNumber();
      return NewChannel;
      }

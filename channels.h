@@ -194,6 +194,7 @@ public:
   int Rid(void) const { return rid; }
   int Number(void) const { return number; }
   void SetNumber(int Number) { number = Number; }
+  void SetGroupSep(bool On) { groupSep=On; } // for adding Bouquets from cChannels
   bool GroupSep(void) const { return groupSep; }
   char Polarization(void) const { return polarization; }
   int Inversion(void) const { return inversion; }
@@ -266,6 +267,9 @@ public:
       ///< modification has been made, and 2 if the user has made a modification.
       ///< Calling this function resets the 'modified' flag to 0.
   cChannel *NewChannel(const cChannel *Transponder, const char *Name, const char *ShortName, const char *Provider, int Nid, int Tid, int Sid, int Rid = 0);
+  cChannel *AddBouquet(char* b_name, cChannel*after=NULL); // added by Balaji
+  cChannel *InsBouquet(char* b_name, cChannel*before=NULL); // added by Balaji
+
   };
 
 extern cChannels Channels;
