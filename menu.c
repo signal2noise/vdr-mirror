@@ -5400,7 +5400,9 @@ void cMenuSetupReplay::Store(void)
 class cMenuSetupMisc : public cMenuSetupBase {
 private:
   const char *updateChannelsTexts[3];
+  const char*AddNewChannelsTexts[2];
   int tmpUpdateChannels;
+  int tmpAddNewChannels;
   virtual void Store(void);
 public:
   cMenuSetupMisc(void);
@@ -5414,7 +5416,11 @@ cMenuSetupMisc::cMenuSetupMisc(void)
   updateChannelsTexts[1] = tr("update"); // 3
   updateChannelsTexts[2] = tr("add"); // 5
 
+  AddNewChannelsTexts[0] = tr("default");
+  AddNewChannelsTexts[1] = tr("in Bouquets");
+
   tmpUpdateChannels = (int) data.UpdateChannels / 2;
+  tmpAddNewChannels = data.AddNewChannels; //XXX change
 
   SetSection(tr("Background activity"));
   SetHelp(tr("Button$Scan EPG"));
@@ -5424,6 +5430,7 @@ cMenuSetupMisc::cMenuSetupMisc(void)
   //Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$SVDRP timeout (s)"),          &data.SVDRPTimeout));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),            &data.ZapTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),        &tmpUpdateChannels, 3, updateChannelsTexts));
+  Add(new cMenuEditStraItem(tr("Setup.DVB$Add new channels"),        &tmpAddNewChannels, 2, AddNewChannelsTexts));
   Add(new cMenuEditChanItem(tr("Setup.Miscellaneous$Initial channel"),            &data.InitialChannel, tr("Setup.Miscellaneous$as before")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Initial volume"),             &data.InitialVolume, -1, 255, tr("Setup.Miscellaneous$as before")));
 }
@@ -5446,6 +5453,9 @@ void cMenuSetupMisc::Store(void)
 	 data.UpdateChannels = 3;
   else if  ( tmpUpdateChannels == 2 )
 	 data.UpdateChannels = 5;
+ 
+  data.AddNewChannels = tmpAddNewChannels;
+
   cMenuSetupBase::Store();
 }
 

@@ -244,6 +244,7 @@ public:
   int VideoDisplayFormat;
   int VideoFormat;
   int UpdateChannels;
+  int AddNewChannels; //Balaji, in the end (default) / in side its own Bouquet - named after the channel's provider
   int UseDolbyDigital;
   int Ac3OverHdmi;
   int LiveDelay;   //RC: for bitstreamout

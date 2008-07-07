@@ -1215,32 +1215,38 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      // Add to appropriate bouquet 
      cChannel *ch=NULL, *c_bouquet=NULL;
 
+
      char bouquetName[128];
-     snprintf(bouquetName,127, ".. %s", strlen(Provider)>0? Provider:"Unknown Provider"); // XXX translate ???
-     //if ( !NewChannel->Vpid() ) strcat(bouquetName, "-Radio");
+     if (Setup.AddNewChannels != 0) // 0 : add at the end, 1: add in bouquets
+         snprintf(bouquetName,127, ".. %s", strlen(Provider)>0? Provider:"Unknown Provider"); // XXX translate ???
+     else
+         snprintf(bouquetName,127,"auto added");
 
      // if no provider, add under unknown provider
      int size = 0;
      for (ch = First(); ch ; ch = Next(ch) )
      {
          size++;
-         if (size > 1 && ch->GroupSep() && strcmp(ch->Name(), bouquetName) >= 0 ) break; 
+         if (size > 1 && ch->GroupSep() && strcmp(ch->Name(), bouquetName) >= 0)  break;
          // skip "Favorites"
+         if (strstr(ch->Name(), "auto added")) break; 
+         // "auto added" is the last bouquet always
      }
 
-     if (size<=0) // Favor
+     if (size<=0) // Favorites
      {
-         AddBouquet("Favorites", NULL); // XXX translate ???
+         AddBouquet("Favorites", NULL);  // XXX translate ???
+         ch = AddBouquet("auto added", NULL); // XXX translate ???
      }
      if (ch==NULL) // bouquet not found
-     {
+     { // should not reach here. as there is always the last bouquet "auto added"
          c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
      }
      else
      {
          if ( strcmp(ch->Name(), bouquetName) == 0 ) 
              c_bouquet = ch;
-         else // strcmp returns greater than
+         else // strcmp returns greater than 
              c_bouquet = InsBouquet(bouquetName,ch);
      }
 

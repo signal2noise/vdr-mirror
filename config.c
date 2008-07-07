@@ -255,6 +255,7 @@ cSetup::cSetup(void)
   VideoDisplayFormat = 1;
   VideoFormat = 0;
   UpdateChannels = 5;
+  AddNewChannels = 0; // add new channels in bouquet / at the end
   UseDolbyDigital = 0;
   Ac3OverHdmi = 0;
   UseDolbyInRecordings = 1;
@@ -445,6 +446,7 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "VideoDisplayFormat"))  VideoDisplayFormat = atoi(Value);
   else if (!strcasecmp(Name, "VideoFormat"))         VideoFormat        = atoi(Value);
   else if (!strcasecmp(Name, "UpdateChannels"))      UpdateChannels     = atoi(Value);
+  else if (!strcasecmp(Name, "AddNewChannels"))      AddNewChannels     = atoi(Value);
   else if (!strcasecmp(Name, "UseDolbyDigital"))     UseDolbyDigital    = atoi(Value);
   else if (!strcasecmp(Name, "Ac3OverHdmi"))         Ac3OverHdmi        = atoi(Value);
   else if (!strcasecmp(Name, "UseDolbyInRecordings")) UseDolbyInRecordings = atoi(Value);
@@ -540,6 +542,7 @@ bool cSetup::Save(void)
   Store("VideoDisplayFormat", VideoDisplayFormat);
   Store("VideoFormat",        VideoFormat);
   Store("UpdateChannels",     UpdateChannels);
+  Store("AddNewChannels",     AddNewChannels);
   Store("UseDolbyDigital",    UseDolbyDigital);
   Store("Ac3OverHdmi",        Ac3OverHdmi);
   Store("UseDolbyInRecordings", UseDolbyInRecordings);
