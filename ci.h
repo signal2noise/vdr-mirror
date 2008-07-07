@@ -114,7 +114,6 @@ private:
   int numSlots;
   bool newCaSupport;
   bool hasUserIO;
-  bool moduleReady[MAX_CI_SLOT];
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
@@ -134,7 +133,6 @@ private:
   const unsigned short *GetCaSystemIds(int Slot);
 #endif
   cCiSession *GetSessionBySessionId(uint16_t SessionId);
-  cCiSession *GetSessionByResourceId(uint32_t ResourceId, int Slot);
   cCiSession *CreateSession(uint32_t ResourceId);
   bool OpenSession(int Length, const uint8_t *Data);
   bool CloseSession(uint16_t SessionId);
@@ -148,6 +146,9 @@ public:
   ~cCiHandler();
   static cCiHandler *CreateCiHandler(int fd_ca);
   static cCiHandler *CreateCiHandler(const char *FileName);
+  cCiSession *GetSessionByResourceId(uint32_t ResourceId, int Slot);
+  bool moduleReady[MAX_CI_SLOT];
+
        ///< Creates a new cCiHandler for the given CA device.
   int NumSlots(void) { return numSlots; }
        ///< Returns the number of CAM slots provided by this CA device.

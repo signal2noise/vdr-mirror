@@ -524,7 +524,7 @@ bool cCiTransportLayer::ModuleReady(int Slot)
   ca_slot_info_t sinfo;
   sinfo.num = Slot;
   if (ioctl(fd, CA_GET_SLOT_INFO, &sinfo) != -1)
-     return (sinfo.flags & CA_CI_MODULE_READY && sinfo.flags & CA_CI_MODULE_PRESENT);
+     return sinfo.flags & CA_CI_MODULE_READY;
   else
      esyslog("ERROR: can't get info on CAM slot %d: %m", Slot);
   return false;
@@ -1756,18 +1756,15 @@ int cCiHandler::NumCams(void)
 
 bool cCiHandler::Ready(void)
 {
-  bool result = true;
   cMutexLock MutexLock(&mutex);
   for (int Slot = 0; Slot < numSlots; Slot++) {
         if (moduleReady[Slot]) {
          cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
-         if (/*!cas ||*/ (cas && !*cas->GetCaSystemIds()) || (cas && cas->GetState() < 3 && cas->GetState() >= 0))
-            result = false;
-        } else {
-	 result = false;
+         if (!cas || (cas && !*cas->GetCaSystemIds()) || (cas && cas->GetState() < 3 && cas->GetState() >= 0))
+            return false;
         }
       }
-  return result;
+  return true;
 }
 
 bool cCiHandler::Process(int Slot)
