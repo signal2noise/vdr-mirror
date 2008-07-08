@@ -457,6 +457,12 @@ cDvbDevice::cDvbDevice(int n)
           frontendType = FE_DVBS2;
         else
           frontendType = feinfo.type;
+#define UGLY_RACECOND_WORKAROUND 1
+#ifdef UGLY_RACECOND_WORKAROUND
+        int tries = 0;
+	if(n==0) {
+	  while(!ciHandler){
+#endif
 #if defined(RBLITE) || defined(CAM_NEW)
         ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
 #else
@@ -468,6 +474,19 @@ cDvbDevice::cDvbDevice(int n)
           ciHandler = new cCiHandler;
 
         if(!ciHandler) close(fd_ca);
+#endif
+#ifdef UGLY_RACECOND_WORKAROUND
+	    if (!ciHandler) { 
+              printf("WORKAROUND: waiting... \n");
+              tries++;
+              if (tries>10) { 
+                SystemExec("/etc/init.d/mcli restart");
+                tries=0;
+              } 
+              sleep(1);
+            }
+          }
+        }
 #endif
         dvbTuner = new cDvbTuner(fd_frontend, CardIndex(), frontendType, ciHandler);
      }
