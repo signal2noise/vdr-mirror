@@ -461,7 +461,7 @@ cDvbDevice::cDvbDevice(int n)
 #ifdef UGLY_RACECOND_WORKAROUND
         int tries = 0;
 	if(n==0) {
-	  while(!ciHandler){
+	  while (!ciHandler && tries < 30) {
 #endif
 #if defined(RBLITE) || defined(CAM_NEW)
         ciHandler = cCiHandler::CreateCiHandler(*cDvbName(DEV_DVB_CA, n));
