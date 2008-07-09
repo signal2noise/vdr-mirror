@@ -938,7 +938,7 @@ cMenuEditBouquet::cMenuEditBouquet(cChannel *Channel, bool New)
   if(tempCaId > 0 && tempCaId < 3){
 	bouquetCaId = tempCaId;
   }
- 
+
   Setup();
 }
 
@@ -1336,7 +1336,7 @@ cMenuBouquets::cMenuBouquets(int view, enum eViewMode mode)
 
   if(viewMode == mode_edit)
      SetStatus(tr("Select channels with OK"));
-	
+
 }
 
 cMenuBouquets::~cMenuBouquets()
@@ -1563,7 +1563,7 @@ eOSState cMenuBouquets::DeleteChannel(void)
      } else {
         int unsigned i;
         bool confirmed = false;
-        /* sort and begin from behind: */ 
+        /* sort and begin from behind: */
  	/* channels must be deleted from the end, otherwise */
  	/* the numbers of the channels that still have to be deleted will change */
         if(!channelMarked.empty())
@@ -1591,7 +1591,7 @@ eOSState cMenuBouquets::DeleteChannel(void)
 		  //cChannel *channel;
 		  if(Count() < end) end = Count();
 		  if(start < 0) start = 0;
- 
+
  		 for(int i = start; i<end; i++){
   		    cMenuChannelItem *p = (cMenuChannelItem *)Get(i);
    		    if(p) {
@@ -1620,7 +1620,7 @@ eOSState cMenuBouquets::ListBouquets(void)
 
 void cMenuBouquets::Move(int From, int To)
 {
-  Move(From, To, true); 
+  Move(From, To, true);
 }
 
 void cMenuBouquets::Move(int From, int To, bool doSwitch)
@@ -1670,8 +1670,8 @@ eOSState cMenuBouquets::MoveMultiple(void)
 	move = false;
 	/* sort the list of channels to change - makes it easier */
 	std::sort(channelMarked.begin(), channelMarked.end());
-	bool inced = false;
-			     	
+	//bool inced = false;
+
 	/* for all marked channels */
 	for (i = 0; i < channelMarked.size(); i++) {
 		Channels.ReNumber();
@@ -1718,7 +1718,7 @@ eOSState cMenuBouquets::MoveMultiple(void)
 							channelMarked[j]--;
 						}
 					currentIndex--;
-				} else { 
+				} else {
 					Channels.Add(chan, Channels.Get(currentIndex));
 				}
 			}
@@ -1727,7 +1727,7 @@ eOSState cMenuBouquets::MoveMultiple(void)
 			p = (cMenuChannelItem *)Get(current);
 			UnMark(p);
 			p = (cMenuChannelItem *)Get(channelMarked.at(i));
-			UnMark(p);	
+			UnMark(p);
 			p = (cMenuChannelItem *)Get(current);
 			UnMark(p);
 		}
@@ -1735,8 +1735,8 @@ eOSState cMenuBouquets::MoveMultiple(void)
 	for (i = 0; i < channelMarked.size(); i++) {
 		cMenuChannelItem *p = (cMenuChannelItem *)Get(channelMarked.at(i));
 		UnMark(p);
-	}					
-			     
+	}
+
 	edit = false;
 	channelMarked.clear();
 	SetGroup(currentIndex);
@@ -1854,7 +1854,7 @@ void cMenuBouquets::Display(void){
 	   strcpy((char*)&titleBuf, "menunormalhidden$");
 	   strncat((char*)&titleBuf, channel->Name(), 100);
            SetTitle((const char*)&titleBuf);
-	} else 
+	} else
 	   SetTitle(channel->Name());
     } else {
       SetTitle("");
@@ -1975,7 +1975,7 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
      			       SetStatus(tr("Select channels with OK"));
                                Display();
 #endif
-			       return EditChannel();				
+			       return EditChannel();
                              }
                             } else {
 			     if(edit && !move)
@@ -2113,7 +2113,7 @@ void cMenuHelp::SetPrevHelp()
 {
   SetStatus(NULL);
   cHelpPage *h = static_cast<cHelpPage *>(helpPage->cListObject::Prev());
-  if (h) 
+  if (h)
   {
     helpPage = h;
     const char *myTitle = helpPage->Title();
@@ -5173,7 +5173,7 @@ public:
 void cMenuSetupCICAM::Update(int cur) {
   SetCols(23);
 #ifdef RBLITE
-  int numDevices=1;       
+  int numDevices=1;
   SetCols(20);
   int fd,state=0;
   fd = open("/dev/reelfpga0", O_RDWR);
@@ -5234,7 +5234,7 @@ eOSState cMenuSetupCICAM::Reset(void)
   if (item) {
      Skins.Message(mtWarning, tr("Resetting CAM..."));
      int slot = item->Slot();
-     int device = item->Device();
+     //int device = item->Device();
      if (item->CiHandler()->Reset(slot)) {
         Skins.Message(mtInfo, tr("CAM has been reset"));
 #if defined(RBLITE) || defined(CAM_NEW)
@@ -5404,6 +5404,7 @@ private:
   int tmpUpdateChannels;
   int tmpAddNewChannels;
   virtual void Store(void);
+  void Setup(void);
 public:
   cMenuSetupMisc(void);
   virtual eOSState ProcessKey(eKeys Key);
@@ -5411,28 +5412,43 @@ public:
 
 cMenuSetupMisc::cMenuSetupMisc(void)
 {
-  SetCols(27);
   updateChannelsTexts[0] = tr("off");
   updateChannelsTexts[1] = tr("update"); // 3
   updateChannelsTexts[2] = tr("add"); // 5
 
-  AddNewChannelsTexts[0] = tr("default");
-  AddNewChannelsTexts[1] = tr("in Bouquets");
+  AddNewChannelsTexts[0] = tr("at the end");
+  AddNewChannelsTexts[1] = tr("to bouquets");
 
   tmpUpdateChannels = (int) data.UpdateChannels / 2;
   tmpAddNewChannels = data.AddNewChannels; //XXX change
 
+
+  SetCols(27);
   SetSection(tr("Background activity"));
+  Setup();
+}
+
+void cMenuSetupMisc::Setup(void)
+{
+
+  int current = Current();
+
+  Clear();
+
   SetHelp(tr("Button$Scan EPG"));
   Add(new cMenuEditIntItem( tr("Setup.EPG$EPG scan timeout (h)"),      &data.EPGScanTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. event timeout (min)"),   &data.MinEventTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. user inactivity (min)"), &data.MinUserInactivity, 0, INT_MAX, tr("off")));
   //Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$SVDRP timeout (s)"),          &data.SVDRPTimeout));
-  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),            &data.ZapTimeout, 0, INT_MAX, tr("off")));
-  Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),        &tmpUpdateChannels, 3, updateChannelsTexts));
-  Add(new cMenuEditStraItem(tr("Setup.DVB$Add new channels"),        &tmpAddNewChannels, 2, AddNewChannelsTexts));
-  Add(new cMenuEditChanItem(tr("Setup.Miscellaneous$Initial channel"),            &data.InitialChannel, tr("Setup.Miscellaneous$as before")));
-  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Initial volume"),             &data.InitialVolume, -1, 255, tr("Setup.Miscellaneous$as before")));
+  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),  &data.ZapTimeout, 0, INT_MAX, tr("off")));
+  Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),            &tmpUpdateChannels, 3, updateChannelsTexts));
+  if (tmpUpdateChannels==2)
+      Add(new cMenuEditStraItem(tr("  Add new channels"),                 &tmpAddNewChannels, 2, AddNewChannelsTexts));
+  Add(new cMenuEditChanItem(tr("Setup.Miscellaneous$Initial channel"),  &data.InitialChannel, tr("Setup.Miscellaneous$as before")));
+  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Initial volume"),   &data.InitialVolume, -1, 255, tr("Setup.Miscellaneous$as before")));
+
+  SetCurrent(Get(current));
+  Display();
 }
 
 eOSState cMenuSetupMisc::ProcessKey(eKeys Key)
@@ -5442,6 +5458,7 @@ eOSState cMenuSetupMisc::ProcessKey(eKeys Key)
         EITScanner.ForceScan();
         return osEnd;
      }
+  Setup();
   return state;
 }
 
@@ -5453,7 +5470,7 @@ void cMenuSetupMisc::Store(void)
 	 data.UpdateChannels = 3;
   else if  ( tmpUpdateChannels == 2 )
 	 data.UpdateChannels = 5;
- 
+
   data.AddNewChannels = tmpAddNewChannels;
 
   cMenuSetupBase::Store();
@@ -5546,7 +5563,7 @@ cMenuSetupPlugins::cMenuSetupPlugins(void)
 
 eOSState cMenuSetupPlugins::ProcessKey(eKeys Key)
 {
- 
+
   //printf("\n%s :  \t HasSubMenu()= %d\n",__PRETTY_FUNCTION__, HasSubMenu());
   eOSState state = HasSubMenu() ? cMenuSetupBase::ProcessKey(Key) : cOsdMenu::ProcessKey(Key);
 
@@ -6715,11 +6732,11 @@ cRecordControl::cRecordControl(cDevice *Device, cTimer *Timer, bool Pause)
      recorder = new cRecorder(fileName, ch->Ca(), timer->Priority(), ch->Vpid(), ch->Apids(), ch->Dpids(), ch->Spids(), liveBuffer);
      if (device->AttachReceiver(recorder, true)) {
         time_t start_t=time(0);
-        while(recorder->GetRemux()->SFmode()==SF_UNKNOWN && (time(0)-start_t)<2) 
+        while(recorder->GetRemux()->SFmode()==SF_UNKNOWN && (time(0)-start_t)<2)
            usleep(50*1000); //TB: give recorder's remux a chance to detect mode
         if(recorder->GetRemux()->SFmode()==SF_H264){
           Recording.SetIsHD(true);
-        } 
+        }
         if(recorder->GetRemux()->TSmode()==rTS){
           Recording.SetIsTS(true);
         }
@@ -7106,7 +7123,7 @@ bool cReplayControl::ShowProgress(bool Initial)
   /* TB: if "lastUpdate" is not set (first call), fill it */
   if(lastUpdate.tv_sec == 0 && lastUpdate.tv_usec == 0)
        lastUpdate = now;
-  
+
   /* TB: 4 times/second is really enough */
   if(!Initial && (now.tv_sec*1000*1000 + now.tv_usec) - (lastUpdate.tv_sec*1000*1000 + lastUpdate.tv_usec) < 250*1000 ) {
        return true;
