@@ -1243,18 +1243,45 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
          if (size > 1 && ch->GroupSep() )
          {
              char *c = bouquetName;
-             if (strcasestr(ch->Name(),bouquetName)) ch->SetName(c,"","");
-             else if (strcasestr(bouquetName,ch->Name())) 
+             /*
+              * if (strcasestr(ch->Name(),bouquetName)) ch->SetName(c,"","");
+              else if (strcasestr(bouquetName,ch->Name())) 
+              {
+              strncpy(bouquetName,ch->Name(), 127);
+              int len = strlen(ch->Name() );
+              len = len>127? 127:len;
+              bouquetName[ len ]=0;
+              }*/
+
+             int cmp_result = strncasecmp(ch->Name(), bouquetName,6);// first 3 chars are '.' , '.' and a ' '
+             //printf(" cmp_result=%d (%s/%s)\n", cmp_result, ch->Name(), bouquetName);
+             if ( cmp_result  > 0)  break; 
+             if (cmp_result == 0) // the 3 chars are equal, then copy the smaller one on to both ch->Name & bouquetName
              {
-                 strncpy(bouquetName,ch->Name(), 127);
-                 int len = strlen(ch->Name() );
-                 len = len>127? 127:len;
-                 bouquetName[ len ]=0;
+                 int len1 = strlen(bouquetName);
+                 int len2 = strlen(ch->Name() );
+                 if (len1 == len2 ) 
+                 {
+                     // add to existing bouquet
+                     strncpy(bouquetName,ch->Name(), 127 );
+                     bouquetName[ len2<128?len2:127 ]=0;
+                     break;
+                 }
+
+                 if (len1 < len2 ) // bouquetName smaller
+                     ch->SetName(c,"",""); 
+                 else
+                 {
+                     strncpy(bouquetName,ch->Name(), 127 );
+                     bouquetName[ len2<128?len2:127 ]=0;
+                 }
+
+                 break;
              }
 
-             if (strcasecmp(ch->Name(), bouquetName) >= 0)  break;
          }
          // skip "Favorites"
+
          if (strstr(ch->Name(), "auto added")) break; 
          // "auto added" is the last bouquet always
      }
@@ -1266,13 +1293,14 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      }
      if (ch==NULL) // bouquet not found
      { 
-        // should not reach here. as there is always the last bouquet "auto added"
+         // should not reach here. as there is always the last bouquet "auto added"
          c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
          AddBouquet(auto_added,NULL); //
      }
      else
      {
-         if ( strcmp(ch->Name(), bouquetName) == 0 ) 
+         //printf("(%s/%s)\n", ch->Name(), bouquetName);
+         if ( strcasecmp(ch->Name(), bouquetName) == 0 ) 
              c_bouquet = ch;
          else // strcmp returns greater than 
              c_bouquet = InsBouquet(bouquetName,ch);
@@ -1285,7 +1313,7 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
 
      if(favorites)      free(favorites);
      return NewChannel;
-     }
+  }
   return NULL;
 }
 
