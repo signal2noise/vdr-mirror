@@ -1224,12 +1224,15 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
          snprintf(bouquetName,127,"auto added");
 
      int size = 0;
-
+     char *favorites = strdup(tr("Favourites"));
+     char dummy[64];
+     snprintf(dummy, 63, "%s (auto added)", tr("new channels"));
+     char *auto_added = dummy;
      // start check for "Favorites"
      ch = First();
-     if (ch && strcmp(ch->Name(), "Favorites") != 0) // "Favorites is always the first entry
+     if (ch && strcmp(ch->Name(), favorites) != 0) // "Favorites is always the first entry
      {
-         InsBouquet("Favorites", ch); 
+         InsBouquet(favorites, ch); 
      }
      // end check for "favorites"
 
@@ -1237,7 +1240,20 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      for (ch = First(); ch ; ch = Next(ch) )
      {
          size++;
-         if (size > 1 && ch->GroupSep() && strcmp(ch->Name(), bouquetName) >= 0)  break;
+         if (size > 1 && ch->GroupSep() )
+         {
+             char *c = bouquetName;
+             if (strcasestr(ch->Name(),bouquetName)) ch->SetName(c,"","");
+             else if (strcasestr(bouquetName,ch->Name())) 
+             {
+                 strncpy(bouquetName,ch->Name(), 127);
+                 int len = strlen(ch->Name() );
+                 len = len>127? 127:len;
+                 bouquetName[ len ]=0;
+             }
+
+             if (strcasecmp(ch->Name(), bouquetName) >= 0)  break;
+         }
          // skip "Favorites"
          if (strstr(ch->Name(), "auto added")) break; 
          // "auto added" is the last bouquet always
@@ -1245,14 +1261,14 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
 
      if (size<=0) // Favorites
      {
-         AddBouquet("Favorites", NULL);  // XXX translate ???
-         ch = AddBouquet("auto added", NULL); // XXX translate ???
+         AddBouquet(favorites, NULL);  // XXX translate ???
+         ch = AddBouquet(auto_added, NULL); // XXX translate ???
      }
      if (ch==NULL) // bouquet not found
      { 
         // should not reach here. as there is always the last bouquet "auto added"
          c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
-         AddBouquet("auto added",NULL); //
+         AddBouquet(auto_added,NULL); //
      }
      else
      {
@@ -1266,6 +1282,8 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      //End by Balaji
 
      ReNumber();
+
+     if(favorites)      free(favorites);
      return NewChannel;
      }
   return NULL;
