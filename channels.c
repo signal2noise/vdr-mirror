@@ -1210,7 +1210,7 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      NewChannel->SetName(Name, ShortName, Provider);
 
      //started by Balaji
-     printf("Name = %s/%s \t\t vpid() = %d\n",Name, Provider, Transponder->Vpid());
+     //printf("Name = %s/%s \t\t vpid() = %d\n",Name, Provider, Transponder->Vpid());
 
      // Add to appropriate bouquet 
      cChannel *ch=NULL, *c_bouquet=NULL;
