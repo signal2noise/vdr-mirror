@@ -479,9 +479,8 @@ cDvbDevice::cDvbDevice(int n)
 	    if (!ciHandler) { 
               printf("WORKAROUND: waiting... \n");
               tries++;
-              if (tries>10) { 
+              if (tries%10==0) { 
                 SystemExec("/etc/init.d/mcli restart");
-                tries=0;
               } 
               sleep(1);
             }
