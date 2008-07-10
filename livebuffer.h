@@ -103,7 +103,11 @@ public:
   int First(void) { return start > delCount ? start : delCount; }
 };
 
+#ifndef USE_FAIR_MUTEX
 class cLiveFileReader : public cThread {
+#else
+class cLiveFileReader : public cFairMutexThread {
+#endif
 private:
   cFileName64 *fileName;
   cUnbufferedFile64 *readFile;
@@ -120,7 +124,11 @@ public:
   void Clear(void);
 };
 
+#ifndef USE_FAIR_MUTEX
 class cLiveFileWriter : public cThread {
+#else
+class cLiveFileWriter : public cFairMutexThread {
+#endif
 private:
   cFileName64 *fileName;
   cUnbufferedFile64 *writeFile;
@@ -144,7 +152,11 @@ public:
 
 class cLiveBuffer;
 
+#ifndef USE_FAIR_MUTEX
 class cLiveCutterThread : public cThread {
+#else
+class cLiveCutterThread : public cFairMutexThread {
+#endif
 private:
   cFileName64 *readFileName, *writeFileName;
   cUnbufferedFile64 *readFile, *writeFile;
@@ -157,7 +169,11 @@ public:
   ~cLiveCutterThread();
 };
 
+#ifndef USE_FAIR_MUTEX
 class cLiveBuffer : public cThread {
+#else
+class cLiveBuffer : public cFairMutexThread {
+#endif
 friend class cLiveCutterThread;
 private:
   uchar buffer[LIVEBUFSIZE];  // evtl. dynamisch anlegen, um bei Speichermangel Fehlermeldung
@@ -192,7 +208,11 @@ public:
 
 class cLiveBackTrace;
 
+#ifndef USE_FAIR_MUTEX
 class cLivePlayer : public cPlayer, public cThread {
+#else
+class cLivePlayer : public cPlayer, public cFairMutexThread {
+#endif
 private:
   enum ePlayModes { pmPlay, pmPause, pmSlow, pmFast, pmStill };
   enum ePlayDirs { pdForward, pdBackward };
@@ -230,7 +250,11 @@ public:
   bool NeedsPauseRec(void);
 };
 
+#ifndef USE_FAIR_MUTEX
 class cLiveReceiver : public cReceiver, cThread {
+#else
+class cLiveReceiver : public cReceiver, cFairMutexThread {
+#endif
 friend class cLiveBufferManager;
 friend class cLiveBufferControl;
 private:

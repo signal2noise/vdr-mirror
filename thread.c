@@ -197,6 +197,99 @@ void cMutex::Unlock(void)
     pthread_mutex_unlock(&mutex);
 }
 
+#ifdef USE_FAIR_MUTEX
+
+// --- cFairMutex ----------------------------------------------------------------
+
+cFairMutex::cFairMutex()
+: locked_(0), condVarPresent_ (false)
+{
+    CreatePool();
+}
+
+cFairMutex::~cFairMutex()
+{
+    DestroyPool();
+}
+
+void cFairMutex::CreatePool()
+{
+    cCondVar *cond;
+    for(int i = 0; i < CONDVAR_POOL_SIZE; i++)
+    {
+        cond = new cCondVar;
+        condVarPool_.push_front(cond);
+    }
+}
+
+void cFairMutex::DestroyPool()
+{
+    cCondVar *cond;
+    for(uint i = 0; i < condVarPool_.size(); i++)
+    {
+        cond = condVarPool_.back();
+        condVarPool_. pop_back();
+        delete cond;
+    }
+}
+
+cCondVar *cFairMutex::GetFromPool()
+{
+    cCondVar *cond = NULL;
+    if (!condVarPool_.empty())
+    {
+        cond = condVarPool_.back();
+        condVarPool_. pop_back();
+    }
+    return cond;
+}
+
+void cFairMutex::PutInPool (cCondVar *cond)
+{
+    condVarPool_.push_front(cond);
+}
+
+void cFairMutex::Lock()
+{
+    mutex_.Lock();
+    ++locked_;
+
+    if (locked_ == 1)
+    {
+        mutex_.Unlock();
+        return;
+    }
+    else
+    {
+        cCondVar *cond = GetFromPool(); 
+        condVarQueue_.push_front(cond);
+
+        while(condVar_ != cond)
+        {
+            cond->Wait(mutex_);
+        }
+        PutInPool(condVar_);
+        condVar_ = NULL;
+    }
+    mutex_.Unlock();
+}
+
+void cFairMutex::Unlock()
+{
+    mutex_.Lock();
+    --locked_;
+    if(!condVarQueue_.empty())
+    {
+        condVar_ = condVarQueue_.back();
+        condVarQueue_.pop_back();
+        condVar_->Broadcast();
+    }
+    mutex_.Unlock();
+}
+
+#endif // USE_FAIR_MUTEX
+
+
 // --- cThread ---------------------------------------------------------------
 
 tThreadId cThread::mainThreadId = 0;

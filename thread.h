@@ -38,6 +38,7 @@ public:
   };
 
 class cMutex;
+class Mutex;
 
 class cCondVar {
 private:
@@ -72,6 +73,39 @@ public:
   void Unlock(void);
   };
 
+#define USE_FAIR_MUTEX
+#ifdef USE_FAIR_MUTEX
+
+#include <deque>
+#define CONDVAR_POOL_SIZE 8
+
+//fair mutex class.
+class cFairMutex /* final */
+{
+    friend class cCondVar;
+public:
+    cFairMutex();
+    ~cFairMutex();
+    void Lock();
+    void Unlock();
+private:
+    std::deque<cCondVar*> condVarQueue_;
+    std::deque<cCondVar*> condVarPool_;
+    cCondVar *condVar_;
+    cMutex mutex_;
+    int locked_;
+    bool condVarPresent_;
+
+    cFairMutex(cFairMutex const &); // forbid copy construction.
+    cFairMutex &operator=(cFairMutex const &); // forbid copy assignment.
+
+    cCondVar *GetFromPool();
+    void PutInPool(cCondVar *cond);
+    void CreatePool();
+    void DestroyPool();
+};
+#endif // USE_FAIR_MUTEX
+
 typedef pid_t tThreadId;
 
 class cThread {
@@ -88,8 +122,8 @@ private:
   static void *StartThread(cThread *Thread);
 protected:
   void SetPriority(int Priority);
-  void Lock(void) { mutex.Lock(); }
-  void Unlock(void) { mutex.Unlock(); }
+  virtual void Lock(void) { mutex.Lock(); }
+  virtual void Unlock(void) { mutex.Unlock(); }
   virtual void Action(void) = 0;
        ///< A derived cThread class must implement the code it wants to
        ///< execute as a separate thread in this function. If this is
@@ -122,6 +156,26 @@ public:
   static tThreadId IsMainThread(void) { return ThreadId() == mainThreadId; }
   static void SetMainThreadId(void);
   };
+
+#ifdef USE_FAIR_MUTEX
+
+class cFairMutexThread : public cThread
+{
+  friend class cThreadLock;
+
+public:
+ cFairMutexThread(const char *Description = NULL)
+ : cThread(Description){} 
+
+private:
+  cFairMutex fairMutex_;
+
+protected:
+  /*override*/ void Lock(void) { fairMutex_.Lock(); }
+  /*override*/ void Unlock(void) { fairMutex_.Unlock(); }
+};
+
+#endif //USE_FAIR_MUTEX
 
 // cMutexLock can be used to easily set a lock on mutex and make absolutely
 // sure that it will be unlocked when the block will be left. Several locks can
