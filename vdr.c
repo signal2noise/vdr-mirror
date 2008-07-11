@@ -627,6 +627,7 @@ int main(int argc, char *argv[])
   cSkin *CurrentSkin = NULL;
   bool channelinfo_requested = false;
   bool installWizardCalled = false;
+  bool netcvUpdateCalled = false;
   //Start by Klaus
   bool channelinfo_was_requested = false;
   eOSState active_function = osUnknown;
@@ -1007,6 +1008,11 @@ int main(int argc, char *argv[])
     	    installWizardCalled = true;
             cRemote::CallPlugin("install");
 	 }
+    else if(!netcvUpdateCalled)
+    {
+        netcvUpdateCalled = true;
+        cRemote::CallPlugin("netcvupdate");
+    }
 	// CAM control:
         if (!Menu && !cOsd::IsOpen()) {
            Menu = CamControl();
