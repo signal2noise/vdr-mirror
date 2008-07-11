@@ -73,7 +73,7 @@ public:
   void Unlock(void);
   };
 
-#define USE_FAIR_MUTEX
+//#define USE_FAIR_MUTEX
 #ifdef USE_FAIR_MUTEX
 
 #include <deque>
