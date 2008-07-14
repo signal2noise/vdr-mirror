@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <signal.h>
 #include "channels.h"
 #include "config.h"
 #include "cutter.h"
@@ -7492,3 +7493,80 @@ eOSState cReplayControl::ProcessKey(eKeys Key)
      ShowMode();
   return osContinue;
 }
+
+// --- cMenuShutdown --------------------------------------------------------
+
+cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode)
+:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode)
+{
+    SetNeedsFastResponse(true);
+    Set();
+}
+
+eOSState cMenuShutdown::ProcessKey(eKeys Key)
+{
+    eOSState state = osUnknown;
+
+    state = cOsdMenu::ProcessKey(Key);
+
+    if(state == osUnknown)
+    {
+        switch (Key)
+        {
+            case kOk:
+                printf("Text = %s\n", Get(Current())->Text());
+                if(std::string(Get(Current())->Text()).find(tr("Standby")) == 2)
+                {
+                    return Shutdown(standby);
+                }
+                else if(std::string(Get(Current())->Text()).find(tr("Deep standby")) == 2)
+                {
+                    return Shutdown(deepstandby);
+                } 
+                else if(std::string(Get(Current())->Text()).find(tr("Reboot")) == 2)
+                {
+                    return Shutdown(restart);
+                }
+             break;
+            case kBack:
+                state = osEnd;
+                break;
+            default:
+                state = osContinue;
+                break;
+        }
+    }
+    return state;
+}
+
+eOSState cMenuShutdown::Shutdown(eShutdownMode mode)
+{
+    interrupted_ = SIGTERM;
+    cControl::Shutdown(); //?? really neccessary?
+    if(mode == standby)
+    {
+        shutdownMode_ = standby;
+    }
+    else if(mode == deepstandby)
+    {
+        shutdownMode_ = deepstandby;
+    }
+    else if(mode == restart)
+    {
+        shutdownMode_ =  restart;
+    }
+    return osEnd;
+}
+
+void cMenuShutdown::Set()
+{
+    char buf[256];
+    sprintf(buf, "%d %s", 1, tr("Standby"));
+    Add(new cOsdItem(buf, osUnknown, true));
+    sprintf(buf, "%d %s", 2, tr("Deep standby"));
+    Add(new cOsdItem(buf, osUnknown, true)); 
+    sprintf(buf, "%d %s", 3, tr("Reboot"));
+    Add(new cOsdItem(buf, osUnknown, true));
+    Display();
+}
+

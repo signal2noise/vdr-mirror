@@ -6473,6 +6473,138 @@ const tI18nPhrase Phrases[] = {
     "Min. bruger inaktivitet (min)",
     "Èasovı limit neaktivnosti (min)",
   },
+  { "Setup.Miscellaneous$Standby mode", // English
+    "Standby Modus", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
+  { "Request", // English
+    "Abfragen", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
+  { "Standby", // English
+    "Standby", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
+  { "Deep standby", // English
+    "Deep Standby", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
+  { "Reboot", // English
+    "Neustart", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
+  { "Choose standby mode", // English
+    "Standby Modus wählen", // Deutsch / German
+    "", // Slovenski / Slovenian
+    "", // Italiano / Italian
+    "", // Nederlands / Dutch
+    "", // Português / Portuguese
+    "", // Français / French
+    "", // Norsk / Norwegian
+    "", // suomi / Finnish
+    "", // Polski / Polish
+    "", // Español / Spanish
+    "", // ÅëëçíéêÜ / Greek
+    "", // Svenska / Swedish
+    "", // Românã / Romanian
+    "", // Magyar / Hungarian
+    "", // Català / Catalanian
+    "", // ÀãááÚØÙ / Russian
+    "", // Hrvatski / Croatian
+    "", // Eesti / Estonian
+    "", // Dansk / Danish
+    "", // Èesky / Czech
+  },
   { "Setup.Miscellaneous$SVDRP timeout (s)",
     "SVDRP trennen bei Inaktivität (s)",
     "SVDRP èas neaktivnosti (s)",

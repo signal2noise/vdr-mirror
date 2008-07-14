@@ -373,4 +373,19 @@ public:
   virtual void Display(void);
   };
 
+enum eShutdownMode { standby, deepstandby, restart };
+
+class cMenuShutdown : public cOsdMenu {
+private:
+  int &interrupted_;
+  eShutdownMode &shutdownMode_;
+  eOSState Shutdown(eShutdownMode mode);
+
+public:
+  cMenuShutdown(int &Interrupted, eShutdownMode &shutdownMode);
+  ~cMenuShutdown(void){};
+  void Set();
+  /*override*/ eOSState ProcessKey(eKeys Key);
+  };
+
 #endif //__MENU_H

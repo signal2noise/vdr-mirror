@@ -195,10 +195,9 @@ static void Eject()
   SystemExec(cmd1);
 }
 
-static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown = false )
+static void PrepareShutdownExternal ( const char *ShutdownCmd, eShutdownMode mode, bool UserShutdown = false )
 {
 	///< executes external shutdown command given with -s
-
 	cTimer *timer = Timers.GetNextActiveTimer();
 	time_t Now   = time(NULL);
 	time_t Next  = timer ? timer->StartTime() : 0;
@@ -207,14 +206,27 @@ static void PrepareShutdownExternal ( const char *ShutdownCmd, bool UserShutdown
 	int Channel = timer ? timer->Channel()->Number() : 0;
 	const char *File = timer ? timer->File() : "";
 
+        const char *modestring = "standby";
+        if(mode == deepstandby)
+        {
+             modestring = "deepstandby";
+        }
+        else if(mode == restart)
+        {
+             modestring = "reboot";
+        }
+
+        printf("####################----------PrepareShutdownExternal %s-----------------\n", modestring);
 	if (timer)
 		Delta = Next - Now; // compensates for Confirm() timeout
 	char *cmd;
-	asprintf(&cmd, "%s %ld %ld %d \"%s\" %d", ShutdownCmd, Next, Delta, Channel,
-	                                          *strescape(File, "\"$"), UserShutdown);
+	asprintf(&cmd, "%s %ld %ld %d \"%s\" %d %s", ShutdownCmd, Next, Delta, Channel,
+	                                          *strescape(File, "\"$"), UserShutdown, modestring); 
+        printf("################----------PrepareShutdownExternal, vor SystemExec-----------------\n");
 	isyslog("executing '%s'", cmd);
 	SystemExec(cmd);
 	free(cmd);
+        printf("####################----------PrepareShutdownExternal, vor return-----------------\n");
 }
 
 static void CancelShutdown(const char *msg = NULL)
@@ -263,6 +275,8 @@ int main(int argc, char *argv[])
   const char *Shutdown = NULL;
   bool TimerWakeup = false;
   bool AutoShutdown = false;
+  bool requestShutdown = false;
+  eShutdownMode shutdownMode = standby;
 
   //Start by Klaus
   Setup.PipIsRunning = false;
@@ -812,6 +826,13 @@ int main(int argc, char *argv[])
 
         time_t Now = time(NULL);
 
+        if(requestShutdown)
+        {
+            printf("------------Menu = new cMenuShutdown--------------------\n");
+            Menu = new cMenuShutdown(Interrupted, shutdownMode);
+            requestShutdown = false;
+        }
+
         // Make sure we have a visible programme in case device usage has changed:
         if (!EITScanner.Active() && cDevice::PrimaryDevice()->HasDecoder() && !cDevice::PrimaryDevice()->HasProgramme()) {
            static time_t lastTime = 0;
@@ -1008,11 +1029,11 @@ int main(int argc, char *argv[])
     	    installWizardCalled = true;
             cRemote::CallPlugin("install");
 	 }
-    else if(!netcvUpdateCalled)
-    {
-        netcvUpdateCalled = true;
-        cRemote::CallPlugin("netcvupdate");
-    }
+        else if(!netcvUpdateCalled)
+        {
+            netcvUpdateCalled = true;
+            cRemote::CallPlugin("netcvupdate");
+        }
 	// CAM control:
         if (!Menu && !cOsd::IsOpen()) {
            Menu = CamControl();
@@ -1614,34 +1635,59 @@ int main(int argc, char *argv[])
                        dsyslog("next timer event at %s", *TimeToString(Next));
                     if (WatchdogTimeout > 0)
                        signal(SIGALRM, SIG_IGN);
-                    if (Interface->Confirm(tr("Activating standby"), UserShutdown ? 2 : SHUTDOWNWAIT, true, true)) {
-                       cControl::Shutdown();
-                       /* RC: moved downwards to be executed on every shutdown, not just
-                              user shutdown. See PrepareShutdownExternal().
-                       int Channel = timer ? timer->Channel()->Number() : 0;
-                       const char *File = timer ? timer->File() : "";
-                       if (timer)
-                          Delta = Next - Now; // compensates for Confirm() timeout
-                       char *cmd;
-                       asprintf(&cmd, "%s %ld %ld %d \"%s\" %d", Shutdown, Next, Delta, Channel, *strescape(File, "\"$"), UserShutdown);
-                       isyslog("executing '%s'", cmd);
-                       SystemExec(cmd);
-                       free(cmd);
-                       */
-                       Interrupted = SIGTERM; // GA
-                       LastActivity = Now - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later
-                       }
-                    else {
-                      LastActivity = Now;
-                      if (WatchdogTimeout > 0) {
-                         alarm(WatchdogTimeout);
-                         if (signal(SIGALRM, Watchdog) == SIG_IGN)
+                    if(Setup.RequestShutDownMode == 0)
+                    {
+                        requestShutdown = true;
+                        LastActivity = Now;
+                        if (WatchdogTimeout > 0) {
+                            alarm(WatchdogTimeout);
+                            if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
-                         }
-                      CancelShutdown("after SHUTDOWNWAIT"); //RC
-                      }
-                    UserShutdown = false;
-                    continue; // skip the rest of the housekeeping for now
+                            }
+                        CancelShutdown("after SHUTDOWNWAIT"); //RC
+                        UserShutdown = false;
+                        continue;
+                    }
+                    else
+                    {
+                        if (Interface->Confirm(tr("Activating standby"), UserShutdown ? 2 : SHUTDOWNWAIT, true, true)) {
+                            cControl::Shutdown();
+                            /* RC: moved downwards to be executed on every shutdown, not just
+                                    user shutdown. See PrepareShutdownExternal().
+                            int Channel = timer ? timer->Channel()->Number() : 0;
+                            const char *File = timer ? timer->File() : "";
+                            if (timer)
+                                Delta = Next - Now; // compensates for Confirm() timeout
+                            char *cmd;
+                            asprintf(&cmd, "%s %ld %ld %d \"%s\" %d", Shutdown, Next, Delta, Channel, *strescape(File, "\"$"), UserShutdown);
+                            isyslog("executing '%s'", cmd);
+                            SystemExec(cmd);
+                            free(cmd);
+                            */
+                            if(Setup.RequestShutDownMode == 1)
+                            {
+                                shutdownMode = standby;
+                            }
+                            else
+                            {
+                                shutdownMode = deepstandby;
+                            }
+                            Interrupted = SIGTERM; // GA
+                            //LastActivity = Now - Setup.MinUserInactivity * 60 + SHUTDOWNRETRY; // try again later ???
+                        }
+                        else
+                        {
+                            LastActivity = Now;
+                            if (WatchdogTimeout > 0) {
+                                alarm(WatchdogTimeout);
+                                if (signal(SIGALRM, Watchdog) == SIG_IGN)
+                                signal(SIGALRM, SIG_IGN);
+                                }
+                            CancelShutdown("after SHUTDOWNWAIT"); //RC
+                        }
+                        UserShutdown = false;
+                        continue; // skip the rest of the housekeeping for now
+                    }
                     }
                  }
               // Disk housekeeping:
@@ -1655,11 +1701,11 @@ int main(int argc, char *argv[])
         PluginManager.MainThreadHook();
         }
   if (Interrupted == SIGTERM) {
-	PrepareShutdownExternal( Shutdown, UserShutdown );
+	PrepareShutdownExternal( Shutdown, shutdownMode, UserShutdown );
   }
 
 Exit:
-
+  printf("#########################--------------------Exit:---------------------------------\n");
   isyslog("caught signal %d", Interrupted);
   cLiveBufferManager::Shutdown();
   PluginManager.StopPlugins();
