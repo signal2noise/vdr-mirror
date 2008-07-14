@@ -5457,8 +5457,9 @@ eOSState cMenuSetupMisc::ProcessKey(eKeys Key)
      if (Key == kRed) {
         EITScanner.ForceScan();
         return osEnd;
+     } else if (Key == kLeft || Key == kRight) {
+        Setup();
      }
-  Setup();
   return state;
 }
 
