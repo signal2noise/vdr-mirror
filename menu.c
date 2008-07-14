@@ -7502,12 +7502,21 @@ eOSState cReplayControl::ProcessKey(eKeys Key)
 // --- cMenuShutdown --------------------------------------------------------
 
 cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode)
-:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode)
+:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode), shutdown_(false)
 {
+    //printf("-----------cMenuShutdown::cMenuShutdown--------------\n");
     SetNeedsFastResponse(true);
     Set();
     int timeout = 10000; //10s
     timer_.Start(timeout);
+}
+
+cMenuShutdown::~cMenuShutdown()
+{
+    if(!shutdown_)
+    {
+        CancelShutdown();
+    }
 }
 
 eOSState cMenuShutdown::ProcessKey(eKeys Key)
@@ -7538,10 +7547,9 @@ eOSState cMenuShutdown::ProcessKey(eKeys Key)
                 {
                     return Shutdown(restart);
                 }
-             break;
+                break;
             case kBack:
                 state = osEnd;
-                break;
             default:
                 state = osContinue;
                 break;
@@ -7553,6 +7561,7 @@ eOSState cMenuShutdown::ProcessKey(eKeys Key)
 eOSState cMenuShutdown::Shutdown(eShutdownMode mode)
 {
     interrupted_ = SIGTERM;
+    shutdown_ = true;
     cControl::Shutdown(); //?? really neccessary?
     if(mode == standby)
     {
@@ -7579,5 +7588,16 @@ void cMenuShutdown::Set()
     sprintf(buf, "%d %s", 3, tr("Reboot"));
     Add(new cOsdItem(buf, osUnknown, true));
     Display();
+}
+
+void cMenuShutdown::CancelShutdown(const char *msg)
+{
+    // cancel external running shutdown watchdog
+    //printf("----------cMenuShutdown::CancelShutdown-----------\n");
+    char *cmd;
+    asprintf(&cmd, "shutdownwd.sh cancel");
+    isyslog("executing '%s' (%s)", cmd, msg);
+    SystemExec(cmd);
+    free(cmd);
 }
 

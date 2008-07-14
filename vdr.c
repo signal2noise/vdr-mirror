@@ -216,25 +216,12 @@ static void PrepareShutdownExternal ( const char *ShutdownCmd, eShutdownMode mod
              modestring = "reboot";
         }
 
-        printf("####################----------PrepareShutdownExternal %s-----------------\n", modestring);
 	if (timer)
 		Delta = Next - Now; // compensates for Confirm() timeout
 	char *cmd;
 	asprintf(&cmd, "%s %ld %ld %d \"%s\" %d %s", ShutdownCmd, Next, Delta, Channel,
 	                                          *strescape(File, "\"$"), UserShutdown, modestring); 
-        printf("################----------PrepareShutdownExternal, vor SystemExec-----------------\n");
 	isyslog("executing '%s'", cmd);
-	SystemExec(cmd);
-	free(cmd);
-        printf("####################----------PrepareShutdownExternal, vor return-----------------\n");
-}
-
-static void CancelShutdown(const char *msg = NULL)
-{
-	// cancel external running shutdown watchdog
-	char *cmd;
-	asprintf(&cmd, "shutdownwd.sh cancel");
-	isyslog("executing '%s' (%s)", cmd, msg);
 	SystemExec(cmd);
 	free(cmd);
 }
@@ -828,7 +815,7 @@ int main(int argc, char *argv[])
 
         if(requestShutdown)
         {
-            printf("------------Menu = new cMenuShutdown--------------------\n");
+            //printf("------------Menu = new cMenuShutdown--------------------\n");
             Menu = new cMenuShutdown(Interrupted, shutdownMode);
             requestShutdown = false;
         }
@@ -1330,8 +1317,9 @@ int main(int argc, char *argv[])
                   break;
                   }
                LastActivity = 1; // not 0, see below!
-               CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
-                                         //     if vdr reaches the switch/case it's still running ok
+               //really needed?
+               //cMenuShutdown::CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
+                                         //     if vdr reaches the switch/case it's still running ok 
                if (cRecordControls::Active()) {
 	          if (!UserShutdown) {
 	             Skins.Message(mtInfo, tr("Activated standby after current recording"));
@@ -1644,7 +1632,6 @@ int main(int argc, char *argv[])
                             if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                             }
-                        CancelShutdown("after SHUTDOWNWAIT"); //RC
                         UserShutdown = false;
                         continue;
                     }
@@ -1677,13 +1664,14 @@ int main(int argc, char *argv[])
                         }
                         else
                         {
+                            printf("---------------------jodelduweideldudeldijö--------------\n");
                             LastActivity = Now;
                             if (WatchdogTimeout > 0) {
                                 alarm(WatchdogTimeout);
                                 if (signal(SIGALRM, Watchdog) == SIG_IGN)
                                 signal(SIGALRM, SIG_IGN);
                                 }
-                            CancelShutdown("after SHUTDOWNWAIT"); //RC
+                            cMenuShutdown::CancelShutdown("after SHUTDOWNWAIT"); //RC
                         }
                         UserShutdown = false;
                         continue; // skip the rest of the housekeeping for now
@@ -1705,7 +1693,6 @@ int main(int argc, char *argv[])
   }
 
 Exit:
-  printf("#########################--------------------Exit:---------------------------------\n");
   isyslog("caught signal %d", Interrupted);
   cLiveBufferManager::Shutdown();
   PluginManager.StopPlugins();
