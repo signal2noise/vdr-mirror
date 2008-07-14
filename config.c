@@ -280,6 +280,7 @@ cSetup::cSetup(void)
   SplitEditedFiles = 0;
   MinEventTimeout = 30;
   MinUserInactivity = 0;
+  RequestShutDownMode = 0;
   MultiSpeedMode = 1;
   ShowReplayMode = 1;
   ResumeID = 0;
@@ -473,6 +474,7 @@ bool cSetup::Parse(const char *Name, const char *Value)
   else if (!strcasecmp(Name, "SplitEditedFiles"))    SplitEditedFiles   = atoi(Value);
   else if (!strcasecmp(Name, "MinEventTimeout"))     MinEventTimeout    = atoi(Value);
   else if (!strcasecmp(Name, "MinUserInactivity"))   MinUserInactivity  = atoi(Value);
+  else if (!strcasecmp(Name, "RequestShutDownMode")) RequestShutDownMode  = atoi(Value);
   else if (!strcasecmp(Name, "MultiSpeedMode"))      MultiSpeedMode     = atoi(Value);
   else if (!strcasecmp(Name, "ShowReplayMode"))      ShowReplayMode     = atoi(Value);
   else if (!strcasecmp(Name, "ResumeID"))            ResumeID           = atoi(Value);
@@ -567,6 +569,7 @@ bool cSetup::Save(void)
   Store("SplitEditedFiles",   SplitEditedFiles);
   Store("MinEventTimeout",    MinEventTimeout);
   Store("MinUserInactivity",  MinUserInactivity);
+  Store("RequestShutDownMode",RequestShutDownMode);
   Store("MultiSpeedMode",     MultiSpeedMode);
   Store("ShowReplayMode",     ShowReplayMode);
   Store("ResumeID",           ResumeID);

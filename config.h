@@ -265,6 +265,7 @@ public:
   int MaxVideoFileSize;
   int SplitEditedFiles;
   int MinEventTimeout, MinUserInactivity;
+  int RequestShutDownMode;
   int MultiSpeedMode;
   int ShowReplayMode;
   int ResumeID;

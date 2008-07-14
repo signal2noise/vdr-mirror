@@ -21,6 +21,7 @@
 #include "submenu.h"
 #include "help.h"
 #include <vector>
+#include <sys/time.h>
 
 class cMenuText : public cOsdMenu {
 private:
@@ -380,6 +381,37 @@ private:
   int &interrupted_;
   eShutdownMode &shutdownMode_;
   eOSState Shutdown(eShutdownMode mode);
+
+  class cTimer
+  {
+  public:
+    cTimer()
+    : oldtime_(0), timeout_(0)
+    {
+    }
+    bool TimedOut()
+    {
+        gettimeofday(&time, &tz);
+        uint newtime = (time.tv_sec%1000000)*1000 + time.tv_usec/1000;
+        if(oldtime_ && newtime - oldtime_ > timeout_)
+        {
+            return true;
+        }
+        return false;
+    }
+    void Start(int timeout)
+    {
+        gettimeofday(&time, &tz);
+        oldtime_ = (time.tv_sec%1000000)*1000 + time.tv_usec/1000;
+        timeout_ = timeout;
+    } 
+  private:
+    struct timeval time;
+    struct timezone tz;
+    uint oldtime_;
+    uint timeout_;
+  }
+  timer_;
 
 public:
   cMenuShutdown(int &Interrupted, eShutdownMode &shutdownMode);

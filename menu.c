@@ -5401,7 +5401,8 @@ void cMenuSetupReplay::Store(void)
 class cMenuSetupMisc : public cMenuSetupBase {
 private:
   const char *updateChannelsTexts[3];
-  const char*AddNewChannelsTexts[2];
+  const char *AddNewChannelsTexts[2];  
+  const char *ShutDownModes[3];
   int tmpUpdateChannels;
   int tmpAddNewChannels;
   virtual void Store(void);
@@ -5424,13 +5425,16 @@ cMenuSetupMisc::cMenuSetupMisc(void)
   tmpAddNewChannels = data.AddNewChannels; //XXX change
 
 
-  SetCols(27);
+  SetCols(26);
   SetSection(tr("Background activity"));
   Setup();
 }
 
 void cMenuSetupMisc::Setup(void)
 {
+  ShutDownModes[0] = tr("Request");
+  ShutDownModes[1] = tr("Standby");
+  ShutDownModes[2] = tr("Deep standby");
 
   int current = Current();
 
@@ -5439,7 +5443,8 @@ void cMenuSetupMisc::Setup(void)
   SetHelp(tr("Button$Scan EPG"));
   Add(new cMenuEditIntItem( tr("Setup.EPG$EPG scan timeout (h)"),      &data.EPGScanTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. event timeout (min)"),   &data.MinEventTimeout, 0, INT_MAX, tr("off")));
-  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. user inactivity (min)"), &data.MinUserInactivity, 0, INT_MAX, tr("off")));
+  Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. user inactivity (min)"), &data.MinUserInactivity, 0, INT_MAX, tr("off")));  
+  Add(new cMenuEditStraItem(tr("Setup.Miscellaneous$Standby mode"), &data.RequestShutDownMode, 3, ShutDownModes));
   //Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$SVDRP timeout (s)"),          &data.SVDRPTimeout));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),  &data.ZapTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),            &tmpUpdateChannels, 3, updateChannelsTexts));
@@ -7501,13 +7506,19 @@ cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode)
 {
     SetNeedsFastResponse(true);
     Set();
+    int timeout = 10000; //10s
+    timer_.Start(timeout);
 }
 
 eOSState cMenuShutdown::ProcessKey(eKeys Key)
 {
     eOSState state = osUnknown;
-
     state = cOsdMenu::ProcessKey(Key);
+
+    if(timer_.TimedOut())
+    {
+         return Shutdown(standby);
+    }
 
     if(state == osUnknown)
     {
