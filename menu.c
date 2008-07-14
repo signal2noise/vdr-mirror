@@ -5934,7 +5934,11 @@ bool cMenuMain::Update(bool Force)
         stopReplayItem = NULL;
         }
      // Color buttons:
-     SetHelp(!replaying ? tr("Button$Record") : NULL, tr("Button$Audio"), replaying ? NULL : tr("Button$Pause"), replaying ? tr("Button$Stop") : cReplayControl::LastReplayed() ? tr("Button$Resume") : NULL);
+//     SetHelp(!replaying ? tr("Button$Record") : NULL, tr("Button$Audio"), replaying ? NULL : tr("Button$Pause"), replaying ? tr("Button$Stop") : cReplayControl::LastReplayed() ? tr("Button$Resume") : NULL);
+     if(!replaying)
+         SetHelp(tr("Recordings"), tr("EPG"), tr("Favorite"), tr("Multifeed"));
+     else
+         SetHelp(NULL, NULL, NULL, NULL);
      result = true;
      }
 
@@ -6064,18 +6068,33 @@ eOSState cMenuMain::ProcessKey(eKeys Key)
                //case kInfo: if (!HadSubMenu) return DisplayHelp((Current() - nrDynamicMenuEntries));
                case kRecord:
                case kRed:    if (!HadSubMenu)
-                                state = replaying ? osContinue : osRecord;
+                             {
+                                 if(!replaying)
+                                     cRemote::CallPlugin("extrecmenu");
+                                 state = osContinue;
+                             }
                              break;
-               case kGreen:  if (!HadSubMenu) {
-                                cRemote::Put(kAudio, true);
-                                state = osEnd;
-                                }
+               case kGreen:  if (!HadSubMenu)
+                             {
+                                 if(!replaying)
+                                     cRemote::CallPlugin("epgsearch");
+                                 state = osContinue;
+                             }
                              break;
                case kYellow: if (!HadSubMenu)
-                                state = replaying ? osContinue : osPause;
+                             {
+                                 if(!replaying)
+                                     AddSubMenu(new cMenuBouquets(2));
+                                 state = osContinue;
+                             }
                              break;
                case kBlue:   if (!HadSubMenu)
-                                state = replaying ? osStopReplay : cReplayControl::LastReplayed() ? osReplay : osContinue;
+                             {
+                                 if(!replaying)
+                                     cRemote::CallPlugin("arghdirector");
+                                 state = osContinue;
+//                                state = replaying ? osStopReplay : cReplayControl::LastReplayed() ? osReplay : osContinue;
+                             }
                              break;
                case kOk:    if(state == osUnknown)
                             {
