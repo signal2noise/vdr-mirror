@@ -1621,12 +1621,13 @@ void cDevice::Detach(cReceiver *Receiver)
       else if (receiver[i])
          receiversLeft = true;
       }
-#if defined(RBLITE) || defined(CAM_NEW)
+/* TB: this is not necessary... */
+#if  0 //defined(RBLITE) || defined(CAM_NEW)
   if (cDevice::GetDevice(0)->CiHandler()) {
     cDevice::GetDevice(0)->CiHandler()->StartDecrypting();
   }
 #endif
-#ifndef RBLITE
+#if 0 //ndef RBLITE
 	CiStartDecrypting();
 #endif
 
