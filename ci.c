@@ -452,7 +452,7 @@ int cCiTransportConnection::Poll(void)
 
 void cCiTransportConnection::Reset(void)
 {
-  Init(-1, 0, 0);
+  Init(-1, slot, 0);
 }
 
 // --- cCiTransportLayer -----------------------------------------------------
