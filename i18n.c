@@ -8986,7 +8986,7 @@ const tI18nPhrase Phrases[] = {
     "",//TODO
     "" // CZ
   },
-  { "Add-ons / Misc",
+  { "Extras",
     "Extras / Sonstiges",
     "",//TODO
     "Utilita' extra",//TODO
