@@ -9911,7 +9911,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "My pictures",
+  { "My Pictures",
     "Meine Bilder",
     "",
     "",
@@ -9933,7 +9933,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "My music",
+  { "My Music",
     "Meine Musik",
     "",
     "",
@@ -9955,7 +9955,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "My videos",
+  { "My Videos",
     "Meine Videos",
     "",
     "",
