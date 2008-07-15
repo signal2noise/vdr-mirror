@@ -717,9 +717,9 @@ bool cDevice::SwitchChannel(const cChannel *Channel, bool LiveView)
   for (int i = 3; i--;) {
       switch (SetChannel(Channel, LiveView)) {
         case scrOk:         Setup.CurrentChannel = CurrentChannel(); return true;
-        case scrNotAvailable: Skins.Message(mtInfo, tr("Channel not available!"));
+        case scrNotAvailable: Skins.QueueMessage(mtInfo, tr("Channel not available!"));
                               return false;
-        case scrNoTransfer:   Skins.Message(mtError, tr("Can't start Transfer Mode!"));
+        case scrNoTransfer:   Skins.QueueMessage(mtError, tr("Can't start Transfer Mode!"));
                               return false;
         case scrFailed:       break; // loop will retry
         }
@@ -754,7 +754,7 @@ bool cDevice::SwitchChannel(int Direction)
            result = true;
         }
      else if (n != first)
-        Skins.Message(mtError, tr("Channel not available!"));
+        Skins.QueueMessage(mtError, tr("Channel not available!"));
      }
   return result;
 }
