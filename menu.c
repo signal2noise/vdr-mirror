@@ -5822,7 +5822,7 @@ void cMenuMain::Set(int current)
         Add(new cOsdItem(hk(tr("Schedule")),   osSchedule));
       else
         if(strcmp(item, "Channels") == 0)
-          Add(new cOsdItem(hk(tr("Channels")),   osChannels));
+          Add(new cOsdItem(hk(tr("Channels Editor")),   osChannels));
       else
         if(strcmp(item, "Timers") == 0)
           Add(new cOsdItem(hk(tr("Timers")),   osTimers));
@@ -5843,7 +5843,7 @@ void cMenuMain::Set(int current)
           Add(new cOsdItem(hk(tr("Language Settings")),   osLanguage));
       else
         if(strcmp(item, "Timezone Settings") == 0)
-          Add(new cOsdItem(hk(tr("Timezone Settings")),   osTimezone));
+          Add(new cOsdItem(hk(tr("Clock Settings")),   osTimezone));
       else
         if(strcmp(item, "Permanent Timeshift") == 0)
           Add(new cOsdItem(hk(tr("Permanent Timeshift")),   osTimeshift));

@@ -569,7 +569,8 @@ bool cSubMenu::LoadXml(const char *fname)
      {   
         char *tmp=NULL;
         if ((tmp =(char*)root->Attribute("suffix"))==NULL)
-              asprintf(&_menuSuffix, " ..."); // set default menuSuffix
+              //asprintf(&_menuSuffix, " ..."); // set default menuSuffix
+              asprintf(&_menuSuffix, ""); // set default menuSuffix
         else
               asprintf(&_menuSuffix, tmp);
             
