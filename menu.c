@@ -7563,24 +7563,28 @@ eOSState cMenuShutdown::ProcessKey(eKeys Key)
 }
 
 eOSState cMenuShutdown::Shutdown(eShutdownMode mode)
-{ 
-    if (Interface->Confirm(tr("Activating standby"), userShutdown_ ? 2 : 180, true, true)) 
+{
+    std::string msg;
+    if(mode == standby)
+    {
+        shutdownMode_ = standby;
+        msg = tr("Activating standby");
+    }
+    else if(mode == deepstandby)
+    {
+        shutdownMode_ = deepstandby;
+        msg = tr("Activating deep standby");
+    }
+    else if(mode == restart)
+    {
+        shutdownMode_ =  restart;
+        msg = tr("Activating reboot");
+    }
+    if (Interface->Confirm(msg.c_str(), userShutdown_ ? 2 : 180, true, true)) 
     {
         interrupted_ = SIGTERM;
         shutdown_ = true;
         cControl::Shutdown(); //?? really neccessary?
-        if(mode == standby)
-        {
-            shutdownMode_ = standby;
-        }
-        else if(mode == deepstandby)
-        {
-            shutdownMode_ = deepstandby;
-        }
-        else if(mode == restart)
-        {
-            shutdownMode_ =  restart;
-        }
     }
     return osEnd;
 }
