@@ -7505,8 +7505,8 @@ eOSState cReplayControl::ProcessKey(eKeys Key)
 
 // --- cMenuShutdown --------------------------------------------------------
 
-cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode)
-:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode), shutdown_(false)
+cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode, bool &userShutdown)
+:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode), userShutdown_(userShutdown), shutdown_(false)
 {
     //printf("-----------cMenuShutdown::cMenuShutdown--------------\n");
     SetNeedsFastResponse(true);
@@ -7563,21 +7563,24 @@ eOSState cMenuShutdown::ProcessKey(eKeys Key)
 }
 
 eOSState cMenuShutdown::Shutdown(eShutdownMode mode)
-{
-    interrupted_ = SIGTERM;
-    shutdown_ = true;
-    cControl::Shutdown(); //?? really neccessary?
-    if(mode == standby)
+{ 
+    if (Interface->Confirm(tr("Activating standby"), userShutdown_ ? 2 : 180, true, true)) 
     {
-        shutdownMode_ = standby;
-    }
-    else if(mode == deepstandby)
-    {
-        shutdownMode_ = deepstandby;
-    }
-    else if(mode == restart)
-    {
-        shutdownMode_ =  restart;
+        interrupted_ = SIGTERM;
+        shutdown_ = true;
+        cControl::Shutdown(); //?? really neccessary?
+        if(mode == standby)
+        {
+            shutdownMode_ = standby;
+        }
+        else if(mode == deepstandby)
+        {
+            shutdownMode_ = deepstandby;
+        }
+        else if(mode == restart)
+        {
+            shutdownMode_ =  restart;
+        }
     }
     return osEnd;
 }
@@ -7594,7 +7597,13 @@ void cMenuShutdown::Set()
     Display();
 }
 
-void cMenuShutdown::CancelShutdown(const char *msg)
+void cMenuShutdown::CancelShutdown()
+{
+    userShutdown_ = false;
+    CancelShutdownScript();
+}
+
+void cMenuShutdown::CancelShutdownScript(const char *msg)
 {
     // cancel external running shutdown watchdog
     //printf("----------cMenuShutdown::CancelShutdown-----------\n");

@@ -816,7 +816,7 @@ int main(int argc, char *argv[])
         if(requestShutdown)
         {
             //printf("------------Menu = new cMenuShutdown--------------------\n");
-            Menu = new cMenuShutdown(Interrupted, shutdownMode);
+            Menu = new cMenuShutdown(Interrupted, shutdownMode, UserShutdown);
             requestShutdown = false;
         }
 
@@ -1317,7 +1317,7 @@ int main(int argc, char *argv[])
                   break;
                   }
                LastActivity = 1; // not 0, see below!
-               cMenuShutdown::CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
+               cMenuShutdown::CancelShutdownScript("kPower"); //RC - we assume its ok to cancel the shutdown here as
                                          //     if vdr reaches the switch/case it's still running ok 
                if (cRecordControls::Active()) {
 	          if (!UserShutdown) {
@@ -1381,7 +1381,7 @@ int main(int argc, char *argv[])
           default: break;
           }
         //if (!ForceShutdown)
-        //    CancelShutdown(); //RC
+        //    cMenuShutdown::CancelShutdownScript(); //RC
         Interact = Menu ? Menu : cControl::Control(); // might have been closed in the mean time
         if (Interact) {
            eOSState state = Interact->ProcessKey(key);
@@ -1626,12 +1626,12 @@ int main(int argc, char *argv[])
                     {
                         requestShutdown = true;
                         LastActivity = Now;
+                        //neccessary??
                         if (WatchdogTimeout > 0) {
                             alarm(WatchdogTimeout);
                             if (signal(SIGALRM, Watchdog) == SIG_IGN)
                             signal(SIGALRM, SIG_IGN);
                             }
-                        UserShutdown = false;
                         continue;
                     }
                     else
@@ -1663,14 +1663,13 @@ int main(int argc, char *argv[])
                         }
                         else
                         {
-                            printf("---------------------jodelduweideldudeldijö--------------\n");
                             LastActivity = Now;
                             if (WatchdogTimeout > 0) {
                                 alarm(WatchdogTimeout);
                                 if (signal(SIGALRM, Watchdog) == SIG_IGN)
                                 signal(SIGALRM, SIG_IGN);
                                 }
-                            cMenuShutdown::CancelShutdown("after SHUTDOWNWAIT"); //RC
+                            cMenuShutdown::CancelShutdownScript("after SHUTDOWNWAIT"); //RC
                         }
                         UserShutdown = false;
                         continue; // skip the rest of the housekeeping for now
@@ -1717,7 +1716,7 @@ Exit:
      Channels.Save();
      }
   cDevice::Shutdown();
-  PluginManager.Shutdown(true);
+  PluginManager.Shutdown(true); 
   cSchedules::Cleanup(true);
   ReportEpgBugFixStats();
   if (WatchdogTimeout > 0)

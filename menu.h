@@ -380,6 +380,7 @@ class cMenuShutdown : public cOsdMenu {
 private:
   int &interrupted_;
   eShutdownMode &shutdownMode_;
+  bool &userShutdown_;
   bool shutdown_;
   eOSState Shutdown(eShutdownMode mode);
 
@@ -415,11 +416,12 @@ private:
   timer_;
 
 public:
-  cMenuShutdown(int &Interrupted, eShutdownMode &shutdownMode);
+  cMenuShutdown(int &Interrupted, eShutdownMode &shutdownMode, bool &userShutdown);
   ~cMenuShutdown();
   void Set();
   /*override*/ eOSState ProcessKey(eKeys Key);
-  static void CancelShutdown(const char *msg = NULL);
+  void CancelShutdown();
+  static void CancelShutdownScript(const char *msg = NULL);
   };
 
 #endif //__MENU_H
