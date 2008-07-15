@@ -1839,7 +1839,7 @@ void cCiHandler::SendCaPmt(void)
                 bool Active = false;
 #if defined(RBLITE) || defined(CAM_NEW)
 		unsigned short MagicCaId = channel[Slot]->Ca();
-		if(MagicCaId >= 0 && MagicCaId < CA_ENCRYPTED_MIN)
+		if(MagicCaId < CA_ENCRYPTED_MIN)
 			; //printf("ASDASDF: %#04x\n", MagicCaId);
 		else
 			MagicCaId = 0;
