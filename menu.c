@@ -1467,7 +1467,10 @@ void cMenuBouquets::Mark()
 	if(!channelMarked.empty()){
 		edit = true;
 		Options();
-        }
+        } else {
+		edit = false;
+		Options();
+	}
      }
      //SetStatus(tr("1-9 for new location - OK to move"));
      if (viewMode == mode_view || (viewMode == mode_edit && !channelMarked.empty()))
