@@ -5967,7 +5967,7 @@ const tI18nPhrase Phrases[] = {
     "Primær grænse",
     "Primární limit",
   },
-  { "Setup.Recording$Default priority",
+  { "Setup.Recording$Default Priority",
     "Standard Priorität",
     "Privzeta prioriteta",
     "Priorita' predefinita",
@@ -5989,7 +5989,7 @@ const tI18nPhrase Phrases[] = {
     "Standard prioritet",
     "Výchozí priorita",
   },
-  { "Setup.Recording$Default lifetime (d)",
+  { "Setup.Recording$Default Recording Lifetime",
     "Standard Lebensdauer",
     "Privzeti ¾ivljenski èas (d)",
     "Durata predefinita (gg)",
@@ -6011,7 +6011,7 @@ const tI18nPhrase Phrases[] = {
     "Standard levetid (d)",
     "Výchozí ¾ivotnost",
   },
-  { "Setup.Recording$Pause priority",
+  { "Setup.Recording$Instant Recording Priority",
     "Priorität der Direktaufzeichnung",
     "Prioriteta pavze",
     "Priorita' di pausa",
@@ -6033,7 +6033,7 @@ const tI18nPhrase Phrases[] = {
     "Pause prioritet",
     "Priorita pøeru¹ení",
   },
-  { "Setup.Recording$Pause lifetime (d)",
+  { "Setup.Recording$Instant Recording Lifetime",
     "Lebensdauer der Direktaufzeichnung",
     "Èas pavze (d)",
     "Durata pausa (gg)",
@@ -6121,7 +6121,7 @@ const tI18nPhrase Phrases[] = {
     "VPS margin (s)",
     "Èasová rezerva pro VPS (s)",
   },
-  { "Setup.Recording$Mark instant recording",
+  { "Setup.Recording$Mark Instant Recording",
     "Direktaufzeichnung markieren",
     "Oznaèi direktno snemanje",
     "Seleziona la registrazione istantanea",
@@ -6165,7 +6165,7 @@ const tI18nPhrase Phrases[] = {
     "Navngiv direkte optagelse",
     "Pojmenovat okam¾ité nahrávky",
   },
-  { "Setup.Recording$Instant rec. time (min)",
+  { "Setup.Recording$Instant Recording Time (min)",
     "Dauer der Direktaufzeichnung (min)",
     "Èas direktnega snemanja (min)",
     "Tempo registrazione immediata (min)",
@@ -6584,7 +6584,7 @@ const tI18nPhrase Phrases[] = {
     "", // Èesky / Czech
   },
   { "Reboot", // English
-    "Neustarten", // Deutsch / German
+    "Neu Starten", // Deutsch / German
     "", // Slovenski / Slovenian
     "", // Italiano / Italian
     "", // Nederlands / Dutch
