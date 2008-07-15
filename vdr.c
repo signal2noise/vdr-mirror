@@ -1317,8 +1317,7 @@ int main(int argc, char *argv[])
                   break;
                   }
                LastActivity = 1; // not 0, see below!
-               //really needed?
-               //cMenuShutdown::CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
+               cMenuShutdown::CancelShutdown("kPower"); //RC - we assume its ok to cancel the shutdown here as
                                          //     if vdr reaches the switch/case it's still running ok 
                if (cRecordControls::Active()) {
 	          if (!UserShutdown) {

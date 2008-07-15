@@ -5330,16 +5330,16 @@ cMenuSetupRecord::cMenuSetupRecord(void)
   tmppauseprio = data.PausePriority == 10 ? 0 : data.PausePriority == 99 ? 2 : 1;
 
   SetSection(tr("Recording"));
-  Add(new cMenuEditBoolItem(tr("Setup.Recording$Record digital audio"),      &data.UseDolbyInRecordings));
-  Add(new cMenuEditIntItem( tr("Setup.Recording$Margin at start (min)"),     &data.MarginStart));
-  Add(new cMenuEditIntItem( tr("Setup.Recording$Margin at stop (min)"),      &data.MarginStop));
-  Add(new cMenuEditStraItem(tr("Setup.Recording$Default priority"),          &tmpprio, 3, PriorityTexts));
-  Add(new cMenuEditIntItem( tr("Setup.Recording$Default lifetime (d)"),      &data.DefaultLifetime, 0, MAXLIFETIME, NULL, tr("unlimited")));
+  Add(new cMenuEditBoolItem(tr("Setup.Recording$Record Digital Audio"),      &data.UseDolbyInRecordings));
+  Add(new cMenuEditIntItem( tr("Setup.Recording$Timer Buffer at Start (min)"),     &data.MarginStart));
+  Add(new cMenuEditIntItem( tr("Setup.Recording$Timer Buffer at End (min)"),      &data.MarginStop));
+  Add(new cMenuEditStraItem(tr("Setup.Recording$Default Priority"),          &tmpprio, 3, PriorityTexts));
+  Add(new cMenuEditIntItem( tr("Setup.Recording$Default Recording Lifetime"),      &data.DefaultLifetime, 0, MAXLIFETIME, NULL, tr("unlimited")));
   Add(new cMenuEditBoolItem(tr("Setup.Recording$Use VPS"),                   &data.UseVps));
-  Add(new cMenuEditBoolItem(tr("Setup.Recording$Mark instant recording"),    &data.MarkInstantRecord));
-  Add(new cMenuEditIntItem( tr("Setup.Recording$Instant rec. time (min)"),   &data.InstantRecordTime, 1, MAXINSTANTRECTIME));
-  Add(new cMenuEditIntItem( tr("Setup.Recording$Pause lifetime (d)"),        &data.PauseLifetime, 0, MAXLIFETIME, NULL, tr("unlimited")));
-  Add(new cMenuEditStraItem( tr("Setup.Recording$Pause priority"),           &tmppauseprio, 3, PriorityTexts));
+  Add(new cMenuEditBoolItem(tr("Setup.Recording$Mark Instant Recording"),    &data.MarkInstantRecord));
+  Add(new cMenuEditIntItem( tr("Setup.Recording$Instant Recording Time (min)"), &data.InstantRecordTime, 1, MAXINSTANTRECTIME));
+  Add(new cMenuEditIntItem( tr("Setup.Recording$Instant Recording Lifetime"),  &data.PauseLifetime, 0, MAXLIFETIME, NULL, tr("unlimited")));
+  Add(new cMenuEditStraItem( tr("Setup.Recording$Instant Recording Priority"), &tmppauseprio, 3, PriorityTexts));
   //Add(new cMenuEditBoolItem(tr("Setup.OSD$Recording directories"),           &data.RecordingDirs));
   Add(new cMenuEditBoolItem(tr("Setup.Recording$Split edited files"),        &data.SplitEditedFiles));
   };
@@ -5448,7 +5448,7 @@ void cMenuSetupMisc::Setup(void)
   Add(new cMenuEditIntItem( tr("Setup.EPG$EPG scan timeout (h)"),      &data.EPGScanTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. event timeout (min)"),   &data.MinEventTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Min. user inactivity (min)"), &data.MinUserInactivity, 0, INT_MAX, tr("off")));  
-  Add(new cMenuEditStraItem(tr("Setup.Miscellaneous$Standby mode"), &data.RequestShutDownMode, 3, ShutDownModes));
+  Add(new cMenuEditStraItem(tr("Setup.Miscellaneous$Power On/Off option"), &data.RequestShutDownMode, 3, ShutDownModes));
   //Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$SVDRP timeout (s)"),          &data.SVDRPTimeout));
   Add(new cMenuEditIntItem( tr("Setup.Miscellaneous$Zap timeout (s)"),  &data.ZapTimeout, 0, INT_MAX, tr("off")));
   Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),            &tmpUpdateChannels, 3, updateChannelsTexts));
@@ -7511,7 +7511,7 @@ cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode)
     //printf("-----------cMenuShutdown::cMenuShutdown--------------\n");
     SetNeedsFastResponse(true);
     Set();
-    int timeout = 10000; //10s
+    int timeout = 10000; //13s
     timer_.Start(timeout);
 }
 

@@ -5461,7 +5461,7 @@ const tI18nPhrase Phrases[] = {
     "" //
     "" // CZ
   },
-  { "Setup.Recording$Record digital audio",
+  { "Setup.Recording$Record Digital Audio",
     "Digitalen Ton aufnehmen",
     "",// TODO
     "Registra audio digitale",// TODO
@@ -5901,7 +5901,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Setup.Recording$Margin at start (min)",
+  { "Setup.Recording$Timer Buffer at Start (min)",
     "Zeitpuffer bei Anfang (min)",
     "Premik zaèetka snemanja (min)",
     "Margine iniziale (min)",
@@ -5923,7 +5923,7 @@ const tI18nPhrase Phrases[] = {
     "Margin ved start (min)",
     "Nahrávat pøed zaèátkem (min)",
   },
-  { "Setup.Recording$Margin at stop (min)",
+  { "Setup.Recording$Timer Buffer at End (min)",
     "Zeitpuffer bei Ende (min)",
     "Zamik konca snemanja (min)",
     "Margine finale (min)",
@@ -6495,8 +6495,8 @@ const tI18nPhrase Phrases[] = {
     "Min. bruger inaktivitet (min)",
     "Èasový limit neaktivnosti (min)",
   },
-  { "Setup.Miscellaneous$Standby mode", // English
-    "Standby Modus", // Deutsch / German
+  { "Setup.Miscellaneous$Power On/Off option", // English
+    "Netzschalterverhalten", // Deutsch / German
     "", // Slovenski / Slovenian
     "", // Italiano / Italian
     "", // Nederlands / Dutch
@@ -6584,7 +6584,7 @@ const tI18nPhrase Phrases[] = {
     "", // Èesky / Czech
   },
   { "Reboot", // English
-    "Neustart", // Deutsch / German
+    "Neustarten", // Deutsch / German
     "", // Slovenski / Slovenian
     "", // Italiano / Italian
     "", // Nederlands / Dutch
