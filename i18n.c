@@ -9360,7 +9360,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "EPG Service",
+  { "Program Guide",
     "EPG Service",
     "",
     "",
