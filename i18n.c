@@ -10175,7 +10175,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Global options",
+  { "Global Settings",
     "Globale Einstellungen",
     "",
     "",
@@ -10307,7 +10307,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Ethernet (internal)",
+  { "Ethernet",
     "Ethernet",
     "",
     "",
