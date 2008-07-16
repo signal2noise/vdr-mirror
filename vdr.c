@@ -1015,12 +1015,12 @@ int main(int argc, char *argv[])
 	if((Setup.Get("stepdone", "install")==NULL || atoi(Setup.Get("stepdone", "install")->Value())<8) && !installWizardCalled){
     	    installWizardCalled = true;
             cRemote::CallPlugin("install");
-	 }
-        else if(!netcvUpdateCalled)
-        {
-            netcvUpdateCalled = true;
-            cRemote::CallPlugin("netcvupdate");
-        }
+	}
+    else if(!installWizardCalled && !netcvUpdateCalled)
+    {
+        netcvUpdateCalled = true;
+        cRemote::CallPlugin("netcvupdate");
+    }
 	// CAM control:
         if (!Menu && !cOsd::IsOpen()) {
            Menu = CamControl();
