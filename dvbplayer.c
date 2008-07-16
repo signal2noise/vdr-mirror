@@ -923,6 +923,12 @@ void cDvbPlayer::Goto ( int Index, bool Still )
 						{
 							PlayTS ( b, Length, false );
 						}
+						/* TB: Hack: do this again to be sure that we get an IFrame */
+                                        	r = ReadFrame ( replayFile, b, Length, sizeof ( b ) );
+                                                for ( uint i = 0; i < 10; ++i )
+                                                {
+                                                        PlayTS ( b, Length, false );
+                                                }
 					}
 				}
 				else
