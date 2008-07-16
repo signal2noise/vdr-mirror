@@ -1334,7 +1334,7 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      ReNumber();
 
      // switch to "real current channel" if it has changed
-     if ( currChannel->Number() != oldCurrentChannelNr)
+     if ( currChannel && currChannel->Number() != oldCurrentChannelNr)
      {
        Channels.SwitchTo( currChannel->Number() ); 
      }
