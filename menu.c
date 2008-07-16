@@ -1968,14 +1968,14 @@ eOSState cMenuBouquets::ProcessKey(eKeys Key)
                                return NewChannel();
                              else {
 #if 1
-                               //edit = true;
 			       viewMode = mode_edit;
-			       //SetGroup(Current());
+			       int curPos = Current();
 			       SetGroup(GetChannel(Current())->Index());
                                if (strcmp(Skins.Current()->Name(), "Reel") == 0)
                                   SetCols(4, 4, 14, 6);
                                else
                                   SetCols(4, 5, 18, 6);
+			       SetCurrent(Get(curPos));
      			       SetStatus(tr("Select channels with OK"));
                                Display();
 #else
