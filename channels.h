@@ -10,7 +10,6 @@
 #ifndef __CHANNELS_H
 #define __CHANNELS_H
 
-//#include "timers.h"
 #include "config.h"
 #include "sources.h"
 #include "thread.h"

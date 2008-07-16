@@ -239,7 +239,6 @@ cChannel::~cChannel()
   linkChannels = NULL; // more than one channel can link to this one, so we need the following loop
 #if 1
   for (cChannel *Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)) {
-
       if (Channel->linkChannels) {
          for (cLinkChannel *lc = Channel->linkChannels->First(); lc; lc = Channel->linkChannels->Next(lc)) {
              if (lc->Channel() == this) {
