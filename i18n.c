@@ -261,7 +261,7 @@ const tI18nPhrase Phrases[] = {
     "Kanály",
   },
   { "Timers",
-    "Timer Manager",
+    "Timer",
     "Termini",
     "Timer",
     "Timers",
