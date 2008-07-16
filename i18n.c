@@ -10881,7 +10881,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Mark as new",
+  { "Mark as New",
     "Als neu markieren",
     "",
     "",
@@ -10903,7 +10903,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Remove archive mark",
+  { "Remove Archive Mark",
     "Archivmarkierung entfernen",
     "",
     "",
@@ -10925,7 +10925,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Remove cutting marks",
+  { "Remove Crop Mark",
     "Schnittmarken entfernen",
     "",
     "",
@@ -10947,7 +10947,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Remove archived recording",
+  { "Remove Archived Recording",
     "Archivierte Aufzeichnung löschen",
     "",
     "",
@@ -10969,7 +10969,7 @@ const tI18nPhrase Phrases[] = {
     "",
     "" // CZ
   },
-  { "Restore archived recording",
+  { "Restore Archived Recording",
     "Archivierte Aufzeichnung wiederherstellen",
     "",
     "",
