@@ -6671,8 +6671,8 @@ const tI18nPhrase Phrases[] = {
     "", // Dansk / Danish
     "", // Èesky / Czech
   },
-  { "Choose standby mode", // English
-    "Standby Modus wählen", // Deutsch / German
+  { "Power On/Off option", // English
+    "Netzschalterverhalten", // Deutsch / German
     "", // Slovenski / Slovenian
     "", // Italiano / Italian
     "", // Nederlands / Dutch

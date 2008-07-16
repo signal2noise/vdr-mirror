@@ -7506,7 +7506,7 @@ eOSState cReplayControl::ProcessKey(eKeys Key)
 // --- cMenuShutdown --------------------------------------------------------
 
 cMenuShutdown::cMenuShutdown(int &interrupted, eShutdownMode &shutdownMode, bool &userShutdown)
-:cOsdMenu(tr("Choose standby mode")), interrupted_(interrupted), shutdownMode_(shutdownMode), userShutdown_(userShutdown), shutdown_(false)
+:cOsdMenu(tr("Power On/Off option")), interrupted_(interrupted), shutdownMode_(shutdownMode), userShutdown_(userShutdown), shutdown_(false)
 {
     //printf("-----------cMenuShutdown::cMenuShutdown--------------\n");
     SetNeedsFastResponse(true);
