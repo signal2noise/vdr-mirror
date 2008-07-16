@@ -1202,6 +1202,7 @@ cChannel *cChannels::AddBouquet(char* b_name, cChannel*after)
 
 cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, const char *ShortName, const char *Provider, int Nid, int Tid, int Sid, int Rid)
 {
+    printf("\t\t adding new channel \033[91;m'%s'\033[0m\n", Name);
   if (Transponder) {
      dsyslog("creating new channel '%s,%s;%s' on %s transponder %d with id %d-%d-%d-%d", Name, ShortName, Provider, *cSource::ToString(Transponder->Source()), Transponder->Transponder(), Nid, Tid, Sid, Rid);
      cChannel *NewChannel = new cChannel;
@@ -1212,22 +1213,28 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      //started by Balaji
      //printf("Name = %s/%s \t\t vpid() = %d\n",Name, Provider, Transponder->Vpid());
 
+     // store current channel info
+     // adding new bouquet / channels should not switch the channel!
+     int oldCurrentChannelNr = cDevice::CurrentChannel();
+     cChannel *currChannel = Channels.GetByNumber(oldCurrentChannelNr);
+
      // Add to appropriate bouquet 
      cChannel *ch=NULL, *c_bouquet=NULL;
 
 
+     char dummy[64];
+      snprintf(dummy, 63, "%s - (auto added)", tr("New Channels"));
+     char *auto_added = dummy;
      char bouquetName[128];
+
      if (Setup.AddNewChannels != 0) // 0 : add at the end, 1: add in bouquets
          snprintf(bouquetName,127, ".. %s", strlen(Provider)>0? Provider:"Unknown Provider"); // XXX translate ???
      // if no provider, add under unknown provider
-     else
-         snprintf(bouquetName,127,"auto added");
+     //else
+         //snprintf(bouquetName,127,auto_added);
 
      int size = 0;
      char *favorites = strdup(tr("Favourites"));
-     char dummy[64];
-     snprintf(dummy, 63, "%s (auto added)", tr("new channels"));
-     char *auto_added = dummy;
      // start check for "Favorites"
      ch = First();
      if (ch && strcmp(ch->Name(), favorites) != 0) // "Favorites is always the first entry
@@ -1240,7 +1247,12 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
      for (ch = First(); ch ; ch = Next(ch) )
      {
          size++;
-         if (size > 1 && ch->GroupSep() )
+
+         // if AddNewChannels == 0 only look for "(auto added)"
+         // size > 1 => skip the first channel : Favorites
+         // ch->GroupSep() only look at bouquets
+
+         if (Setup.AddNewChannels !=0 && size > 1 && ch->GroupSep() )
          {
              char *c = bouquetName;
              /*
@@ -1280,36 +1292,52 @@ cChannel *cChannels::NewChannel(const cChannel *Transponder, const char *Name, c
              }
 
          }
-         // skip "Favorites"
 
-         if (strstr(ch->Name(), "auto added")) break; 
          // "auto added" is the last bouquet always
-     }
+         if (strstr(ch->Name(), "(auto added)")) break; 
+     } // end for
 
      if (size<=0) // Favorites
      {
-         AddBouquet(favorites, NULL);  // XXX translate ???
-         ch = AddBouquet(auto_added, NULL); // XXX translate ???
+         AddBouquet(favorites, NULL);  
+         ch = AddBouquet(auto_added, NULL); 
      }
      if (ch==NULL) // bouquet not found
      { 
          // should not reach here. as there is always the last bouquet "auto added"
-         c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
-         AddBouquet(auto_added,NULL); //
+         if (Setup.AddNewChannels != 0)
+             {
+                 c_bouquet = AddBouquet(bouquetName,NULL); // add at the end
+                 AddBouquet(auto_added, NULL);
+             }
+         else
+             c_bouquet = AddBouquet(auto_added,NULL); //add "am Ende"
      }
      else
      {
-         //printf("(%s/%s)\n", ch->Name(), bouquetName);
-         if ( strcasecmp(ch->Name(), bouquetName) == 0 ) 
+         if ( Setup.AddNewChannels !=0)
+         {
+             if ( strcasecmp(ch->Name(), bouquetName) == 0 ) 
+                 c_bouquet = ch;
+             else // strcmp returns greater than 
+                 c_bouquet = InsBouquet(bouquetName,ch);
+         }
+         else
+         // ch != NULL and AddNewChannels == 0 means "(auto added)" was found at ch
              c_bouquet = ch;
-         else // strcmp returns greater than 
-             c_bouquet = InsBouquet(bouquetName,ch);
      }
 
+    printf("adding %s to %s\n", NewChannel->Name(), c_bouquet->Name() );
      Add(NewChannel,c_bouquet);
      //End by Balaji
 
      ReNumber();
+
+     // switch to "real current channel" if it has changed
+     if ( currChannel->Number() != oldCurrentChannelNr)
+     {
+       Channels.SwitchTo( currChannel->Number() ); 
+     }
 
      if(favorites)      free(favorites);
      return NewChannel;
