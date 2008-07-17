@@ -414,6 +414,28 @@ const tI18nPhrase Phrases[] = {
     "",
     "",
   },
+  { "recording already runnig - Start another?",
+    "Aufzeichnung läuft bereits - andere Sendung aufzeichnen?",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",// TODO
+    "",
+    "",// TODO
+    "",
+    "",
+    "",
+  },
   { "Replay settings",
     "Wiedergabeeinstellungen",
     "",
