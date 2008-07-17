@@ -11617,6 +11617,28 @@ const tI18nPhrase Phrases[] = {
   "",
   "" // CZ
   },
+  { "Convert to MPEG",
+  "In MPEG (PS) umwandeln",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "" // CZ
+  },
   { NULL }
   };
 
